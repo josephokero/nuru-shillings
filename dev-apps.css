@@ -14,7 +14,7 @@
   font-weight: 600;
 }
 .da-form { padding: 4px 0 6px; }
-.da-form .row .field:first-child { margin-top: 0; }
+.da-form .row .field { margin-top: 0; }
 .da-uris { height: auto; min-height: 64px; padding: 10px 12px; resize: vertical; font: 13px/1.6 var(--mono); }
 .da-hint { margin: 8px 0 0; color: var(--dim); font-size: 12.5px; }
 .da-hint code { color: var(--muted); font-family: var(--mono); font-size: 12px; }

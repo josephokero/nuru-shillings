@@ -32,7 +32,7 @@ try {
   r = await post("topup/start", { mode: "test", method: "paypal", usd: 10 });
   ok("sandbox top-up refused (test money stays instant)", r.status === 400, r.json.error);
   r = await post("topup/start", { mode: "live", method: "paypal", usd: 10 });
-  ok("unverified user refused", r.status === 403, r.json.error);
+  ok("unverified user can top up (ID is only needed to withdraw)", r.status === 200 && /paypal\.com/.test(r.json.redirect || ""), r.json.error);
 
   await sql`UPDATE users SET name = 'Pay Test', country = 'Kenya', verified_at = now() WHERE id = ${user.id}`;
   r = await post("topup/start", { mode: "live", method: "bitcoin", usd: 10 });

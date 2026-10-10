@@ -399,7 +399,7 @@ button.onclick = async () => {
 };</pre>
             <p><code>status</code> is <code>succeeded</code>, <code>declined</code>, <code>cancelled</code>, <code>expired</code>, <code>closed</code> (the window was closed) or <code>blocked</code> (the browser blocked the popup; Nuru then opens the page in the same tab). You can also pass <code>onSuccess</code>, <code>onDecline</code> and <code>onClose</code> callbacks.</p>
             <p><strong>Outside your app (redirect).</strong> Send the person to <code>url</code>. If you set <code>return_url</code>, they come back to <code>return_url?deposit=dep_…&amp;status=succeeded&amp;reference=…</code> after they finish.</p>
-            <p>If they are not logged in to Nuru, the window asks them to log in or create a free wallet first, then returns to the deposit. People using a live wallet verify their name and country once.</p>
+            <p>If they are not logged in to Nuru, the window asks them to log in or create a free wallet first, then returns to the deposit. Paying into an app needs no identity check; people only verify before their first withdrawal.</p>
             <h3>4. Confirm on your server</h3>
             <p>The popup result and the return URL are for your interface only. Before you credit the person, check the deposit with your secret key, or wait for the <code>deposit.succeeded</code> webhook:</p>
             <pre class="doc-code"><b>GET</b> /v1/deposits/dep_41f0d2a7c9e15b3a8d60

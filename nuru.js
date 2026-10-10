@@ -31,7 +31,7 @@
     el.className = "nuru-veil";
     el.setAttribute("role", "dialog");
     el.setAttribute("aria-modal", "true");
-    el.innerHTML = `<div><i></i><b>Finish in the Nuru Shillings window</b><p>Don’t see it? Bring it back to confirm your deposit securely.</p><button type="button">Show window</button><button type="button">Cancel</button></div>`;
+    el.innerHTML = `<div><i></i><b>Finish in the Nuru Shillings window</b><p>Don’t see it? Bring it back to confirm securely.</p><button type="button">Show window</button><button type="button">Cancel</button></div>`;
     const [show, cancel] = el.querySelectorAll("button");
     show.addEventListener("click", onFocus);
     cancel.addEventListener("click", onCancel);

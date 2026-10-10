@@ -384,13 +384,14 @@ async function devApps(req, res, { needUser }) {
   const rows = await db()`SELECT a.*,
       (SELECT count(*) FROM connections c WHERE c.app_id = a.id AND c.mode = 'test' AND c.revoked_at IS NULL)::int AS users_test,
       (SELECT count(*) FROM connections c WHERE c.app_id = a.id AND c.mode = 'live' AND c.revoked_at IS NULL)::int AS users_live,
-      (SELECT COALESCE(sum(d.amount), 0) FROM deposits d WHERE d.app_id = a.id AND d.mode = 'live' AND d.status = 'succeeded')::bigint AS live_total
+      (SELECT COALESCE(sum(d.amount - d.fee), 0) FROM deposits d WHERE d.app_id = a.id AND d.mode = 'test' AND d.status = 'succeeded')::bigint AS test_total,
+      (SELECT COALESCE(sum(d.amount - d.fee), 0) FROM deposits d WHERE d.app_id = a.id AND d.mode = 'live' AND d.status = 'succeeded')::bigint AS live_total
     FROM apps a WHERE a.owner_id = ${user.id} AND a.deleted_at IS NULL ORDER BY a.created_at`;
   send(res, 200, {
     apps: rows.map((a) => ({
       id: a.id, name: a.name, website: a.website, redirect_uris: a.redirect_uris, created: a.created_at, brand: brandOf(a),
       users: { test: a.users_test, live: a.users_live },
-      live_total: Number(a.live_total),
+      received: { test: Number(a.test_total), live: Number(a.live_total) },
     })),
     connect_base: `${APP_URL}/connect`,
     sdk: `${APP_URL}/nuru.js`,

@@ -92,13 +92,15 @@
 
   function appRow(a) {
     const color = colorFor(a.brand);
+    const m = Nsh.mode();
+    const users = a.users[m];
     return `
       <li class="da-app" data-id="${esc(a.id)}">
         <div class="da-top">
           ${tile(a)}
           <div class="da-name">
             <b>${esc(a.name)}</b>
-            <span>${a.website ? `${esc(a.website.replace(/^https?:\/\//, ""))} · ` : ""}${a.users.live} live user${a.users.live === 1 ? "" : "s"} · ${Nsh.nsh(a.live_total)} NSH received</span>
+            <span>${a.website ? `${esc(a.website.replace(/^https?:\/\//, ""))} · ` : ""}${users} ${m === "live" ? "live" : "Sandbox"} user${users === 1 ? "" : "s"} · ${Nsh.nsh(a.received[m])} NSH received</span>
           </div>
           <div class="da-actions">
             <button class="btn sm primary" type="button" data-test>Test the popup</button>

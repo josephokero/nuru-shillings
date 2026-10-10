@@ -177,7 +177,7 @@
         <ul class="dp-rows">
           <li><span>Receipt</span><b>${esc(id)}</b></li>
           <li><span>New wallet balance</span><b>${nsh(r.balance)} NSH</b></li>
-          <li><span>Email receipt</span><b>Sent to ${esc(info.user.email)}</b></li>
+          <li><span>Receipt emailed to</span><b>${esc(info.user.email)}</b></li>
         </ul>
         <div class="dp-actions one">
           <a class="dp-btn go" href="${esc(backHref(status))}" data-back>${backLabel()}</a>

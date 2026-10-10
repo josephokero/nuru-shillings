@@ -83,7 +83,6 @@
         <button type="button" class="cn-switch" id="switch">Not you?</button>
       </div>
       ${info.existing ? `<div class="cn-note">${ICONS.check}<span>Already connected. Continue to go back to ${esc(info.app.name)}.</span></div>` : ""}
-      ${info.mode === "live" && !u.verified ? `<div class="cn-note warn">${ICONS.shield}<span>Verify your name and country once before connecting apps to your live wallet. <a href="/dashboard#account" target="_blank" rel="noopener"><b>Verify now</b></a></span></div>` : ""}
       ${perms(info)}
       <div class="cn-note">${ICONS.shield}<span>${esc(info.app.name)} can’t take money on its own or see your balance. Disconnect any time from <b>Apps</b> in your wallet.</span></div>
       <div class="cn-actions row2">
