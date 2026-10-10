@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Community help · Nuru Shillings</title>
+  <meta name="description" content="Community help for Nuru Shillings: questions from wallet holders, businesses, and developers, answered by the Nuru team.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=78">
+</head>
+<body class="home subpage">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="/#product">Product</a>
+          <a href="/docs">Developers</a>
+          <a href="/#business">Business</a>
+          <a href="/about">About</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+    <main class="legal">
+      <div class="legal-sheet">
+        <span class="legal-tick tl"></span><span class="legal-tick tr"></span><span class="legal-tick bl"></span><span class="legal-tick br"></span>
+        <header class="legal-hero">
+          <h1>Community help</h1>
+          <p>Wallet holders, businesses, and developers helping each other</p>
+        </header>
+        <div class="legal-frame">
+          <article>
+            <h2 id="how">How it works</h2>
+            <p>Ask a question below. The Nuru team reads every question, answers it, and publishes the useful ones here without your name or email, so the next person finds the answer faster.</p>
+            <p>For anything about your own account or a specific payment, use the <a href="/help#contact">Help centre</a> instead. That stays private between you and support.</p>
+
+            <h2 id="topics">Topics</h2>
+            <div class="cm-topics">
+              <div class="cm-topic"><strong>Wallet and balance</strong><p>Adding money, the rate, activity, and refunds.</p><span>Wallet holders</span></div>
+              <div class="cm-topic"><strong>Withdrawals</strong><p>PayPal, cards, M-Pesa, and how long each one takes.</p><span>Wallet holders</span></div>
+              <div class="cm-topic"><strong>Taking payments</strong><p>Business names, categories, the 1% fee, and checkout.</p><span>Businesses</span></div>
+              <div class="cm-topic"><strong>API and webhooks</strong><p>Creating payments, refunds, the sandbox, and webhook delivery.</p><span>Developers</span></div>
+              <div class="cm-topic"><strong>Privacy and safety</strong><p>What checkout shows, what stays private, and spotting scams.</p><span>Everyone</span></div>
+            </div>
+
+            <h2 id="answered">Answered questions</h2>
+            <div class="help-list">
+              <details class="help-q"><summary>Can I run a store under a name that is not a registered company?</summary><div>
+                <p>Yes. Give the store a name. Nuru records it on its own servers and shows only that name at checkout. Your personal name is not shown to buyers.</p>
+                <p><small>Answered by the Nuru team</small></p>
+              </div></details>
+              <details class="help-q"><summary>My site was refused by a card processor. Will Nuru accept it?</summary><div>
+                <p>Nuru does not refuse a site because card networks refuse its category, including adult sites. What is illegal where the buyer or the company is located is still not allowed. See <a href="/terms#use">Acceptable use</a>.</p>
+                <p><small>Answered by the Nuru team</small></p>
+              </div></details>
+              <details class="help-q"><summary>Does a buyer need a Nuru wallet to pay me?</summary><div>
+                <p>No. A buyer with Nuru Shillings pays from the wallet. A buyer without them pays with M-Pesa, PayPal, or a card on the same checkout.</p>
+                <p><small>Answered by the Nuru team</small></p>
+              </div></details>
+              <details class="help-q"><summary>Can anyone trace my payments on a public chain?</summary><div>
+                <p>No. Payments are kept on Nuru’s private chain and are not written to a public ledger. Checkout shows the company name only.</p>
+                <p><small>Answered by the Nuru team</small></p>
+              </div></details>
+              <details class="help-q"><summary>My webhook is not receiving events.</summary><div>
+                <p>Check that the URL is https and returns a 2xx response quickly. Send a test event from Business tools. Events are <code>payment.paid</code> and <code>payment.refunded</code>.</p>
+                <p><small>Answered by the Nuru team</small></p>
+              </div></details>
+              <details class="help-q"><summary>Someone in a group chat offered to “unlock” my withdrawal for a fee.</summary><div>
+                <p>That is a scam. Nuru never charges to withdraw and never asks for your password, PIN, or secret key. Report it to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>.</p>
+                <p><small>Answered by the Nuru team</small></p>
+              </div></details>
+            </div>
+
+            <h2 id="ask">Ask the community</h2>
+            <p>Keep it general. Do not post a payment id, a balance, a password, or a key.</p>
+            <form class="nx-formbox" data-contact="community">
+              <div class="row">
+                <label>Name (not published)<input name="name" autocomplete="name" maxlength="120"></label>
+                <label>Email (not published)<input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+              </div>
+              <label>Topic
+                <select name="subject">
+                  <option>Wallet and balance</option>
+                  <option>Withdrawals</option>
+                  <option>Taking payments</option>
+                  <option>API and webhooks</option>
+                  <option>Privacy and safety</option>
+                  <option>Something else</option>
+                </select>
+              </label>
+              <label>Your question<textarea name="message" required minlength="10" maxlength="6000"></textarea></label>
+              <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <div class="actions">
+                <button type="submit">Post question</button>
+                <p class="status" role="status"></p>
+              </div>
+            </form>
+
+            <h2 id="rules">Community rules</h2>
+            <ul>
+              <li>Be respectful. No harassment, spam, or advertising.</li>
+              <li>Never share passwords, PINs, secret keys, card numbers, or someone else’s details.</li>
+              <li>No help with anything that is not allowed under the <a href="/terms#use">Terms</a>.</li>
+              <li>Nuru staff will never message you first asking for money or codes.</li>
+            </ul>
+          </article>
+          <aside class="legal-toc">
+            <nav class="legal-docs">
+              <strong>Support</strong>
+              <a href="/help">Help centre</a>
+              <a class="active" href="/community">Community</a>
+              <a href="/docs">Docs</a>
+              <a href="/security">Security</a>
+            </nav>
+            <details class="legal-onpage" open>
+              <summary>On this page</summary>
+              <a href="#how">How it works</a>
+              <a href="#topics">Topics</a>
+              <a href="#answered">Answered questions</a>
+              <a href="#ask">Ask the community</a>
+              <a href="#rules">Community rules</a>
+            </details>
+          </aside>
+        </div>
+      </div>
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/docs">Read the API&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard">Add money</a>
+        <a href="/dashboard">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+        <a href="/docs#sandbox">Sandbox</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <script src="legal.js?v=2"></script>
+  <script src="help.js?v=1"></script>
+  <script src="assistant.js?v=1"></script>
+</body>
+</html>

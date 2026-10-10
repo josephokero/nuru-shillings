@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help centre · Nuru Shillings</title>
+  <meta name="description" content="Answers about adding money, paying, withdrawing, fees, privacy, business names, and the Nuru Shillings API. Contact support at supportnorashillings@benuru.com.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=78">
+</head>
+<body class="home subpage">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="/#product">Product</a>
+          <a href="/docs">Developers</a>
+          <a href="/#business">Business</a>
+          <a href="/about">About</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+    <main class="legal">
+      <div class="legal-sheet">
+        <span class="legal-tick tl"></span><span class="legal-tick tr"></span><span class="legal-tick bl"></span><span class="legal-tick br"></span>
+        <header class="legal-hero">
+          <h1>Help centre</h1>
+          <p>Answers about the wallet, payments, and the API</p>
+        </header>
+        <div class="legal-frame">
+          <article>
+            <label class="help-search">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input type="search" placeholder="Search the help centre" aria-label="Search the help centre" data-help-search>
+            </label>
+            <div class="help-paths">
+              <button type="button" data-open-assistant><strong>Ask the assistant</strong><span>Instant answers, any time of day.</span></button>
+              <a href="/community"><strong>Community help</strong><span>Questions other users asked, and how they were solved.</span></a>
+              <a href="#contact"><strong>Contact support</strong><span>A person replies to your email.</span></a>
+            </div>
+            <p class="help-empty" hidden>No answer matches that. Ask the assistant, or write to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>.</p>
+
+            <section data-help-group>
+              <h2 id="start">Getting started</h2>
+              <div class="help-list">
+                <details class="help-q"><summary>How do I open an account?</summary><div>
+                  <p>Go to <a href="/signup">Start free</a>. Enter your email and choose Continue with Email. We send you a link; open it and your wallet is ready. There is no password. The account is free, and it starts with 10,000 Sandbox NSH to try things out.</p>
+                </div></details>
+                <details class="help-q"><summary>The sign-in email did not arrive.</summary><div>
+                  <p>Check your spam or promotions folder, then choose Resend on the sign-in page. Each link works once and expires after 20 minutes, so always use the newest one.</p>
+                </div></details>
+                <details class="help-q"><summary>What are Sandbox and Live?</summary><div>
+                  <p>Use the switch at the top of your wallet. Sandbox uses practice money so you can try adding, sending, and taking payments safely. Live is real money and needs you to verify once.</p>
+                </div></details>
+                <details class="help-q"><summary>Why do I need to verify, and what does it cost?</summary><div>
+                  <p>Before live money moves, you confirm the name on the account and your country, once. It is free. Until it is done, the wallet cannot add money, pay, or withdraw.</p>
+                </div></details>
+                <details class="help-q"><summary>What is one Nuru Shilling worth?</summary><div>
+                  <p>100 Nuru Shillings equal 1 US dollar. The same rate is used when you buy, pay, get a refund, or sell back. 10 USD is 1,000 NSH. 18 USD is 1,800 NSH.</p>
+                </div></details>
+                <details class="help-q"><summary>Who can use Nuru Shillings?</summary><div>
+                  <p>Anyone 18 or older, or the age of majority where they live if that is higher. Each person may hold one personal wallet.</p>
+                </div></details>
+              </div>
+            </section>
+
+            <section data-help-group>
+              <h2 id="pay">Adding money and paying</h2>
+              <div class="help-list">
+                <details class="help-q"><summary>How do I add money?</summary><div>
+                  <p>Open your <a href="/dashboard">wallet</a> and choose Add money. Pay with PayPal, a supported card, or M-Pesa. The balance is available immediately.</p>
+                </div></details>
+                <details class="help-q"><summary>Where can I spend Nuru Shillings?</summary><div>
+                  <p>On any platform that connects the Nuru API. You pay on that platform’s own page. You do not open a second account or leave the site.</p>
+                </div></details>
+                <details class="help-q"><summary>Can a buyer pay without a Nuru balance?</summary><div>
+                  <p>Yes. A buyer without Nuru Shillings can pay with M-Pesa, PayPal, or a card on the same checkout.</p>
+                </div></details>
+                <details class="help-q"><summary>A payment was refused. Was I charged?</summary><div>
+                  <p>No. A refused payment does not change your balance and has no fee. If you think it was refused in error, write to support with the payment id.</p>
+                </div></details>
+                <details class="help-q"><summary>How do refunds work?</summary><div>
+                  <p>The company refunds with the original payment id. The full amount returns to the same wallet, at the same rate, and appears next to the original charge in your activity. Each payment can be refunded once.</p>
+                </div></details>
+              </div>
+            </section>
+
+            <section data-help-group>
+              <h2 id="withdraw">Withdrawing</h2>
+              <div class="help-list">
+                <details class="help-q"><summary>How do I withdraw?</summary><div>
+                  <p>Sell your balance back at 100 NSH to 1 USD and withdraw to PayPal, a supported card, or M-Pesa in your verified name. Nuru charges nothing to withdraw.</p>
+                </div></details>
+                <details class="help-q"><summary>How long does a withdrawal take?</summary><div>
+                  <p>It starts when you submit it. Arrival time depends on the method you chose. If the method rejects it, the amount returns to your wallet.</p>
+                </div></details>
+                <details class="help-q"><summary>Will PayPal, my card, or M-Pesa charge a fee?</summary><div>
+                  <p>They may, under their own terms. Those fees are not Nuru fees and Nuru does not collect them.</p>
+                </div></details>
+              </div>
+            </section>
+
+            <section data-help-group>
+              <h2 id="privacy">Privacy and security</h2>
+              <div class="help-list">
+                <details class="help-q"><summary>Is my name shown when I pay?</summary><div>
+                  <p>No. Checkout shows the company name only. Your name is not shown to other buyers and the payment is not written to a public ledger. Records stay on Nuru’s private chain.</p>
+                </div></details>
+                <details class="help-q"><summary>Does Nuru sell my information?</summary><div>
+                  <p>No. Nuru does not sell personal information and runs no advertising trackers. See the <a href="/privacy">Privacy Notice</a>.</p>
+                </div></details>
+                <details class="help-q"><summary>Someone asked for my sign-in link or PIN. Is that Nuru?</summary><div>
+                  <p>No. Nuru never asks you to forward a sign-in link or to share your secret API key, M-Pesa PIN, or card security code. Do not reply, and write to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>.</p>
+                </div></details>
+                <details class="help-q"><summary>I think someone used my account.</summary><div>
+                  <p>Secure your email account first, because sign-in links go there. If you use Business tools, choose Replace key. Then write to support from the address on the account. Activity reported before it happens is not your responsibility.</p>
+                </div></details>
+              </div>
+            </section>
+
+            <section data-help-group>
+              <h2 id="business">For businesses</h2>
+              <div class="help-list">
+                <details class="help-q"><summary>Do I need a registered company?</summary><div>
+                  <p>No. You give your business a name. Nuru records that name on its own servers, and it is the only name a checkout shows. Your personal name is not shown to buyers.</p>
+                </div></details>
+                <details class="help-q"><summary>What kinds of sites can take payment?</summary><div>
+                  <p>Shops, services, subscriptions, marketplaces, apps, digital products, and adult sites. Nuru does not refuse a site because card networks refuse its category.</p>
+                  <p>Fraud, money laundering, anything illegal where the buyer or the company is located, weapons, illegal drugs, stolen data, material that exploits children, unlicensed gambling, and pyramid schemes are not allowed. See <a href="/terms#use">Acceptable use</a>.</p>
+                </div></details>
+                <details class="help-q"><summary>What does it cost a business?</summary><div>
+                  <p>1% of each payment that is paid. Nothing to open, nothing monthly, nothing on a refused payment. On a refund the fee comes back. On 1,800 NSH the fee is 18 NSH and you receive 1,782 NSH.</p>
+                </div></details>
+              </div>
+            </section>
+
+            <section data-help-group>
+              <h2 id="developers">For developers</h2>
+              <div class="help-list">
+                <details class="help-q"><summary>How do I create a payment?</summary><div>
+                  <p>One request with the amount, the unit <code>NSH</code>, your reference, and the company name. The response returns a payment id and a status. See the <a href="/docs">Docs</a>.</p>
+                </div></details>
+                <details class="help-q"><summary>Which webhooks are sent?</summary><div>
+                  <p><code>payment.paid</code> and <code>payment.refunded</code>, to the https URL you save in Business tools.</p>
+                </div></details>
+                <details class="help-q"><summary>Is there a sandbox?</summary><div>
+                  <p>Yes. The sandbox and the test key are free and never move a live balance.</p>
+                </div></details>
+                <details class="help-q"><summary>Where should the secret key live?</summary><div>
+                  <p>On your server only. Never put a live key in a page the buyer can read, and never email it to us.</p>
+                </div></details>
+              </div>
+            </section>
+
+            <h2 id="contact">Contact support</h2>
+            <p>A person reads every message. Include the payment id if it is about a payment. Do not include a password or a secret key.</p>
+            <form class="nx-formbox" data-contact="help">
+              <div class="row">
+                <label>Name<input name="name" autocomplete="name" maxlength="120"></label>
+                <label>Email<input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+              </div>
+              <div class="row">
+                <label>Subject<input name="subject" maxlength="160" placeholder="What is it about?"></label>
+                <label>Payment id (optional)<input name="paymentId" maxlength="80" placeholder="pay_…"></label>
+              </div>
+              <label>Message<textarea name="message" required minlength="10" maxlength="6000"></textarea></label>
+              <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <div class="actions">
+                <button type="submit">Send to support</button>
+                <p class="status" role="status"></p>
+              </div>
+            </form>
+            <p>Or write directly to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Company and partnership questions: <a href="mailto:norashillings@benuru.com">norashillings@benuru.com</a>.</p>
+          </article>
+          <aside class="legal-toc">
+            <nav class="legal-docs">
+              <strong>Support</strong>
+              <a class="active" href="/help">Help centre</a>
+              <a href="/community">Community</a>
+              <a href="/docs">Docs</a>
+              <a href="/security">Security</a>
+            </nav>
+            <details class="legal-onpage" open>
+              <summary>On this page</summary>
+              <a href="#start">Getting started</a>
+              <a href="#pay">Adding money and paying</a>
+              <a href="#withdraw">Withdrawing</a>
+              <a href="#privacy">Privacy and security</a>
+              <a href="#business">For businesses</a>
+              <a href="#developers">For developers</a>
+              <a href="#contact">Contact support</a>
+            </details>
+          </aside>
+        </div>
+      </div>
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/docs">Read the API&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard">Add money</a>
+        <a href="/dashboard">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+        <a href="/docs#sandbox">Sandbox</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <script src="legal.js?v=2"></script>
+  <script src="help.js?v=1"></script>
+  <script src="assistant.js?v=1"></script>
+</body>
+</html>

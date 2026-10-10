@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <title>Signing in · Nuru Shillings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+  <header class="auth-top">
+    <a class="brand" href="/">Nuru</a>
+  </header>
+  <main class="auth-wrap">
+    <div class="auth-card auth-sent">
+      <section id="wait">
+        <div class="spinner"></div>
+        <h1>Signing you in…</h1>
+        <p>One moment.</p>
+      </section>
+      <section id="bad" hidden>
+        <h1>This link can’t be used</h1>
+        <p id="why">It has expired or was already used.</p>
+        <div class="actions"><a class="btn primary block" href="/signin">Get a new link</a></div>
+      </section>
+    </div>
+  </main>
+  <script src="nsh.js?v=1"></script>
+  <script>
+    (async () => {
+      const token = location.hash.slice(1);
+      history.replaceState(null, "", "/auth");
+      const show = (text) => {
+        document.querySelector("#wait").hidden = true;
+        document.querySelector("#bad").hidden = false;
+        if (text) document.querySelector("#why").textContent = text;
+      };
+      if (!token) return show("The link is missing its code. Open it again from your email.");
+      try {
+        await Nsh.api("auth/verify", { body: { token }, redirect: false });
+        const next = localStorage.getItem("nsh-next");
+        localStorage.removeItem("nsh-next");
+        location.replace(next || "/dashboard");
+      } catch (err) {
+        show(err.message);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security · Nuru Shillings</title>
+  <meta name="description" content="How Nuru Shillings protects accounts, API keys, webhooks, and payments, what you are responsible for, and how to report a vulnerability.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=78">
+</head>
+<body class="home subpage">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="/#product">Product</a>
+          <a href="/docs">Developers</a>
+          <a href="/#business">Business</a>
+          <a href="/about">About</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+    <main class="legal">
+      <div class="legal-sheet">
+        <span class="legal-tick tl"></span><span class="legal-tick tr"></span><span class="legal-tick bl"></span><span class="legal-tick br"></span>
+        <header class="legal-hero">
+          <h1>Security</h1>
+          <p>Last updated 10 October 2026</p>
+        </header>
+        <div class="legal-frame">
+          <article>
+            <div class="legal-lead">
+              <strong>The short version</strong>
+              <ul>
+                <li>Payments settle on a private chain. Checkout shows the company name, not the person who paid.</li>
+                <li>There are no passwords. You sign in with a one-time email link, and there is no third-party login.</li>
+                <li>Live money and live keys stay locked until you verify your name and country.</li>
+                <li>Secret keys belong on your server. Webhooks must use https. Confirm every payment before you deliver.</li>
+                <li>We never ask you to forward a sign-in link or share a secret key, M-Pesa PIN, or card security code.</li>
+                <li>Found a weakness? Report it to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Section 15 explains how.</li>
+              </ul>
+            </div>
+
+            <h2 id="purpose"><span class="n">01</span>What this page is</h2>
+            <p>This page describes how Nuru Shillings protects accounts, keys, and payments, what each side is responsible for, and how to report a problem. It applies to wallet holders, companies, and developers.</p>
+            <p>It is a description of the product’s controls. It is not a certificate from an auditor, it does not claim a banking licence, and it does not make Nuru a bank. The <a href="/terms">Terms of Service</a> and the <a href="/privacy">Privacy Notice</a> also apply.</p>
+
+            <h2 id="shared"><span class="n">02</span>Who is responsible for what</h2>
+            <p>Security is shared. Nuru protects the Service; you protect your sign-in, your keys, and your own platform.</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Area</th><th>Nuru does</th><th>You do</th></tr>
+                <tr><td>Sign-in</td><td>Sends one-time links that expire in 20 minutes; stores only hashes; offers no third-party login</td><td>Keep your email account secure; log out on shared devices</td></tr>
+                <tr><td>Verification</td><td>Locks live money and live keys until you verify</td><td>Give a true name and country</td></tr>
+                <tr><td>API keys</td><td>Separates test and live keys; creates a live key only after verification; stores keys as hashes</td><td>Keep keys on your server; report a leak at once</td></tr>
+                <tr><td>Payments</td><td>Records the status, amount, company, and reference; settles privately</td><td>Store your reference; deliver only when paid</td></tr>
+                <tr><td>Webhooks</td><td>Accepts https endpoints only; sends the payment id so you can confirm it</td><td>Confirm with <code>GET /v1/payments/:id</code>; ignore duplicates</td></tr>
+                <tr><td>Your platform</td><td>—</td><td>Secure your own servers, accounts, and customer data</td></tr>
+              </table>
+            </div>
+
+            <h2 id="chain"><span class="n">03</span>Private settlement</h2>
+            <p>A paid payment is marked <code>chain: "private"</code>. It is not written to a public ledger, so no one can read a public chain to trace who paid whom. The company, the buyer, and Nuru can still match the payment id to the reference the company stored, which is what refunds and support need.</p>
+
+            <h2 id="checkout"><span class="n">04</span>What checkout shows</h2>
+            <p>Checkout shows the company name and the amount. It does not show the name of the person who paid. The payment fields are limited to amount, unit, reference, and company. A platform should keep it that way: do not place a buyer’s name, email, or phone number inside the reference.</p>
+
+            <h2 id="earnings"><span class="n">05</span>Earnings</h2>
+            <p>Nuru does not hold a company’s earnings on a card network that can freeze the payout. A company receives the amount of each paid payment less the 1% fee. Refunds are made by payment id and return both the amount and the fee. A buyer can sell back and withdraw to PayPal, a card, or M-Pesa at 100 Nuru Shillings to 1 US dollar.</p>
+
+            <h2 id="accounts"><span class="n">06</span>Account protection</h2>
+            <h3>Email sign-in links</h3>
+            <p>There are no passwords, so there is no password to guess, reuse, or leak. To sign in, you enter your email and we send a link. The link works once and expires after 20 minutes. We store only a one-way SHA-256 hash of it.</p>
+            <p>The secret part of the link sits after the <code>#</code> in the address. Browsers do not send that part to servers, so email security scanners that open links cannot use it up. The page sends it to Nuru only when you open it yourself.</p>
+            <p>Anyone who can read your email can sign in, so protect your email account with a strong password and two-step verification. There is no sign-in through Google or any other company.</p>
+            <h3>Limits</h3>
+            <p>We limit how many links can be requested for one email address and from one IP address in a short time. A hidden form field also catches automated form-fillers. Together they stop simple scripts from opening accounts in bulk or flooding an inbox.</p>
+            <h3>Sessions</h3>
+            <p>A session is kept in an HttpOnly, Secure cookie that page scripts cannot read. It lasts up to 30 days on that device, or until you log out. Logging out ends the session on our servers at once. Always log out on a shared or public computer.</p>
+
+            <h2 id="verify"><span class="n">07</span>The verification gate</h2>
+            <p>Until you verify the name on the account and your country, a wallet cannot add, send, pay, or withdraw live money, and Business tools cannot create a live key. Sandbox and the test key work before verification and can never move a live balance. Verification is free and done once.</p>
+
+            <h2 id="keys"><span class="n">08</span>API keys</h2>
+            <div class="legal-table">
+              <table>
+                <tr><th>Key</th><th>Prefix</th><th>Moves live money</th><th>Available</th></tr>
+                <tr><td>Test key</td><td><code>nsh_test_</code></td><td>No</td><td>Any time, in Sandbox</td></tr>
+                <tr><td>Live key</td><td><code>nsh_live_</code></td><td>Yes</td><td>After verification</td></tr>
+              </table>
+            </div>
+            <ul>
+              <li>A key is shown in full once, when you create it. Nuru keeps only a one-way hash and the last four characters, so we cannot show it to you again. Copy it straight into your server’s settings.</li>
+              <li>Keep secret keys in server-side environment variables or a secrets manager.</li>
+              <li>Never place a key in a web page, a mobile app bundle, a browser extension, a public repository, a screenshot, or an email.</li>
+              <li>Give access to the live key only to the people who need it.</li>
+              <li>Use the test key in development and continuous integration.</li>
+              <li>If a key may be exposed, open Business tools and choose <strong>Replace key</strong>. The old key stops working at once. Do not send the key itself to anyone, including us.</li>
+            </ul>
+
+            <h2 id="api"><span class="n">09</span>Calling the API safely</h2>
+            <ul>
+              <li>Call <code>https://norashillings.benuru.com/v1</code> from your server only, over https.</li>
+              <li>Send the key in the header: <code>Authorization: Bearer nsh_live_…</code>.</li>
+              <li>Send amounts as strings of Nuru Shillings, for example <code>"1800"</code>, to avoid rounding errors.</li>
+              <li>Use your own unique <code>reference</code> per order, and check it before creating a second payment for the same order.</li>
+              <li>Treat any status other than <code>paid</code> as not paid.</li>
+            </ul>
+
+            <h2 id="webhooks"><span class="n">10</span>Webhooks</h2>
+            <p>Nuru sends <code>payment.paid</code> and <code>payment.refunded</code> to the endpoint you save with <code>POST /v1/webhooks</code>. The endpoint must use https and a public host name; addresses on private networks are refused. Nuru waits up to 5 seconds for a reply and records whether delivery succeeded. Each event carries the event id, the type, the payment id, the reference, and the status.</p>
+            <ol>
+              <li>Fulfil an order from the webhook, never from a browser redirect, which a user can fake.</li>
+              <li>Before you deliver, confirm the payment with <code>GET /v1/payments/:id</code> using your secret key.</li>
+              <li>Check that the payment’s <code>reference</code> and <code>amount</code> match the order you stored.</li>
+              <li>Record the event id and ignore an event you have already processed.</li>
+              <li>Reply with a 2xx status quickly and do slow work afterwards.</li>
+              <li>Use <code>POST /v1/webhooks/test</code> to check your endpoint before going live.</li>
+            </ol>
+
+            <h2 id="checklist"><span class="n">11</span>Go-live checklist</h2>
+            <ol>
+              <li>Your account is verified and the live key is stored on the server only.</li>
+              <li>No key appears in client code, logs, or your repository history.</li>
+              <li>Your webhook endpoint uses https and passes the test event.</li>
+              <li>Orders are delivered only after a confirmed <code>paid</code> status.</li>
+              <li>Duplicate events cannot deliver an order twice.</li>
+              <li>Refunds use the original payment id.</li>
+              <li>Your checkout shows your company name, your terms, and your refund policy.</li>
+              <li>The payment reference holds an order id, not personal data.</li>
+            </ol>
+
+            <h2 id="fraud"><span class="n">12</span>Fraud and abuse</h2>
+            <p>We may refuse a payment, limit requests, or suspend an account to stop fraud, stolen payment methods, scripted sign-ups, or any use the <a href="/terms#use">Terms</a> prohibit. A refused payment does not move a balance and is free. If you believe a payment was refused by mistake, write to us with the payment id and a person will review it.</p>
+
+            <h2 id="phishing"><span class="n">13</span>Phishing and impersonation</h2>
+            <p>Nuru will <strong>never</strong> ask you to forward a sign-in link, or for your secret API key, your M-Pesa PIN, your card security code, or a one-time code from your bank. We will not ask you to move your balance to “protect” it.</p>
+            <p>Real sign-in links always open <code>norashillings.benuru.com</code>. Before you open one, check the address it points to, and never open a sign-in email you did not ask for. If you receive a message that claims to be from Nuru and asks for any of these, do not reply. Forward it to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>.</p>
+
+            <h2 id="incidents"><span class="n">14</span>If there is an incident</h2>
+            <p>If we find a security incident, we act to contain it, investigate what was affected, and fix the cause. If it affects your account or personal information, we will tell you without undue delay, explain what happened and what you should do, and notify the relevant authority where the law requires.</p>
+
+            <h2 id="disclosure"><span class="n">15</span>Reporting a vulnerability</h2>
+            <p>If you believe you have found a security weakness in Nuru, email <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a> with the subject line “Security report”. Please include:</p>
+            <ul>
+              <li>a description of the issue and its possible impact;</li>
+              <li>the steps to reproduce it, and the page or API route involved;</li>
+              <li>how we can contact you.</li>
+            </ul>
+            <h3>What we ask of you</h3>
+            <ul>
+              <li>Test only against your own account and the test key.</li>
+              <li>Do not access, change, or delete data that is not yours.</li>
+              <li>Do not run denial-of-service tests, spam, or social engineering against people.</li>
+              <li>Give us reasonable time to fix the issue before you tell anyone else.</li>
+            </ul>
+            <h3>What we commit to</h3>
+            <ul>
+              <li>We will acknowledge your report within 5 business days.</li>
+              <li>We will keep you updated while we work on it and tell you when it is fixed.</li>
+              <li>If you act in good faith and follow these rules, we will not pursue legal action against you for your research.</li>
+            </ul>
+
+            <h2 id="limits"><span class="n">16</span>Limits of this page</h2>
+            <p>This page states the product rules and the controls Nuru is built around. It does not claim a banking licence, deposit insurance, or a completed third-party audit. The commitments you can rely on are the ones written here and in the Terms: the rate is fixed at 100 NSH = 1 USD, settlement is private, checkout shows the company name, live money waits for verification, and a refund uses the original payment id.</p>
+
+            <h2 id="contact"><span class="n">17</span>Contact</h2>
+            <p>Security reports and account help: <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Include the payment id if it is about a payment. Never send a sign-in link or a secret key.</p>
+            <p class="legal-end">Nuru Shillings · Security · Version 10 October 2026</p>
+          </article>
+          <aside class="legal-toc">
+            <nav class="legal-docs">
+              <strong>Documents</strong>
+              <a href="/docs">Docs</a>
+              <a href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
+              <a class="active" href="/security">Security</a>
+              <a href="/about">About</a>
+            </nav>
+            <details class="legal-onpage" open>
+              <summary>On this page</summary>
+              <small>Overview</small>
+              <a href="#purpose">What this page is</a>
+              <a href="#shared">Who is responsible</a>
+              <small>Payments</small>
+              <a href="#chain">Private settlement</a>
+              <a href="#checkout">What checkout shows</a>
+              <a href="#earnings">Earnings</a>
+              <small>Access</small>
+              <a href="#accounts">Account protection</a>
+              <a href="#verify">The verification gate</a>
+              <a href="#keys">API keys</a>
+              <small>Developers</small>
+              <a href="#api">Calling the API safely</a>
+              <a href="#webhooks">Webhooks</a>
+              <a href="#checklist">Go-live checklist</a>
+              <small>Trust</small>
+              <a href="#fraud">Fraud and abuse</a>
+              <a href="#phishing">Phishing</a>
+              <a href="#incidents">Incidents</a>
+              <a href="#disclosure">Reporting a vulnerability</a>
+              <a href="#limits">Limits of this page</a>
+              <a href="#contact">Contact</a>
+            </details>
+          </aside>
+        </div>
+      </div>
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/docs">Read the API&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard">Add money</a>
+        <a href="/dashboard">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+        <a href="/docs#endpoints">Endpoints</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <script src="legal.js?v=2"></script>
+  <script src="assistant.js?v=1"></script>
+</body>
+</html>

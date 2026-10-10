@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Business tools · Nuru Shillings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+  <header class="top" id="top"></header>
+  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+  <main class="page" id="page" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Business tools</h1>
+        <p>Take Nuru payments on your own platform. The company pays 1% only when a payment is paid.</p>
+      </div>
+    </div>
+
+    <div class="banner sandbox" id="sandbox-note" hidden>
+      <span><b>Sandbox.</b> Test keys, test payments, test webhooks. No real money.</span>
+    </div>
+    <div class="banner" id="verify-note" hidden>
+      <span><b>Verify yourself</b> in your wallet to unlock the live key.</span>
+      <a class="btn sm primary" href="/dashboard">Go to wallet</a>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <div class="card-head">
+          <div><h2>Secret key</h2><p id="key-note">Use it from your server only.</p></div>
+          <span class="tag" id="key-mode">Sandbox</span>
+        </div>
+        <div class="card-body">
+          <div class="key" id="key-box"><code id="key-text">No key yet</code><button class="btn sm" type="button" id="copy-key" hidden>Copy</button></div>
+          <p class="msg" id="key-msg"></p>
+          <button class="btn primary" type="button" id="roll-key">Create key</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div><h2>Webhook</h2><p>We POST payment.paid and payment.refunded here.</p></div>
+        </div>
+        <form class="card-body" id="hook-form">
+          <input class="input" name="url" type="url" placeholder="https://your-site.com/nuru" autocomplete="off">
+          <p class="msg" id="hook-msg"></p>
+          <div class="row" style="flex-direction:row">
+            <button class="btn primary" type="submit">Save</button>
+            <button class="btn" type="button" id="hook-test">Send test event</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <div><h2>Quick start</h2><p>Create a payment from your server.</p></div>
+        <a class="btn sm" href="/docs#endpoints">All endpoints</a>
+      </div>
+      <div class="card-body">
+        <pre class="code" id="snippet"></pre>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div><h2>Create a payment</h2><p id="pay-note">Sandbox payments are paid at once so you can test.</p></div>
+      </div>
+      <form class="card-body" id="pay-form">
+        <div class="row">
+          <label class="field" style="margin-top:0"><span>Amount (NSH)</span><input class="input" name="amount" inputmode="numeric" value="1800" required></label>
+          <label class="field" style="margin-top:0"><span>Company name buyers see</span><input class="input" name="company" required placeholder="Northwind Books" maxlength="80"></label>
+          <label class="field" style="margin-top:0"><span>Your reference</span><input class="input" name="reference" placeholder="order_1042" maxlength="100"></label>
+        </div>
+        <button class="btn primary" type="submit" style="margin-top:16px">Create payment</button>
+        <p class="msg" id="pay-msg"></p>
+        <pre class="code" id="pay-out" hidden></pre>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>Payments</h2><p>Your latest 20.</p></div></div>
+      <ul class="list" id="payments"></ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>Webhook events</h2><p>What we sent, and what your server answered.</p></div></div>
+      <ul class="list" id="events"></ul>
+    </section>
+  </main>
+  <div class="loading" id="loading"><div class="spinner"></div></div>
+  <footer class="foot">
+    <a href="/docs">Docs</a>
+    <a href="/security">Security</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/help">Help</a>
+  </footer>
+  <script src="nsh.js?v=1"></script>
+  <script src="developer.js?v=10"></script>
+</body>
+</html>

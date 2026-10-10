@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Wallet · Nuru Shillings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+  <header class="top" id="top"></header>
+  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+  <main class="page" id="page" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Wallet</h1>
+        <p>100 Nuru Shillings = 1 US dollar</p>
+      </div>
+    </div>
+
+    <div class="banner sandbox" id="sandbox-note" hidden>
+      <span><b>Sandbox.</b> Test money only. Nothing here is real.</span>
+    </div>
+    <div class="banner" id="verify-note" hidden>
+      <span><b>Verify yourself</b> to use Live. It’s free and takes a minute.</span>
+      <button class="btn sm primary" type="button" data-open="verify">Verify</button>
+    </div>
+
+    <section class="card">
+      <div class="balance">
+        <div>
+          <small id="bal-label">Balance</small>
+          <strong><span id="bal">0</span><em>NSH</em></strong>
+          <div class="usd" id="bal-usd">$0.00</div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="button" data-open="add">Add money</button>
+          <button class="btn" type="button" data-open="send">Send</button>
+          <button class="btn" type="button" data-open="withdraw">Withdraw</button>
+        </div>
+      </div>
+
+      <form class="panel" id="panel-add" hidden>
+        <h3>Add money</h3>
+        <p class="note" id="add-note">Choose an amount. 100 NSH are added for every dollar.</p>
+        <div class="chips" id="chips">
+          <button type="button" data-usd="10">$10</button>
+          <button type="button" data-usd="25">$25</button>
+          <button type="button" data-usd="50" class="on">$50</button>
+          <button type="button" data-usd="100">$100</button>
+        </div>
+        <div class="row">
+          <label class="field"><span>Amount in USD</span><input class="input" name="usd" inputmode="numeric" value="50" required></label>
+          <label class="field"><span>Pay with</span><select class="input" name="method"><option>PayPal</option><option>Card</option><option>M-Pesa</option></select></label>
+        </div>
+        <button class="btn primary" type="submit" style="margin-top:16px">Add <span id="add-preview">5,000 NSH</span></button>
+        <p class="msg" id="msg-add"></p>
+      </form>
+
+      <form class="panel" id="panel-send" hidden>
+        <h3>Send</h3>
+        <p class="note">Send Nuru Shillings to anyone with a Nuru account. Free and instant.</p>
+        <div class="row">
+          <label class="field"><span>Their email</span><input class="input" name="to" type="email" required placeholder="friend@example.com"></label>
+          <label class="field"><span>Amount in NSH</span><input class="input" name="amount" inputmode="numeric" required placeholder="1000"></label>
+        </div>
+        <button class="btn primary" type="submit" style="margin-top:16px">Send</button>
+        <p class="msg" id="msg-send"></p>
+      </form>
+
+      <form class="panel" id="panel-withdraw" hidden>
+        <h3>Withdraw</h3>
+        <p class="note">Sell at 100 NSH = 1 USD and withdraw for free.</p>
+        <div class="row">
+          <label class="field"><span>Amount in NSH</span><input class="input" name="amount" inputmode="numeric" required placeholder="1000"></label>
+          <label class="field"><span>To</span><select class="input" name="method"><option>PayPal</option><option>M-Pesa</option><option>Card</option></select></label>
+        </div>
+        <label class="field"><span id="dest-label">PayPal email</span><input class="input" name="destination" required placeholder="you@example.com"></label>
+        <button class="btn primary" type="submit" style="margin-top:16px">Withdraw</button>
+        <p class="msg" id="msg-withdraw"></p>
+      </form>
+
+      <form class="panel" id="panel-verify" hidden>
+        <h3>Verify yourself</h3>
+        <p class="note">Your name and country, once. Free. Needed before live money moves.</p>
+        <div class="row">
+          <label class="field"><span>Full name</span><input class="input" name="name" required autocomplete="name" placeholder="First and last name"></label>
+          <label class="field"><span>Country</span><input class="input" name="country" required autocomplete="country-name" list="countries" placeholder="Kenya"></label>
+        </div>
+        <datalist id="countries">
+          <option>Kenya</option><option>Uganda</option><option>Tanzania</option><option>Rwanda</option><option>Nigeria</option><option>Ghana</option><option>South Africa</option><option>Ethiopia</option><option>United States</option><option>United Kingdom</option><option>Canada</option><option>Germany</option><option>France</option><option>India</option><option>United Arab Emirates</option><option>Australia</option>
+        </datalist>
+        <button class="btn primary" type="submit" style="margin-top:16px">Verify</button>
+        <p class="msg" id="msg-verify"></p>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div><h2>Activity</h2><p id="act-note">Everything that moved your balance.</p></div>
+      </div>
+      <ul class="list" id="activity"></ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div><h2>Account</h2><p>Signed in with a link sent to your email.</p></div>
+        <span class="tag" id="verified-tag">Not verified</span>
+      </div>
+      <div class="card-body">
+        <dl class="kv">
+          <dt>Email</dt><dd id="acc-email"></dd>
+          <dt>Name</dt><dd id="acc-name">—</dd>
+          <dt>Country</dt><dd id="acc-country">—</dd>
+        </dl>
+      </div>
+    </section>
+  </main>
+  <div class="loading" id="loading"><div class="spinner"></div></div>
+  <footer class="foot">
+    <a href="/docs">Docs</a>
+    <a href="/security">Security</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/help">Help</a>
+  </footer>
+  <script src="nsh.js?v=1"></script>
+  <script src="app.js?v=10"></script>
+</body>
+</html>

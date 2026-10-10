@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Notice · Nuru Shillings</title>
+  <meta name="description" content="How Nuru Shillings collects, uses, shares, protects, and keeps personal information for wallets, payments, and Business tools.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=78">
+</head>
+<body class="home subpage">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="/#product">Product</a>
+          <a href="/docs">Developers</a>
+          <a href="/#business">Business</a>
+          <a href="/about">About</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+    <main class="legal">
+      <div class="legal-sheet">
+        <span class="legal-tick tl"></span><span class="legal-tick tr"></span><span class="legal-tick bl"></span><span class="legal-tick br"></span>
+        <header class="legal-hero">
+          <h1>Privacy Notice</h1>
+          <p>Last updated 10 October 2026 · Effective 10 October 2026</p>
+        </header>
+        <div class="legal-frame">
+          <article>
+            <div class="legal-lead">
+              <strong>The short version</strong>
+              <ul>
+                <li>We collect what it takes to run a wallet and a payment: your email, your name and country once you verify, your balance, and payment records. There is no password.</li>
+                <li>Checkout shows the company name. Your name is not shown to the buyer or written to a public ledger.</li>
+                <li>We do not sell personal information. We do not run advertising trackers. We do not offer sign-in with Google or any other company.</li>
+                <li>We share only what a payment needs: the payment result with the company, and a withdrawal with the method you chose.</li>
+                <li>You can ask to see, correct, export, or delete your information by writing to us.</li>
+              </ul>
+            </div>
+
+            <h2 id="about"><span class="n">01</span>About this notice</h2>
+            <p>This Privacy Notice explains how Nuru Shillings (“Nuru”, “we”, “us”) collects, uses, shares, protects, and keeps personal information when you visit our website, open an account, hold a balance, pay a company, withdraw, or connect the payments API.</p>
+            <p>It should be read with the <a href="/terms">Terms of Service</a>, which set the rules of the product, and the <a href="/security">Security</a> page, which describes the controls around accounts, keys, and payments.</p>
+
+            <h2 id="controller"><span class="n">02</span>Who is responsible</h2>
+            <p>Nuru Shillings is responsible for the personal information described in this notice (the “controller” in data-protection law). You can reach us at <a href="mailto:norashillings@benuru.com">norashillings@benuru.com</a> for privacy questions and at <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a> for help with an account or a payment.</p>
+            <p>When a company accepts Nuru inside its own platform, that company is a separate controller for the information it collects in its own website, app, account system, or marketing list. Its own privacy notice applies to that information.</p>
+
+            <h2 id="who"><span class="n">03</span>Who this notice covers</h2>
+            <ul>
+              <li><strong>Visitors</strong> who read this website without an account.</li>
+              <li><strong>Wallet holders</strong> who buy, hold, spend, or withdraw Nuru Shillings.</li>
+              <li><strong>Companies</strong> named on a checkout, and the people who act for them.</li>
+              <li><strong>Developers</strong> who hold an API key and receive webhooks.</li>
+              <li><strong>People who contact us</strong> by email.</li>
+            </ul>
+
+            <h2 id="provide"><span class="n">04</span>Information you give us</h2>
+            <h3>When you open an account</h3>
+            <ul>
+              <li>Your email address. We send a one-time sign-in link to it; there is no password.</li>
+              <li>A one-way hash of each sign-in link, the IP address that asked for it, and when it was used. We keep the hash, never the link itself.</li>
+              <li>A one-way hash of your session, and when it expires.</li>
+              <li>The time you joined and the time you last signed in.</li>
+            </ul>
+            <h3>When you verify</h3>
+            <ul>
+              <li>The name on the account and your country. Verification is free and done once before live money moves.</li>
+              <li>If the details do not match, or the law requires it, we may ask for more information. We will tell you why when we ask.</li>
+            </ul>
+            <h3>When you contact us</h3>
+            <ul>
+              <li>Your email, its contents, and any payment id you include, so we can answer and keep a record of the request.</li>
+            </ul>
+
+            <h2 id="payments"><span class="n">05</span>Information created by payments</h2>
+            <p>Every payment produces a record with these fields:</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Field</th><th>What it holds</th></tr>
+                <tr><td>id</td><td>The payment id, for example <code>pay_1042</code></td></tr>
+                <tr><td>status</td><td><code>pending</code>, <code>paid</code>, or <code>refunded</code></td></tr>
+                <tr><td>mode</td><td><code>test</code> (Sandbox) or <code>live</code></td></tr>
+                <tr><td>fee</td><td>The 1% fee the company pays on the payment</td></tr>
+                <tr><td>amount and unit</td><td>The amount in NSH, for example <code>1800</code> and <code>NSH</code></td></tr>
+                <tr><td>company</td><td>The company name the buyer saw at checkout</td></tr>
+                <tr><td>chain</td><td><code>private</code> — the record is not written to a public ledger</td></tr>
+                <tr><td>reference</td><td>The order id the company supplied</td></tr>
+              </table>
+            </div>
+            <p>A wallet also keeps its balance and the activity that changed it: money added, a payment sent, a refund received, or a withdrawal, with the method used (PayPal, a card, or M-Pesa). A refund record points back to the original payment id. We do not need your home address to take a payment.</p>
+            <p>If you use Business tools, we also keep a one-way hash and the last four characters of each API key, the https webhook URL you saved for Sandbox and for Live, and the events sent to that URL with their delivery result. A live payment also records the wallet that paid it.</p>
+
+            <h2 id="auto"><span class="n">06</span>Information collected automatically</h2>
+            <ul>
+              <li><strong>Technical data.</strong> When your browser loads a page, our servers receive standard request data such as your IP address, browser type, and the page requested. We use it to deliver the page, keep the Service secure, and investigate abuse.</li>
+              <li><strong>Browser storage.</strong> The site sets one sign-in cookie and stores two small preferences in your browser. See section 17.</li>
+              <li><strong>Fonts.</strong> This website loads the Inter and IBM Plex Mono typefaces from Google Fonts. Your browser therefore sends a request, including your IP address, to Google when a page loads. This is not a sign-in and does not give Google your Nuru account.</li>
+            </ul>
+            <p>We do not use advertising cookies, cross-site tracking pixels, or third-party analytics that build a profile of you.</p>
+
+            <h2 id="others"><span class="n">07</span>Information from others</h2>
+            <ul>
+              <li><strong>Payment methods.</strong> PayPal, your card issuer, or your mobile-money provider tells us whether money you added or withdrew succeeded, failed, or was reversed.</li>
+              <li><strong>Companies.</strong> A platform tells us the amount, the unit, the company name, and its own reference when it creates a payment.</li>
+            </ul>
+
+            <h2 id="use"><span class="n">08</span>How we use information and why</h2>
+            <div class="legal-table">
+              <table>
+                <tr><th>Purpose</th><th>Information</th><th>Legal basis</th></tr>
+                <tr><td>Open your account and sign you in</td><td>Email, sign-in link hash, session hash</td><td>Contract</td></tr>
+                <tr><td>Verify you before live money moves</td><td>Name, country</td><td>Contract; legal obligation</td></tr>
+                <tr><td>Add money, pay, refund, and withdraw at 100 NSH = 1 USD</td><td>Balance, payment records, method</td><td>Contract</td></tr>
+                <tr><td>Show the company name and return the result to the platform</td><td>Payment record</td><td>Contract</td></tr>
+                <tr><td>Charge the 1% fee and return it on a refund</td><td>Payment record</td><td>Contract</td></tr>
+                <tr><td>Send webhooks to the developer’s https endpoint</td><td>Event id, type, payment id, reference, status</td><td>Contract</td></tr>
+                <tr><td>Prevent fraud, scripted sign-ups, and abuse</td><td>IP address, request limits, technical data, activity</td><td>Legitimate interests; legal obligation</td></tr>
+                <tr><td>Answer support requests and complaints</td><td>Email, payment id</td><td>Contract; legitimate interests</td></tr>
+                <tr><td>Send notices about the Terms, fees, or security</td><td>Email</td><td>Contract; legal obligation</td></tr>
+                <tr><td>Meet accounting, tax, and lawful requests</td><td>Payment records, verification</td><td>Legal obligation</td></tr>
+              </table>
+            </div>
+            <p>We do not use your information to decide credit, set prices for you personally, or show you advertising.</p>
+
+            <h2 id="shown"><span class="n">09</span>What other people can see</h2>
+            <ul>
+              <li><strong>The buyer at checkout</strong> sees the company name and the amount. They do not see another customer’s name.</li>
+              <li><strong>The company</strong> receives the payment result: id, status, amount, unit, company, chain, and the reference it supplied. It does not receive your whole wallet, your balance, or your other payments.</li>
+              <li><strong>The public</strong> sees nothing. Payments are settled on a private chain and are not published on a public ledger.</li>
+            </ul>
+
+            <h2 id="share"><span class="n">10</span>When we share information</h2>
+            <p>We share personal information only in these cases:</p>
+            <ul>
+              <li><strong>With the company you pay</strong> — the payment result listed in section 09.</li>
+              <li><strong>With your payment method</strong> — PayPal, your card issuer, or your mobile-money provider receives what it needs to process money you add or withdraw, such as the amount and the account, card, or phone number you gave.</li>
+              <li><strong>With service providers</strong> who host, secure, or send email for the Service, under a written contract that allows them to use the information only to provide that service to us.</li>
+              <li><strong>With authorities</strong> when the law that applies to Nuru requires it, or to respond to a lawful order. Where the law allows, we tell you first.</li>
+              <li><strong>To protect people and the Service</strong> — to investigate fraud or a breach of the Terms, or to protect the safety of a person.</li>
+              <li><strong>In a business transfer</strong> — if Nuru is merged or acquired, the new owner must honour this notice. We will tell you before your information is subject to a different notice.</li>
+            </ul>
+
+            <h2 id="never"><span class="n">11</span>What we never do</h2>
+            <ul>
+              <li>We do not sell or rent personal information, balances, payment references, company names, or email addresses.</li>
+              <li>We do not share your information for advertising.</li>
+              <li>We do not publish payments on a public ledger.</li>
+              <li>We do not offer sign-in through Google or any other company.</li>
+              <li>We never ask you to forward a sign-in link or to share your secret API key, your M-Pesa PIN, or your card security code.</li>
+            </ul>
+
+            <h2 id="transfers"><span class="n">12</span>International transfers</h2>
+            <p>Nuru is a worldwide service, so your information may be processed in a country other than your own. When we transfer personal information across borders, we use safeguards required by the applicable law, such as contractual protections with the recipient, and we only transfer what the purpose needs.</p>
+
+            <h2 id="keep"><span class="n">13</span>How long we keep it</h2>
+            <div class="legal-table">
+              <table>
+                <tr><th>Information</th><th>How long</th></tr>
+                <tr><td>Account details</td><td>While the account is open, then up to 2 years to handle disputes</td></tr>
+                <tr><td>Verification name and country</td><td>While the account is open, then as long as the law requires</td></tr>
+                <tr><td>Payment and refund records</td><td>While the account is open, then as long as accounting and financial law requires</td></tr>
+                <tr><td>Webhook events</td><td>90 days</td></tr>
+                <tr><td>Support emails</td><td>2 years after the request is closed</td></tr>
+                <tr><td>Technical request logs</td><td>Up to 90 days, longer only if needed to investigate abuse</td></tr>
+                <tr><td>Sign-in links</td><td>Expire after 20 minutes; the hashed record is kept only as long as needed to stop abuse</td></tr>
+                <tr><td>Sessions</td><td>Up to 30 days, or until you log out</td></tr>
+                <tr><td>Cookie and preferences on your device</td><td>See section 17</td></tr>
+              </table>
+            </div>
+            <p>When a retention period ends, we delete the information or make it anonymous. Payment ids already created may be kept so a refund can still be matched to the original payment.</p>
+
+            <h2 id="secure"><span class="n">14</span>How we protect it</h2>
+            <ul>
+              <li>There are no passwords to leak. Sign-in links, sessions, and API keys are stored only as one-way hashes.</li>
+              <li>A sign-in link works once and expires after 20 minutes. Requests for links are limited per email and per IP address.</li>
+              <li>A live key cannot be created until the account is verified, and test keys can never move a live balance.</li>
+              <li>Webhook endpoints must use https and cannot point at private network addresses.</li>
+              <li>A hidden form field stops simple scripts from opening accounts.</li>
+              <li>Access to payment records is limited to the people who need it to run the Service.</li>
+            </ul>
+            <p>No system is perfectly secure. If a breach affects your personal information, we will tell you and the relevant authority without undue delay where the law requires. More detail is on the <a href="/security">Security</a> page.</p>
+
+            <h2 id="rights"><span class="n">15</span>Your rights</h2>
+            <p>Depending on where you live, you may have the right to:</p>
+            <ul>
+              <li><strong>Access</strong> — get a copy of the personal information we hold about you.</li>
+              <li><strong>Correction</strong> — fix information that is wrong or incomplete.</li>
+              <li><strong>Deletion</strong> — ask us to delete information we no longer need, subject to records we must keep by law.</li>
+              <li><strong>Restriction</strong> — ask us to limit how we use your information while a question is resolved.</li>
+              <li><strong>Objection</strong> — object to use based on our legitimate interests.</li>
+              <li><strong>Portability</strong> — receive your account and payment records in a common, machine-readable format.</li>
+              <li><strong>Withdraw consent</strong> — where we rely on consent, withdraw it at any time.</li>
+              <li><strong>Complain</strong> — lodge a complaint with the data-protection authority where you live or work.</li>
+            </ul>
+            <p>We will not treat you differently for using these rights.</p>
+
+            <h2 id="requests"><span class="n">16</span>How to make a request</h2>
+            <p>Email <a href="mailto:norashillings@benuru.com">norashillings@benuru.com</a> from the address on your account and say which right you want to use. Include a payment id if the request is about a payment. We may ask you to confirm your identity before we act. We will reply within 30 days; if a request is complex, we may extend that by up to 60 days and will tell you why.</p>
+            <p>We will never ask you to send a sign-in link or a secret key to make a request.</p>
+
+            <h2 id="cookies"><span class="n">17</span>Cookies and browser storage</h2>
+            <p>This website does not set advertising or analytics cookies. Your balance, activity, and keys live on our servers, not in your browser. The browser holds only these items:</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Name</th><th>Type</th><th>Purpose</th><th>Lasts</th></tr>
+                <tr><td><code>nsh_session</code></td><td>Cookie (HttpOnly, Secure)</td><td>Keeps you signed in. Page scripts cannot read it.</td><td>30 days, or until you log out</td></tr>
+                <tr><td><code>nsh-mode</code></td><td>Local storage</td><td>Remembers whether you last chose Sandbox or Live</td><td>Until you clear it</td></tr>
+                <tr><td><code>nsh-next</code></td><td>Local storage</td><td>Remembers the page to return to after you open a sign-in link, such as a checkout</td><td>Removed once you are signed in</td></tr>
+              </table>
+            </div>
+            <p>These items are strictly necessary for the Service. You can remove them at any time in your browser settings; you will then be signed out.</p>
+
+            <h2 id="email"><span class="n">18</span>Emails we send</h2>
+            <p>We send service emails about your account, verification, payments, security, and changes to the Terms. You cannot opt out of these while the account is open because they are part of the Service. We do not send marketing email unless you have asked for it, and every marketing email will include a way to stop.</p>
+
+            <h2 id="automated"><span class="n">19</span>Automated checks</h2>
+            <p>We use automated checks, such as a hidden form field at sign-up and limits on repeated requests, to stop abuse. We do not make decisions that have legal or similarly significant effects on you based solely on automated processing. If a check blocks you, you can write to us and a person will review it.</p>
+
+            <h2 id="children"><span class="n">20</span>Children</h2>
+            <p>Nuru is not for children. You must be at least 18, or the age of legal majority where you live, to open an account. If we learn that a child has opened an account, we will close it and delete the information we are not required to keep.</p>
+
+            <h2 id="links"><span class="n">21</span>Other websites</h2>
+            <p>A company that accepts Nuru, and payment methods such as PayPal or M-Pesa, run their own services under their own privacy notices. This notice does not cover them. Read their notices before you give them information.</p>
+
+            <h2 id="changes"><span class="n">22</span>Changes to this notice</h2>
+            <p>If we change this notice, the “Last updated” date at the top changes. If a change materially affects how we use your information, we will email you before it takes effect. The version published on this page is the one that applies.</p>
+
+            <h2 id="contact"><span class="n">23</span>Contact</h2>
+            <p>Privacy questions and requests: <a href="mailto:norashillings@benuru.com">norashillings@benuru.com</a><br>Account and payment help: <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a></p>
+            <p class="legal-end">Nuru Shillings · Privacy Notice · Version 10 October 2026</p>
+          </article>
+          <aside class="legal-toc">
+            <nav class="legal-docs">
+              <strong>Documents</strong>
+              <a href="/docs">Docs</a>
+              <a class="active" href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
+              <a href="/security">Security</a>
+              <a href="/about">About</a>
+            </nav>
+            <details class="legal-onpage" open>
+              <summary>On this page</summary>
+              <small>The notice</small>
+              <a href="#about">About this notice</a>
+              <a href="#controller">Who is responsible</a>
+              <a href="#who">Who this covers</a>
+              <small>What we collect</small>
+              <a href="#provide">Information you give us</a>
+              <a href="#payments">Information from payments</a>
+              <a href="#auto">Collected automatically</a>
+              <a href="#others">Information from others</a>
+              <small>How we use it</small>
+              <a href="#use">How we use it and why</a>
+              <a href="#shown">What others can see</a>
+              <a href="#share">When we share</a>
+              <a href="#never">What we never do</a>
+              <a href="#transfers">International transfers</a>
+              <a href="#keep">How long we keep it</a>
+              <a href="#secure">How we protect it</a>
+              <small>Your choices</small>
+              <a href="#rights">Your rights</a>
+              <a href="#requests">How to make a request</a>
+              <a href="#cookies">Cookies and storage</a>
+              <a href="#email">Emails we send</a>
+              <a href="#automated">Automated checks</a>
+              <a href="#children">Children</a>
+              <a href="#links">Other websites</a>
+              <a href="#changes">Changes</a>
+              <a href="#contact">Contact</a>
+            </details>
+          </aside>
+        </div>
+      </div>
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/docs">Read the API&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard">Add money</a>
+        <a href="/dashboard">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+        <a href="/docs#endpoints">Endpoints</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <script src="legal.js?v=2"></script>
+  <script src="assistant.js?v=1"></script>
+</body>
+</html>

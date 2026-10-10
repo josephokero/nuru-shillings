@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentation · Nuru Shillings</title>
+  <meta name="description" content="The Nuru Shillings payments API: keys, Sandbox and Live, creating payments, checkout, refunds, webhooks, and errors. 100 Nuru Shillings equal 1 US dollar.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=81">
+</head>
+<body class="home subpage">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="/#product">Product</a>
+          <a href="/docs">Developers</a>
+          <a href="/#business">Business</a>
+          <a href="/about">About</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+    <main class="legal">
+      <div class="legal-sheet">
+        <span class="legal-tick tl"></span><span class="legal-tick tr"></span><span class="legal-tick bl"></span><span class="legal-tick br"></span>
+        <header class="legal-hero">
+          <h1>Documentation</h1>
+          <p>Payments API, version 1 · Last updated 10 October 2026</p>
+        </header>
+        <div class="legal-frame">
+          <article>
+            <div class="legal-lead">
+              <strong>The short version</strong>
+              <ul>
+                <li>Create a payment with one request: an amount in NSH, your order reference, and the company name the buyer sees.</li>
+                <li>Use a <code>nsh_test_</code> key in Sandbox and a <code>nsh_live_</code> key in Live. The requests and responses are the same.</li>
+                <li>A live payment returns a <code>checkout_url</code>. Send the buyer there; the payment becomes <code>paid</code> when they pay.</li>
+                <li>Nuru sends <code>payment.paid</code> and <code>payment.refunded</code> to your https webhook. Confirm with <code>GET /v1/payments/:id</code> before you deliver.</li>
+                <li>100 NSH = 1 USD. The company pays 1% of each paid payment. Everything else is free.</li>
+              </ul>
+            </div>
+
+            <h2 id="intro"><span class="n">01</span>Introduction</h2>
+            <p>The Nuru Shillings API lets a website or app take payment in Nuru Shillings (NSH). Your server creates a payment, the buyer pays it from their Nuru wallet, and Nuru tells your server the result. The buyer sees your company name and the amount. Their own name is not shown to you or written to a public ledger.</p>
+            <p>A payment moves through these steps:</p>
+            <ol>
+              <li>Your server calls <code>POST /v1/payments</code> with the amount, your reference, and your company name.</li>
+              <li>Nuru returns a payment with an id. In Live the status is <code>pending</code> and the response includes a <code>checkout_url</code>.</li>
+              <li>You send the buyer to the <code>checkout_url</code>. They log in to their wallet and confirm the payment.</li>
+              <li>The status becomes <code>paid</code>, the amount less the 1% fee is added to your balance, and Nuru sends <code>payment.paid</code> to your webhook.</li>
+              <li>Your server confirms the payment and delivers the order.</li>
+            </ol>
+            <p>Everything in this document can be tried in Sandbox first, with practice money and no verification.</p>
+
+            <h2 id="start"><span class="n">02</span>Before you start</h2>
+            <h3>Open an account</h3>
+            <p>Go to <a href="/signup">Start free</a> and enter your email. We send a sign-in link; opening it creates your account. There is no password and no cost. Every account starts with a wallet and 10,000 Sandbox NSH.</p>
+            <h3>Open Business tools</h3>
+            <p>From your wallet, choose <strong>Business tools</strong>. This is where you create keys, save a webhook, create payments by hand, refund them, and see every event Nuru sent. The <strong>Sandbox / Live</strong> switch at the top decides which mode you are working in.</p>
+            <h3>Verify before Live</h3>
+            <p>Sandbox works immediately. Before you can create a live key, you confirm the name on the account and your country, once. Verification is free. Until it is done, live money cannot move in or out of the account.</p>
+
+            <h2 id="quickstart"><span class="n">03</span>Quick start</h2>
+            <p>This takes about two minutes in Sandbox.</p>
+            <ol>
+              <li>In Business tools, switch to <strong>Sandbox</strong> and choose <strong>Create key</strong>. Copy the key; it is shown once.</li>
+              <li>Store it on your server as an environment variable, for example <code>NURU_SECRET_KEY</code>.</li>
+              <li>Create a payment:</li>
+            </ol>
+            <pre class="doc-code"><b>curl</b> https://norashillings.benuru.com/v1/payments \
+  -H "Authorization: Bearer $NURU_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": "1800",
+    "unit": "NSH",
+    "reference": "order_1042",
+    "company": "Northwind Books"
+  }'</pre>
+            <p>In Sandbox the payment is <code>paid</code> at once and 1,782 Sandbox NSH are added to your balance. The same call in Node.js:</p>
+            <pre class="doc-code"><b>const</b> res = await fetch("https://norashillings.benuru.com/v1/payments", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.NURU_SECRET_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    amount: "1800",
+    unit: "NSH",
+    reference: "order_1042",
+    company: "Northwind Books",
+  }),
+});
+<b>const</b> payment = await res.json();</pre>
+
+            <h2 id="amounts"><span class="n">04</span>Rate and amounts</h2>
+            <p>The rate is fixed: <strong>100 Nuru Shillings equal 1 US dollar</strong>. It is the same when a buyer adds money, pays, receives a refund, or withdraws. There is no spread and no second rate.</p>
+            <ul>
+              <li>Amounts are whole numbers of NSH, sent as strings, for example <code>"1800"</code>. Strings avoid rounding errors in JSON.</li>
+              <li>The smallest amount is <code>"1"</code> (0.01 USD). The largest single payment is <code>"100000000"</code> (1,000,000 USD).</li>
+              <li>Decimals, negative numbers, and leading signs are refused.</li>
+              <li>To convert a price in dollars, multiply by 100: 18.00 USD is <code>"1800"</code>.</li>
+            </ul>
+
+            <h2 id="fees"><span class="n">05</span>Fees</h2>
+            <p>Opening an account, the wallet, Business tools, the API, Sandbox, adding money, and withdrawing are free. There is no monthly fee.</p>
+            <p>The company pays <strong>1%</strong> of each payment that reaches <code>paid</code>, rounded to the nearest whole NSH. The buyer pays the listed amount and no Nuru fee. A payment that is never paid costs nothing. A refund returns the fee to you.</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Amount</th><th>Fee</th><th>You receive</th></tr>
+                <tr><td>49 NSH</td><td>0 NSH</td><td>49 NSH</td></tr>
+                <tr><td>250 NSH</td><td>3 NSH</td><td>247 NSH</td></tr>
+                <tr><td>1,800 NSH</td><td>18 NSH</td><td>1,782 NSH</td></tr>
+                <tr><td>10,000 NSH</td><td>100 NSH</td><td>9,900 NSH</td></tr>
+              </table>
+            </div>
+            <p>Every payment object shows its own <code>fee</code>, so you never need to calculate it yourself.</p>
+
+            <h2 id="modes"><span class="n">06</span>Sandbox and Live</h2>
+            <p>Each account has two separate balances and two separate sets of keys. The mode is decided by the key you send, not by the URL.</p>
+            <div class="legal-table">
+              <table>
+                <tr><th></th><th>Sandbox</th><th>Live</th></tr>
+                <tr><td>Key prefix</td><td><code>nsh_test_</code></td><td><code>nsh_live_</code></td></tr>
+                <tr><td>Money</td><td>Practice NSH; starts at 10,000</td><td>Real NSH at 100 NSH = 1 USD</td></tr>
+                <tr><td>Verification</td><td>Not needed</td><td>Needed before a live key exists</td></tr>
+                <tr><td>New payment</td><td><code>paid</code> at once</td><td><code>pending</code> with a <code>checkout_url</code></td></tr>
+                <tr><td>Webhook</td><td>Its own URL</td><td>Its own URL</td></tr>
+                <tr><td>Can affect the other mode</td><td>No</td><td>No</td></tr>
+              </table>
+            </div>
+            <p>Build and test against Sandbox. When you go live, change the key. The fields, routes, and responses stay the same.</p>
+
+            <h2 id="auth"><span class="n">07</span>Authentication</h2>
+            <p>Send your secret key in the <code>Authorization</code> header of every request:</p>
+            <pre class="doc-code"><b>Authorization:</b> Bearer nsh_live_••••••••••••••••4f2a</pre>
+            <ul>
+              <li><strong>Shown once.</strong> Nuru stores only a one-way hash of the key and its last four characters. If you lose it, create a new one.</li>
+              <li><strong>One key per mode.</strong> Creating a key with <strong>Replace key</strong> stops the previous key in that mode immediately. Update your server before you replace a key that is in use.</li>
+              <li><strong>Server only.</strong> Never place a key in a web page, a mobile app, a public repository, or a log. Anyone with the key can create payments and refunds on your account.</li>
+              <li><strong>Live keys need verification.</strong> A live key on an account that is not verified is refused with status 403.</li>
+            </ul>
+
+            <h2 id="requests"><span class="n">08</span>Requests and responses</h2>
+            <ul>
+              <li>Base URL: <code>https://norashillings.benuru.com/v1</code></li>
+              <li>Use https. Send request bodies as JSON with <code>Content-Type: application/json</code>.</li>
+              <li>Every response is JSON. A successful request returns status 200.</li>
+              <li>A failed request returns a 4xx or 5xx status and a body with one field, <code>error</code>, that explains what to fix. See <a href="#errors">Errors</a>.</li>
+              <li>Times are in UTC, in ISO 8601 format, for example <code>2026-10-10T09:30:00.000Z</code>.</li>
+            </ul>
+            <div class="legal-table">
+              <table>
+                <tr><th>Method and path</th><th>What it does</th></tr>
+                <tr><td><code>POST /v1/payments</code></td><td>Create a payment</td></tr>
+                <tr><td><code>GET /v1/payments/:id</code></td><td>Retrieve one payment</td></tr>
+                <tr><td><code>POST /v1/refunds</code></td><td>Refund a paid payment</td></tr>
+                <tr><td><code>POST /v1/webhooks</code></td><td>Save or clear the webhook URL for this mode</td></tr>
+                <tr><td><code>GET /v1/webhooks</code></td><td>Read the saved webhook URL</td></tr>
+                <tr><td><code>POST /v1/webhooks/test</code></td><td>Send a test event to the saved URL</td></tr>
+              </table>
+            </div>
+
+            <h2 id="object"><span class="n">09</span>The payment object</h2>
+            <p>Every payment route returns a payment object with these fields:</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Field</th><th>Description</th></tr>
+                <tr><td><code>id</code></td><td>Unique payment id, starting with <code>pay_</code>. Store it with your order.</td></tr>
+                <tr><td><code>status</code></td><td><code>pending</code>, <code>paid</code>, or <code>refunded</code>.</td></tr>
+                <tr><td><code>amount</code></td><td>The amount the buyer pays, in NSH, as a string.</td></tr>
+                <tr><td><code>unit</code></td><td>Always <code>NSH</code>.</td></tr>
+                <tr><td><code>fee</code></td><td>The 1% fee you pay when the payment is paid, in NSH, as a string.</td></tr>
+                <tr><td><code>company</code></td><td>The name the buyer sees at checkout.</td></tr>
+                <tr><td><code>chain</code></td><td>Always <code>private</code>. The payment is not written to a public ledger.</td></tr>
+                <tr><td><code>reference</code></td><td>Your own order id, or <code>null</code> if you did not send one.</td></tr>
+                <tr><td><code>mode</code></td><td><code>test</code> for Sandbox or <code>live</code>.</td></tr>
+                <tr><td><code>created</code></td><td>When the payment was created.</td></tr>
+                <tr><td><code>checkout_url</code></td><td>Present only while the status is <code>pending</code>. The page where the buyer pays.</td></tr>
+              </table>
+            </div>
+            <h3>Statuses</h3>
+            <div class="legal-table">
+              <table>
+                <tr><th>Status</th><th>Meaning</th><th>Next</th></tr>
+                <tr><td><code>pending</code></td><td>Created in Live and waiting for the buyer. No money has moved.</td><td>Becomes <code>paid</code> when the buyer pays.</td></tr>
+                <tr><td><code>paid</code></td><td>The buyer’s balance was charged and yours was credited, less the fee.</td><td>Can be refunded once.</td></tr>
+                <tr><td><code>refunded</code></td><td>The full amount went back to the buyer and the fee came back to you.</td><td>Final.</td></tr>
+              </table>
+            </div>
+            <p>Treat any status other than <code>paid</code> as not paid.</p>
+
+            <h2 id="create"><span class="n">10</span>Create a payment</h2>
+            <pre class="doc-code"><b>POST</b> /v1/payments</pre>
+            <div class="legal-table">
+              <table>
+                <tr><th>Parameter</th><th>Required</th><th>Description</th></tr>
+                <tr><td><code>amount</code></td><td>Yes</td><td>Whole NSH as a string, from <code>"1"</code> to <code>"100000000"</code>.</td></tr>
+                <tr><td><code>company</code></td><td>Yes</td><td>The name the buyer sees. Up to 80 characters.</td></tr>
+                <tr><td><code>reference</code></td><td>No</td><td>Your order id, up to 100 characters. Do not put personal data in it.</td></tr>
+                <tr><td><code>unit</code></td><td>No</td><td>If sent, must be <code>NSH</code>.</td></tr>
+              </table>
+            </div>
+            <p>Request:</p>
+            <pre class="doc-code">{
+  "amount": "1800",
+  "unit": "NSH",
+  "reference": "order_1042",
+  "company": "Northwind Books"
+}</pre>
+            <p>Response with a live key:</p>
+            <pre class="doc-code">{
+  "id": "pay_8f2c41d09a7be3150c66",
+  "status": "pending",
+  "amount": "1800",
+  "unit": "NSH",
+  "fee": "18",
+  "company": "Northwind Books",
+  "chain": "private",
+  "reference": "order_1042",
+  "mode": "live",
+  "created": "2026-10-10T09:30:00.000Z",
+  "checkout_url": "https://norashillings.benuru.com/pay?id=pay_8f2c41d09a7be3150c66"
+}</pre>
+            <p>With a test key the same request returns <code>"status": "paid"</code> and <code>"mode": "test"</code>, with no <code>checkout_url</code>, and Nuru sends <code>payment.paid</code> to your Sandbox webhook straight away.</p>
+            <p>Each call creates a new payment. Before you create a second payment for the same order, check whether you already stored a payment id for it.</p>
+
+            <h2 id="retrieve"><span class="n">11</span>Retrieve a payment</h2>
+            <pre class="doc-code"><b>GET</b> /v1/payments/pay_8f2c41d09a7be3150c66</pre>
+            <p>Returns the payment object. You can only read payments that belong to your account and to the mode of the key you send. Use this call to confirm a payment before you deliver an order, and to check the status if a webhook did not arrive.</p>
+
+            <h2 id="checkout"><span class="n">12</span>Checkout</h2>
+            <p>A live payment is paid on Nuru’s checkout page, at the <code>checkout_url</code> in the response. Redirect the buyer there, or show it as a link or button.</p>
+            <ul>
+              <li>The page shows your company name and the amount.</li>
+              <li>A buyer without an account can create one on the spot with their email. They return to the same checkout after opening the sign-in link.</li>
+              <li>The buyer must be verified and have enough live balance. If not, the page tells them what to do and nothing is charged.</li>
+              <li>A payment can be paid only once. A second attempt is refused.</li>
+              <li>You cannot pay your own payment.</li>
+            </ul>
+            <p>Do not treat the buyer returning to your site as proof of payment. Wait for the webhook, or check with <code>GET /v1/payments/:id</code>.</p>
+
+            <h2 id="refunds"><span class="n">13</span>Refund a payment</h2>
+            <pre class="doc-code"><b>POST</b> /v1/refunds
+
+{
+  "payment": "pay_8f2c41d09a7be3150c66"
+}</pre>
+            <p>Returns the payment object with <code>"status": "refunded"</code>, and sends <code>payment.refunded</code> to your webhook.</p>
+            <ul>
+              <li>Only a <code>paid</code> payment can be refunded, and only once.</li>
+              <li>The refund is always the full amount. The buyer receives everything they paid, at the same rate.</li>
+              <li>Your balance is reduced by the amount you received, and the fee is returned to you, so the refund costs you nothing extra.</li>
+              <li>Your balance in that mode must cover the amount you received. If it does not, the refund is refused and nothing changes.</li>
+              <li>You can also refund from the payments list in Business tools.</li>
+            </ul>
+
+            <h2 id="webhooks"><span class="n">14</span>Webhooks</h2>
+            <p>A webhook is a URL on your server that Nuru calls when a payment changes. Sandbox and Live each have their own URL, set with the key of that mode or in Business tools.</p>
+            <h3>Save, read, or clear the URL</h3>
+            <pre class="doc-code"><b>POST</b> /v1/webhooks
+
+{
+  "url": "https://your-platform.example/nuru"
+}</pre>
+            <p>Returns <code>{"url": "…", "mode": "live"}</code>. Send an empty <code>url</code> to stop webhooks for that mode. <code>GET /v1/webhooks</code> returns the saved URL. The URL must:</p>
+            <ul>
+              <li>use https;</li>
+              <li>use a public host name, not an IP address, <code>localhost</code>, or a <code>.local</code> or <code>.internal</code> name;</li>
+              <li>be at most 500 characters.</li>
+            </ul>
+            <h3>Events</h3>
+            <div class="legal-table">
+              <table>
+                <tr><th>Type</th><th>Sent when</th></tr>
+                <tr><td><code>payment.paid</code></td><td>A payment becomes <code>paid</code>.</td></tr>
+                <tr><td><code>payment.refunded</code></td><td>A payment is refunded.</td></tr>
+                <tr><td><code>webhook.test</code></td><td>You call <code>POST /v1/webhooks/test</code> or choose Send test event.</td></tr>
+              </table>
+            </div>
+            <p>Nuru sends a <code>POST</code> request with a JSON body and these headers: <code>Content-Type: application/json</code>, <code>User-Agent: NuruShillings-Webhooks/1</code>, and <code>Nuru-Event-Id</code>.</p>
+            <pre class="doc-code"><b>POST</b> https://your-platform.example/nuru
+
+{
+  "id": "evt_3b91e07c55d2a8f41b20",
+  "type": "payment.paid",
+  "created": "2026-10-10T09:31:12.000Z",
+  "data": {
+    "id": "pay_8f2c41d09a7be3150c66",
+    "status": "paid",
+    "amount": "1800",
+    "unit": "NSH",
+    "company": "Northwind Books",
+    "chain": "private",
+    "reference": "order_1042"
+  }
+}</pre>
+            <p>A <code>webhook.test</code> event has <code>"data": {"test": true}</code> instead of a payment.</p>
+            <h3>Delivery</h3>
+            <ul>
+              <li>Nuru makes one attempt per event and waits up to 5 seconds for a reply. Redirects are not followed.</li>
+              <li>Reply with any 2xx status as soon as you receive the event, then do slow work afterwards.</li>
+              <li>Every event and the status your server returned are listed under <strong>Webhook events</strong> in Business tools.</li>
+              <li>If your server was down, nothing is lost: read the payment with <code>GET /v1/payments/:id</code>.</li>
+            </ul>
+            <h3>Handling an event safely</h3>
+            <ol>
+              <li>Read <code>data.id</code> from the event.</li>
+              <li>Call <code>GET /v1/payments/:id</code> with your secret key. Trust that response, not the event body.</li>
+              <li>Check that the <code>status</code> is <code>paid</code>, and that the <code>reference</code> and <code>amount</code> match the order you stored.</li>
+              <li>Record the event id. If the same id arrives again, ignore it.</li>
+              <li>Deliver the order.</li>
+            </ol>
+            <pre class="doc-code"><b>app.post</b>("/nuru", express.json(), async (req, res) => {
+  res.sendStatus(200);
+  const event = req.body;
+  if (event.type !== "payment.paid" || await seen(event.id)) return;
+  const url = `https://norashillings.benuru.com/v1/payments/${event.data.id}`;
+  const r = await fetch(url, {
+    headers: { Authorization: `Bearer ${process.env.NURU_SECRET_KEY}` },
+  });
+  const payment = await r.json();
+  const order = await findOrder(payment.reference);
+  if (payment.status === "paid" && order && order.amount === payment.amount) {
+    await deliver(order);
+  }
+});</pre>
+
+            <h2 id="errors"><span class="n">15</span>Errors</h2>
+            <p>A failed request returns a status code and a message written for the developer:</p>
+            <pre class="doc-code">{
+  "error": "amount must be a whole number of NSH as a string, for example \"1800\"."
+}</pre>
+            <div class="legal-table">
+              <table>
+                <tr><th>Status</th><th>Meaning</th><th>Common causes</th></tr>
+                <tr><td>400</td><td>The request cannot be done as sent</td><td>Missing or invalid <code>amount</code> or <code>company</code>; <code>unit</code> other than NSH; refunding a payment that is not paid; balance too low for a refund; webhook URL not allowed</td></tr>
+                <tr><td>401</td><td>No valid key</td><td>Missing <code>Authorization</code> header; mistyped key; key was replaced</td></tr>
+                <tr><td>403</td><td>Not allowed yet</td><td>Live key used before the account is verified</td></tr>
+                <tr><td>404</td><td>Not found</td><td>Payment id does not exist, belongs to another account, or belongs to the other mode; unknown route</td></tr>
+                <tr><td>500</td><td>Problem on Nuru’s side</td><td>Try again. If it continues, write to support with the time and route</td></tr>
+              </table>
+            </div>
+            <p>Requests that fail with 4xx do not change anything. Fix the request before you retry it.</p>
+
+            <h2 id="golive"><span class="n">16</span>Going live</h2>
+            <ol>
+              <li>Your integration works end to end in Sandbox, including a refund and a webhook.</li>
+              <li>Your account is verified, and you created a live key in Business tools with the switch on <strong>Live</strong>.</li>
+              <li>The live key is stored on your server only, and not in your code repository.</li>
+              <li>You saved a live webhook URL and it passes Send test event.</li>
+              <li>You send buyers to the <code>checkout_url</code> and deliver only after a confirmed <code>paid</code>.</li>
+              <li>Duplicate events cannot deliver an order twice.</li>
+              <li>Your site shows your company name, your terms, and your refund policy.</li>
+            </ol>
+            <p>Read the <a href="/security">Security</a> page for how to keep keys and webhooks safe, and the <a href="/terms">Terms</a> for the rules that apply to taking payments.</p>
+
+            <h2 id="support"><span class="n">17</span>Support and changes</h2>
+            <p>Questions about the API or a live payment go to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Include the payment id and the time of the request. Never send your secret key.</p>
+            <p>This document describes version 1. We may add new fields to responses and new event types without notice, so your code should ignore fields it does not recognise. If we need to remove or change an existing field, we will announce it by email and on this page before it takes effect.</p>
+            <p class="legal-end">Nuru Shillings · Documentation · Payments API version 1 · 10 October 2026</p>
+          </article>
+          <aside class="legal-toc">
+            <nav class="legal-docs">
+              <strong>Documents</strong>
+              <a class="active" href="/docs">Docs</a>
+              <a href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
+              <a href="/security">Security</a>
+              <a href="/about">About</a>
+            </nav>
+            <details class="legal-onpage" open>
+              <summary>On this page</summary>
+              <small>Start</small>
+              <a href="#intro">Introduction</a>
+              <a href="#start">Before you start</a>
+              <a href="#quickstart">Quick start</a>
+              <small>Concepts</small>
+              <a href="#amounts">Rate and amounts</a>
+              <a href="#fees">Fees</a>
+              <a href="#modes">Sandbox and Live</a>
+              <a href="#auth">Authentication</a>
+              <small>API reference</small>
+              <a href="#requests">Requests and responses</a>
+              <a href="#object">The payment object</a>
+              <a href="#create">Create a payment</a>
+              <a href="#retrieve">Retrieve a payment</a>
+              <a href="#checkout">Checkout</a>
+              <a href="#refunds">Refund a payment</a>
+              <a href="#webhooks">Webhooks</a>
+              <a href="#errors">Errors</a>
+              <small>Launch</small>
+              <a href="#golive">Going live</a>
+              <a href="#support">Support and changes</a>
+            </details>
+          </aside>
+        </div>
+      </div>
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/developer">Open Business tools&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard">Add money</a>
+        <a href="/dashboard">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+        <a href="/docs#modes">Sandbox</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <script src="legal.js?v=2"></script>
+  <script src="assistant.js?v=1"></script>
+</body>
+</html>

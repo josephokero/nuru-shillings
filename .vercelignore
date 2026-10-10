@@ -1,0 +1,9 @@
+.env
+.env.*
+node_modules
+server.mjs
+*-v*.png
+preview*.png
+stage-*.png
+_*.png
+_*.html

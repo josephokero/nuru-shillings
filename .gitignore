@@ -1,0 +1,11 @@
+﻿.env
+.env.*
+.env*
+node_modules/
+.vercel
+*-v*.png
+preview*.png
+stage-*.png
+_*.png
+_*.html
+_*.mjs

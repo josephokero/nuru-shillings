@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nuru Shillings</title>
+  <meta name="description" content="Buy Nuru Shillings and spend them on any platform that connects the payment API. 100 Nuru Shillings equal 1 US dollar. Worldwide.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@16,500;16,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="vercel-theme.css">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=78">
+</head>
+<body class="home">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="#product">Product</a>
+          <a href="#developers">Developers</a>
+          <a href="#business">Business</a>
+          <a href="#why">Why Nuru</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="ref-hero">
+        <div class="ref-hero-copy">
+          <h1>Payment<br>Infrastructure</h1>
+          <div class="ref-buttons">
+            <a class="ref-light ref-pill" href="/signup">Start free</a>
+            <a class="ref-dark ref-pill" href="#developers">For developers</a>
+          </div>
+        </div>
+        <div class="ref-orb-wrap" aria-hidden="true">
+          <span class="ref-orb"></span>
+        </div>
+        <p class="ref-hero-note">Other payments can be traced<br>Those networks can lock earnings<br>Nuru runs on a private chain</p>
+        <section class="pay-row" aria-label="Buy Nuru Shillings with">
+          <img src="logos/paypal.svg" alt="PayPal">
+          <img src="logos/visa.svg" alt="Visa">
+          <img src="logos/mastercard.svg" alt="Mastercard">
+          <img src="logos/americanexpress.svg" alt="American Express">
+          <img src="logos/discover.svg" alt="Discover">
+          <img src="logos/jcb.svg" alt="JCB">
+          <img src="logos/dinersclub.svg" alt="Diners Club">
+          <img class="mpesa" src="logos/mpesa.svg?v=4" alt="M-Pesa">
+        </section>
+      </section>
+
+      <section class="ref-feature clean-stage" id="product">
+        <h2>One balance that works<br>wherever you do</h2>
+        <div class="clean-row">
+          <div class="clean-art">
+            <div class="clean-back">
+              <svg class="clean-cube" viewBox="0 0 140 140" aria-hidden="true">
+                <path d="M70 16 L122 44 L70 72 L18 44 Z" fill="#111" stroke="#fff" stroke-width="3"/>
+                <path d="M18 44 L70 72 L70 124 L18 96 Z" fill="#0b0b0b" stroke="#fff" stroke-width="3"/>
+                <path d="M70 72 L122 44 L122 96 L70 124 Z" fill="#1a1a1a" stroke="#fff" stroke-width="3"/>
+                <circle cx="70" cy="78" r="14" fill="#fff"/>
+              </svg>
+              <p>Private payment</p>
+            </div>
+            <div class="clean-window">
+              <header>
+                <span>New payment</span>
+                <span class="clean-tools">
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 L12 4 M8 4 H12 V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4 L12 12 M12 4 L4 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </span>
+              </header>
+              <div class="clean-ask">
+                <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M8 16c2.2-3.2 4.8-4.8 8-4.8S21.8 12.8 24 16c-2.2 3.2-4.8 4.8-8 4.8S10.2 19.2 8 16z" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="16" cy="16" r="2.2" fill="#fff"/></svg>
+                <strong>Who can see this payment?</strong>
+              </div>
+              <ul>
+                <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 V7 L8 4 L13 7 V13 H3 Z M6.5 13 V9.5 H9.5 V13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg><span><b>Company name only</b><small>The buyer sees Northwind. The person who paid is not on the payment.</small></span></li>
+                <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 8 H10 M5 6.5 A2.2 2.2 0 1 1 5 9.5 H7 M11 9.5 A2.2 2.2 0 1 1 11 6.5 H9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><b>Private chain</b><small>The payment is not written to a public ledger, so it cannot be traced there.</small></span></li>
+                <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.4 8.1 L7.2 9.8 L10.7 6.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Earnings stay unlocked</b><small>Nuru does not hold the payout on a network that can freeze it.</small></span></li>
+                <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 5.2 V8.2 L10 9.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><b>Verify once, then use it</b><small>Opening the account is free. You confirm your name before live money moves.</small></span></li>
+              </ul>
+              <footer><img src="logo.svg" alt="" width="14" height="14"> Northwind</footer>
+            </div>
+          </div>
+          <aside class="ref-copy-block">
+            <p><strong>Only the company is visible.</strong> The buyer, the platform, and Nuru can match a payment id. A public chain cannot.</p>
+            <small>What stays private</small>
+            <ul>
+              <li>The payer’s name is not on the checkout</li>
+              <li>Settlement stays on a private chain</li>
+              <li>Earnings are not locked by the network</li>
+              <li>The rate stays 100 NSH = 1 USD</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="ref-feature ref-feature-reverse" id="developers">
+        <h2>Ship checkout from zero<br>to production instantly</h2>
+        <div class="ref-feature-grid">
+          <aside class="ref-copy-block">
+            <p><strong>One call opens the payment.</strong> You send the amount, your order reference, and the company name the buyer should see.</p>
+            <small>What you get back</small>
+            <ul>
+              <li>Payment id</li>
+              <li>Paid or refused</li>
+              <li>Company name shown</li>
+              <li>Private-chain settlement</li>
+              <li>Webhook when it finishes</li>
+              <li>Refund by payment id</li>
+            </ul>
+          </aside>
+          <div class="ref-browser ref-code-ui code-detail">
+            <div class="ref-window-bar"><span>POST /v1/payments</span><b>200 OK</b></div>
+            <pre><em>const</em> payment = <em>await</em> nuru.payments.create({
+  amount: <span>"1800"</span>,
+  unit: <span>"NSH"</span>,
+  reference: <span>"order_1042"</span>,
+  company: <span>"Northwind Books"</span>
+})</pre>
+            <div class="code-return">
+              <small>Returns</small>
+              <pre>{
+  id: <span>"pay_1042"</span>,
+  status: <span>"paid"</span>,
+  amount: <span>"1800"</span>,
+  unit: <span>"NSH"</span>,
+  company: <span>"Northwind Books"</span>,
+  chain: <span>"private"</span>,
+  reference: <span>"order_1042"</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="host" id="business">
+        <h2>Host the wallet<br>inside your platform</h2>
+        <div class="host-row">
+          <div class="host-dash" aria-hidden="true">
+            <header class="hd-top">
+              <div class="hd-brand"><img src="logo.svg" alt=""><span>Northwind</span></div>
+              <nav><em>Wallet</em><span>Activity</span><span>Payments</span><span>Settings</span></nav>
+              <div class="hd-tools"><span><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.7" cy="6.7" r="4.1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9.8 9.8 13.2 13.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Search</span><b><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.1" fill="currentColor"/></svg>Pay</b></div>
+            </header>
+            <div class="hd-body">
+              <aside>
+                <p>Start</p>
+                <strong>Balance</strong>
+                <span>Add money</span>
+                <span>Send</span>
+                <span>History</span>
+                <p>Checkout</p>
+                <span>Orders</span>
+                <span>Company name</span>
+                <span>Methods</span>
+                <p>Account</p>
+                <span>Customers</span>
+                <span>Receipts</span>
+              </aside>
+              <div class="hd-stage">
+                <div class="hd-art">
+                  <i></i><i></i><i></i>
+                </div>
+                <h3>Pay on this page</h3>
+                <p>The wallet lives inside Northwind. Buyers see the company name only.</p>
+                <div class="hd-cards">
+                  <div><small>Balance</small><strong>2,480 NSH</strong></div>
+                  <div><small>This order</small><strong>1,800 NSH</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="ref-copy-block">
+            <p><strong>Customers pay on your own platform.</strong> The wallet stays inside your product, so they never leave for another checkout.</p>
+            <small>Features</small>
+            <ul>
+              <li>Embedded wallet</li>
+              <li>Payment on your page</li>
+              <li>Company name only</li>
+              <li>No second website</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="move" id="move">
+        <h2>Buy, sell,<br>and withdraw</h2>
+        <div class="move-grid">
+          <article>
+            <h3>Buy</h3>
+            <p>Pay with PayPal, a card, or M-Pesa.</p>
+            <strong>10.00 USD <b>→</b> 1,000 NSH</strong>
+          </article>
+          <article>
+            <h3>Sell</h3>
+            <p>Turn Nuru Shillings back into money.</p>
+            <strong>1,000 NSH <b>→</b> 10.00 USD</strong>
+          </article>
+          <article>
+            <h3>Withdraw</h3>
+            <p>Send the money where you want it.</p>
+            <strong>100 NSH <b>=</b> 1 USD</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="why" id="why">
+        <h2>Why Nuru Shillings</h2>
+        <div class="why-board">
+          <div class="why-head">
+            <span>Capability</span>
+            <span>Nuru Shillings</span>
+            <span>Typical processor</span>
+          </div>
+          <details class="why-row">
+            <summary><span>Payment methods</span><span>Nuru balance, M-Pesa, PayPal, and cards, on one checkout</span><span>Usually one method, and the others are someone else’s problem</span></summary>
+            <p>A buyer is not forced onto a single rail. If they already hold Nuru Shillings, they spend that balance. If they do not, they pay with M-Pesa, PayPal, or a card without leaving the page. The merchant keeps one checkout instead of stitching separate processors together.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Who can pay</span><span>Any buyer with a wallet, or with M-Pesa, PayPal, or a card</span><span>Only customers that processor already has</span></summary>
+            <p>There is no extra account the buyer must open on the merchant’s site. A person with Nuru Shillings pays from that wallet. A person without it still pays, using M-Pesa, PayPal, or a card. The merchant reaches both.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Settlement</span><span>Private chain. Nothing is posted in public</span><span>A ledger the processor’s network can see</span></summary>
+            <p>The payment is settled on Nuru’s private chain. It is not written to a public network where anyone can follow the amount, the time, and the path. The company is the name on the payment. The person behind it is not.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Checkout display</span><span>The company name. Not the person</span><span>The buyer’s identity is often attached to the charge</span></summary>
+            <p>What a checkout shows is the company taking the payment. It does not put the buyer’s name on display as the public face of the transaction. The merchant still receives a clear paid or refused result, with their own order reference.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Deposits</span><span>In the wallet immediately</span><span>Often held for review, then paid out later</span></summary>
+            <p>Money added to the wallet is available at once, at 100 Nuru Shillings to 1 US dollar. The buyer does not wait through a hold before they can spend. A later payment draws on that balance the moment they confirm.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Published rate</span><span>100 NSH = 1 USD, on every site</span><span>The rate and the fee change by corridor</span></summary>
+            <p>The unit does not get renegotiated at checkout. Ten dollars is 1,000 NSH. Eighteen dollars is 1,800 NSH. A shop in one country and a buyer in another use that same rate, so the amount on the page is the amount that moves.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Record</span><span>Kept on Nuru’s own chain</span><span>Copied onto a public or partner ledger</span></summary>
+            <p>The payment record stays with Nuru. It carries the amount, the unit, the merchant’s reference, and the status. It is not left on a public ledger where a third party can trace it from the outside.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Merchant category</span><span>Shops, apps, and adult sites are accepted</span><span>Adult sites and similar categories are refused</span></summary>
+            <p>Card processors decline whole categories, including adult content. Nuru does not refuse a site for that reason. A shop, an app, a marketplace, or an adult site can take payment on its own page, and the buyer still pays with Nuru, M-Pesa, PayPal, or a card.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Checkout location</span><span>The buyer stays on the merchant’s page</span><span>The buyer is often sent to another site</span></summary>
+            <p>The order, the customer, and the page remain the merchant’s. Nuru is the way the buyer pays there. They do not create a second account, and they are not moved to a hosted page that belongs to someone else.</p>
+          </details>
+          <details class="why-row">
+            <summary><span>Refund</span><span>Returned to the same wallet, by payment id</span><span>Returned on the original rail, if that rail allows it</span></summary>
+            <p>A refund uses the payment id. The Nuru Shillings go back to the same wallet, and the activity shows the return next to the original charge. The merchant matches it with the reference they sent when the payment was created.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="price" id="price">
+        <h2>Free to start.<br>1% when a payment is paid.</h2>
+        <div class="fact-row">
+          <article><small>Setup</small><strong>Free</strong><p>Open a wallet with your email and start. No monthly fee.</p></article>
+          <article><small>Before live money</small><strong>Verify yourself</strong><p>Confirm your name and country once. Then add, pay, withdraw, or take live payments.</p></article>
+          <article><small>Each paid payment</small><strong>1%</strong><p>The company pays 1 NSH for every 100 NSH that is paid. The buyer pays no fee. Refusals are free.</p></article>
+        </div>
+      </section>
+
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/docs">Read the API&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard">Add money</a>
+        <a href="/dashboard">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+        <a href="/docs#sandbox">Sandbox</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <header class="vx-nav wrap">
+    <a class="vx-brand" href="/"><span class="vx-mark" aria-hidden="true"></span> Nuru Shillings</a>
+    <nav class="vx-menu" aria-label="Page">
+      <a href="#wallet">Wallet</a>
+      <a href="#platforms">Platforms</a>
+      <a href="#rate">Rate</a>
+      <a href="#api">API</a>
+    </nav>
+    <div class="vx-nav-actions">
+      <a class="vx-btn vx-outline" href="#api">Read API</a>
+      <a class="vx-btn vx-solid" href="/dashboard">Open wallet</a>
+    </div>
+  </header>
+
+  <section class="vx-hero wrap">
+    <div class="vx-hero-left">
+      <h1>Payment infrastructure</h1>
+      <div class="vx-hero-btns">
+        <a class="vx-btn vx-solid" href="/dashboard">Open wallet</a>
+        <a class="vx-btn vx-outline" href="#platforms">For platforms</a>
+      </div>
+    </div>
+    <div class="vx-hero-glow" aria-hidden="true">
+      <span class="vx-circle"></span>
+    </div>
+    <ul class="vx-hero-right">
+      <li>For buyers worldwide</li>
+      <li>To pay on any connected checkout</li>
+      <li>100 Nuru Shillings = 1 US dollar</li>
+    </ul>
+  </section>
+
+  <section class="vx-logos wrap" aria-label="Works with">
+    <span>Shops</span><span>Apps</span><span>Marketplaces</span><span>SaaS</span><span>Invoices</span><span>Subscriptions</span>
+  </section>
+
+  <section class="vx-showcase wrap" id="wallet">
+    <h2 class="vx-showcase-h">Build checkout on payment that works everywhere</h2>
+    <div class="vx-showcase-grid">
+      <div class="vx-showcase-aside">
+        <p>Nuru Shillings powers one wallet for buyers and a simple API for platforms.</p>
+        <p class="vx-feats-label">Features</p>
+        <ul class="vx-feats">
+          <li>One worldwide balance</li>
+          <li>Checkout on their site</li>
+          <li>Payments API</li>
+          <li>Clear paid or refused</li>
+        </ul>
+      </div>
+      <div class="vx-panel">
+        <header class="vx-panel-head"><span>Wallet</span><span class="vx-pill">Live</span></header>
+        <div class="vx-panel-body">
+          <p class="vx-panel-k">Balance</p>
+          <p class="vx-panel-num">2,480.00 NSH</p>
+          <p class="vx-panel-sub">24.80 USD</p>
+          <div class="vx-panel-row"><span>Northwind Books</span><b>−1,800</b></div>
+          <div class="vx-panel-row"><span>Card added</span><b class="up">+5,000</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="vx-main">
+
+    <section class="wrap spec" aria-label="At a glance">
+      <div>
+        <strong>100 NSH</strong>
+        <span>equals 1 US dollar, at the published rate.</span>
+      </div>
+      <div>
+        <strong>One wallet</strong>
+        <span>Buy once. Spend on every connected platform.</span>
+      </div>
+      <div>
+        <strong>Any country</strong>
+        <span>Buyers and merchants are not tied to one market.</span>
+      </div>
+      <div>
+        <strong>Their checkout</strong>
+        <span>The buyer never leaves the platform’s own site.</span>
+      </div>
+    </section>
+
+    <section class="wrap block" id="coin">
+      <header class="sec-head">
+        <p class="kicker">01 — The coin</p>
+        <h2>A single unit you can hold and spend.</h2>
+        <p class="deck">Nuru Shillings are not a new account on every website. They are one balance. Platforms connect that balance as a way to pay.</p>
+      </header>
+      <div class="trio">
+        <article>
+          <h3>Bought in one place</h3>
+          <p>Add money by card or bank transfer. The wallet credits Nuru Shillings at the published rate and shows the dollar value beside the balance.</p>
+        </article>
+        <article>
+          <h3>Priced the same everywhere</h3>
+          <p>A platform in one country and a buyer in another use the same unit. Nobody renegotiates what a Nuru Shilling is at the moment of payment.</p>
+        </article>
+        <article>
+          <h3>Spent where it is accepted</h3>
+          <p>If a shop, app, or marketplace has connected the API, the buyer can pay with the coin they already hold. The rest of checkout stays theirs.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="band" id="rate">
+      <div class="wrap rate-layout">
+        <div>
+          <p class="kicker">02 — The rate</p>
+          <p class="figure">100</p>
+          <h2>Nuru Shillings to one dollar.</h2>
+          <p class="deck light">The rate does not change from site to site. When a platform prices an order, it prices it in NSH. The buyer sees that amount, and the wallet shows what it is in dollars.</p>
+        </div>
+        <div class="sheet">
+          <p class="sheet-label">What you receive</p>
+          <div class="line"><span>10.00 USD</span><strong>1,000.00 NSH</strong></div>
+          <div class="line"><span>25.00 USD</span><strong>2,500.00 NSH</strong></div>
+          <div class="line"><span>50.00 USD</span><strong>5,000.00 NSH</strong></div>
+          <div class="line"><span>100.00 USD</span><strong>10,000.00 NSH</strong></div>
+          <p class="sheet-foot">Amount in dollars × 100 = Nuru Shillings.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap block" id="example">
+      <header class="sec-head">
+        <p class="kicker">03 — A payment</p>
+        <h2>An order, written out in full.</h2>
+        <p class="deck">Northwind Books sells a title for 18 dollars. On a connected checkout that price is 1,800 Nuru Shillings. The buyer confirms. The balance moves. The shop is told.</p>
+      </header>
+      <div class="receipt">
+        <div class="receipt-top">
+          <div>
+            <p class="sheet-label">Platform</p>
+            <strong class="receipt-name">Northwind Books</strong>
+            <span>reference order_1042</span>
+          </div>
+          <div class="pill">Paid</div>
+        </div>
+        <dl>
+          <div><dt>Amount</dt><dd>1,800.00 NSH</dd></div>
+          <div><dt>In dollars</dt><dd>18.00 USD</dd></div>
+          <div><dt>Balance before</dt><dd>2,480.00 NSH</dd></div>
+          <div><dt>Balance after</dt><dd>680.00 NSH</dd></div>
+          <div><dt>Told to the platform</dt><dd>paid</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="wrap block" id="checkout">
+      <header class="sec-head">
+        <p class="kicker">05 — Checkout</p>
+        <h2>Five steps. The buyer stays put.</h2>
+        <p class="deck">The platform keeps its page, its order, and its customer. Nuru Shillings is a way to pay on that page, not a second website the buyer must join.</p>
+      </header>
+      <ol class="rail">
+        <li>
+          <span>01</span>
+          <div>
+            <h3>The buyer holds a balance</h3>
+            <p>They add money once. The wallet shows Nuru Shillings and the dollar equivalent. That balance is what later checkouts draw from.</p>
+          </div>
+        </li>
+        <li>
+          <span>02</span>
+          <div>
+            <h3>The platform creates a payment</h3>
+            <p>It sends the amount in Nuru Shillings, the unit, and its own order reference. The reference is how the platform matches our result to its order.</p>
+          </div>
+        </li>
+        <li>
+          <span>03</span>
+          <div>
+            <h3>The buyer confirms on that site</h3>
+            <p>They see the amount and the platform name where they are already shopping. They do not create a new account for that shop inside Nuru Shillings.</p>
+          </div>
+        </li>
+        <li>
+          <span>04</span>
+          <div>
+            <h3>The balance moves</h3>
+            <p>If the wallet can cover the amount, it is debited and the payment is marked paid. If it cannot, the payment is refused and nothing moves.</p>
+          </div>
+        </li>
+        <li>
+          <span>05</span>
+          <div>
+            <h3>The platform is told at once</h3>
+            <p>It receives the payment id, the status, and the same reference it sent. A refund uses that id and returns the Nuru Shillings to the buyer.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="wrap block" id="sides">
+      <header class="sec-head">
+        <p class="kicker">06 — Two sides</p>
+        <h2>What each person actually does.</h2>
+      </header>
+      <div class="two">
+        <article>
+          <p class="sheet-label">The buyer</p>
+          <h3>Holds the coin and confirms.</h3>
+          <ul>
+            <li>Opens one wallet, in any country.</li>
+            <li>Adds money and sees both NSH and USD.</li>
+            <li>Pays a platform without leaving its checkout.</li>
+            <li>Reads every add and every payment in one list.</li>
+          </ul>
+        </article>
+        <article>
+          <p class="sheet-label">The platform</p>
+          <h3>Connects the API and gets a yes or no.</h3>
+          <ul>
+            <li>Keeps its own customers and its own page.</li>
+            <li>Prices the order in Nuru Shillings.</li>
+            <li>Sends amount, unit, and an order reference.</li>
+            <li>Marks the order from the status we return.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap block" id="platforms">
+      <header class="sec-head">
+        <p class="kicker">07 — For platforms</p>
+        <h2>A payment method, not a new accounts system.</h2>
+        <p class="deck">You do not import your users into Nuru Shillings. You offer the coin beside the ways you already take payment. We confirm the balance and tell you the result.</p>
+      </header>
+      <div class="trio">
+        <article>
+          <h3>Your checkout</h3>
+          <p>The button lives on your page. Your order number stays your order number. We store it as the reference and send it back with the result.</p>
+        </article>
+        <article>
+          <h3>A clear result</h3>
+          <p>Paid, or refused. You do not infer success from a redirect. The payment object carries the status, the amount, and your reference.</p>
+        </article>
+        <article>
+          <h3>A refund on the same rail</h3>
+          <p>Refund against the payment id. The Nuru Shillings return to the buyer’s wallet, and the payment records the refund beside the original charge.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="api-band" id="api">
+      <div class="wrap">
+        <header class="sec-head">
+          <p class="kicker">08 — The API</p>
+          <h2>Three calls. One payment.</h2>
+          <p class="deck light">Create the payment, read it back, refund it. Amounts are strings in Nuru Shillings so a platform does not lose cents to floating point.</p>
+        </header>
+        <div class="endpoints">
+          <div><code>POST</code><span>/v1/payments</span><p>Open a charge for an order.</p></div>
+          <div><code>GET</code><span>/v1/payments/:id</span><p>Read status and reference.</p></div>
+          <div><code>POST</code><span>/v1/refunds</span><p>Return Nuru Shillings to the buyer.</p></div>
+        </div>
+        <div class="code-grid">
+          <div>
+            <p class="code-label">Request</p>
+            <pre class="code"><em>POST</em> /v1/payments
+Authorization: Bearer nsh_live_••••••••4f2a
+
+{
+  "amount": "1800",
+  "unit": "NSH",
+  "reference": "order_1042"
+}</pre>
+          </div>
+          <div>
+            <p class="code-label">Response</p>
+            <pre class="code">{
+  "id": "pay_1042",
+  "amount": "1800",
+  "unit": "NSH",
+  "reference": "order_1042",
+  "status": "paid"
+}</pre>
+          </div>
+        </div>
+        <p class="api-foot">Host <span>https://norashillings.benuru.com/v1</span> · Unit is always NSH · 1,800 NSH is 18.00 USD</p>
+      </div>
+    </section>
+
+    <section class="wrap block" id="uses">
+      <header class="sec-head">
+        <p class="kicker">09 — Where it fits</p>
+        <h2>Any place that already takes a payment.</h2>
+      </header>
+      <div class="uses">
+        <article>
+          <h3>Shops</h3>
+          <p>A catalog price is shown in dollars and charged in Nuru Shillings. The order is fulfilled when the status is paid.</p>
+        </article>
+        <article>
+          <h3>Subscriptions</h3>
+          <p>Each period is a new payment with its own reference. A failed period is a refused payment, not a silent gap.</p>
+        </article>
+        <article>
+          <h3>Marketplaces</h3>
+          <p>The marketplace is the platform. It creates the payment, then settles with its sellers from the result.</p>
+        </article>
+        <article>
+          <h3>Apps</h3>
+          <p>An app sells a feature or a credit pack. The buyer confirms the Nuru Shilling amount inside the app.</p>
+        </article>
+        <article>
+          <h3>Invoices</h3>
+          <p>An invoice number is the reference. When it is paid, the same number comes back on the payment.</p>
+        </article>
+        <article>
+          <h3>Refunds</h3>
+          <p>A returned order is a refund call. The buyer sees the Nuru Shillings back in the wallet activity.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap block" id="record">
+      <header class="sec-head">
+        <p class="kicker">10 — The record</p>
+        <h2>Every payment carries the same fields.</h2>
+        <p class="deck">Nothing important is left in a note. The platform can reconcile an order from the object alone.</p>
+      </header>
+      <div class="fields">
+        <div><code>id</code><p>The payment’s own id. Refunds point at this.</p></div>
+        <div><code>amount</code><p>The charge in Nuru Shillings, as a string.</p></div>
+        <div><code>unit</code><p>Always NSH, so a client cannot mix currencies.</p></div>
+        <div><code>reference</code><p>The platform’s order, invoice, or subscription id.</p></div>
+        <div><code>status</code><p>Paid or refused. The platform branches on this.</p></div>
+        <div><code>created</code><p>When the payment was decided, for the ledger.</p></div>
+      </div>
+    </section>
+
+    <section class="wrap block" id="questions">
+      <header class="sec-head">
+        <p class="kicker">11 — Questions</p>
+        <h2>Short answers.</h2>
+      </header>
+      <div class="faqs">
+        <details open>
+          <summary>Is this only for one country?</summary>
+          <p>No. A buyer can live in one country and a platform in another. The coin is priced in US dollars so the unit does not change at the border.</p>
+        </details>
+        <details>
+          <summary>What is a Nuru Shilling worth?</summary>
+          <p>100 Nuru Shillings equal 1 US dollar. Ten dollars buys 1,000 NSH. Eighteen dollars is a charge of 1,800 NSH.</p>
+        </details>
+        <details>
+          <summary>Does the buyer leave the platform to pay?</summary>
+          <p>No. Checkout stays on the platform. The platform asks us whether the balance covers the amount, and the buyer confirms there.</p>
+        </details>
+        <details>
+          <summary>Is this a public blockchain?</summary>
+          <p>No. It is a wallet and a payment API. Platforms integrate it the way they integrate any other way to pay.</p>
+        </details>
+        <details>
+          <summary>What if the balance is too low?</summary>
+          <p>The payment is refused. The balance is left as it was, and the platform receives a refused status instead of paid.</p>
+        </details>
+        <details>
+          <summary>Can a platform refund?</summary>
+          <p>Yes. It refunds by payment id. The Nuru Shillings go back to the same wallet, and the activity shows the return.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="wrap finale">
+      <h2>Open a wallet and hold the coin.</h2>
+      <p>Add money, pay a platform, and keep the record in one place.</p>
+      <a class="btn" href="/dashboard">Go to the dashboard</a>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <div class="foot-brand">
+      <a class="brand" href="/">Nuru Shillings</a>
+      <p>A worldwide coin for checkout. 100 NSH = 1 USD.</p>
+    </div>
+    <div>
+      <p class="sheet-label">Product</p>
+      <a href="#rate">Rate</a>
+      <a href="#wallet">Wallet</a>
+      <a href="#checkout">Checkout</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+    <div>
+      <p class="sheet-label">Platforms</p>
+      <a href="#platforms">Integration</a>
+      <a href="#api">API</a>
+      <a href="#record">Payment fields</a>
+      <a href="#questions">Questions</a>
+    </div>
+  </footer>
+  <script src="assistant.js?v=1"></script>
+</body>
+</html>
