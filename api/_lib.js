@@ -186,6 +186,10 @@ async function resendMail(payload) {
   return r.ok;
 }
 
+export async function mailAdmin(subject, text) {
+  return resendMail({ to: [SUPPORT], subject: `[Nuru ops] ${subject}`, text: `${text}\n\n—\nNuru Shillings · ${APP_URL}` });
+}
+
 export async function mailLink(to, link, isNew) {
   const title = isNew ? "Create your Nuru Shillings account" : "Log in to Nuru Shillings";
   const action = isNew ? "Create account" : "Log in";

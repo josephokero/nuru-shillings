@@ -1,4 +1,4 @@
-import { db, HttpError, APP_URL, mailReceipt } from "./_lib.js";
+import { db, HttpError, APP_URL, mailReceipt, mailAdmin, isEmail, newId } from "./_lib.js";
 
 /* ---------- config ---------- */
 
@@ -143,6 +143,52 @@ export async function paypalVerifyWebhook(req, event) {
     }),
   });
   return r.ok && r.json.verification_status === "SUCCESS";
+}
+
+/* ---------- PayPal Payouts (withdrawals) ---------- */
+
+const PAYOUT_ERRORS = {
+  INSUFFICIENT_FUNDS: "PayPal withdrawals are paused for a moment. Your money is back in your wallet. Try again soon or choose another method.",
+  VALIDATION_ERROR: "PayPal didn’t accept that email address. Check it and try again. Your money is back in your wallet.",
+  RECEIVER_UNREGISTERED: "That email isn’t a PayPal account. Check it and try again. Your money is back in your wallet.",
+};
+
+/** The request id makes a repeated call return the original payout instead of paying twice. */
+export async function paypalPayout(w) {
+  const r = await pp("/v1/payments/payouts", {
+    method: "POST",
+    headers: { "PayPal-Request-Id": `nsh-${w.id}` },
+    body: JSON.stringify({
+      sender_batch_header: {
+        sender_batch_id: w.id,
+        email_subject: "You have money from Nuru Shillings",
+        email_message: "Your Nuru Shillings withdrawal has arrived.",
+      },
+      items: [{
+        recipient_type: "EMAIL",
+        receiver: w.destination,
+        amount: { value: (Number(w.amount) / 100).toFixed(2), currency: "USD" },
+        note: "Nuru Shillings withdrawal",
+        sender_item_id: w.id,
+      }],
+    }),
+  });
+  if (r.ok) return { batchId: r.json.batch_header?.payout_batch_id || null };
+  if (r.status >= 500) return { unknown: true };
+  const issue = r.json?.name || "";
+  console.error("[paypal] payout", r.status, issue, JSON.stringify(r.json).slice(0, 300));
+  return { failed: true, issue, reason: PAYOUT_ERRORS[issue] || "PayPal couldn’t send this withdrawal. Your money is back in your wallet." };
+}
+
+export async function paypalPayoutStatus(batchId) {
+  const r = await pp(`/v1/payments/payouts/${encodeURIComponent(batchId)}`);
+  if (!r.ok) return null;
+  const item = r.json.items?.[0];
+  return {
+    status: String(item?.transaction_status || (r.json.batch_header?.batch_status === "DENIED" ? "DENIED" : "PENDING")).toUpperCase(),
+    txn: item?.transaction_id || null,
+    error: item?.errors?.name || null,
+  };
 }
 
 /* ---------- PayHero (M-Pesa STK push) ---------- */
@@ -297,4 +343,118 @@ export async function settleMpesa(t) {
     return (await completeTopup(t.id, { receipt: s.receipt, meta: { settled_by: "status" } })) || t;
   }
   return (await failTopup(t.id, s.reason)) || t;
+}
+
+/* ---------- withdrawal lifecycle (PayPal, paid out instantly from the business PayPal balance) ---------- */
+
+const holdHours = () => Math.max(0, Number(env("NSH_TOPUP_HOLD_HOURS") || 24));
+const dailyCap = () => Math.max(100, Math.round(Number(env("NSH_PAYOUT_DAILY_USD") || 1000) * 100));
+const PAYOUT_FAILED = new Set(["FAILED", "RETURNED", "BLOCKED", "REFUNDED", "REVERSED", "DENIED", "CANCELED"]);
+
+export const publicWithdrawal = (w) => ({
+  id: w.id, method: w.method, amount: Number(w.amount), destination: w.destination,
+  status: w.status, receipt: w.receipt, failure: w.failure, created: w.created_at, paid: w.paid_at,
+});
+
+/** Put the money back exactly once: only the call that flips the row to failed credits the wallet. */
+export async function failWithdrawal(id, reason) {
+  const [w] = await db()`WITH w AS (
+      UPDATE withdrawals SET status = 'failed', failure = ${reason}, refunded_at = now()
+      WHERE id = ${id} AND status IN ('pending', 'processing', 'unclaimed') RETURNING *
+    ), b AS (
+      UPDATE balances SET amount = balances.amount + w.amount FROM w
+      WHERE balances.user_id = w.user_id AND balances.mode = w.mode RETURNING 1
+    ), l AS (
+      INSERT INTO ledger (user_id, mode, kind, amount, counterparty, method, ref)
+      SELECT user_id, mode, 'withdraw_refund', amount, 'Returned to your wallet', method, id FROM w
+    ) SELECT * FROM w`;
+  return w || null;
+}
+
+/** Settle from PayPal's own records. A refused retry is never refunded: the first attempt may have paid. */
+export async function settleWithdrawal(w) {
+  if (w.method !== "PayPal" || !["processing", "unclaimed"].includes(w.status)) return w;
+  const sql = db();
+  if (!w.provider_ref) {
+    const p = await paypalPayout(w).catch(() => ({ unknown: true }));
+    if (p.unknown) return w;
+    if (p.failed) {
+      const [r] = await sql`UPDATE withdrawals SET status = 'review', failure = ${p.issue || "refused on retry"}
+        WHERE id = ${w.id} AND status = 'processing' RETURNING *`;
+      await mailAdmin(`Withdrawal ${w.id} needs a look`, `PayPal refused a retry of withdrawal ${w.id} (${p.issue || "no reason"}). The first attempt may have paid. Check PayPal before refunding.`).catch(() => {});
+      return r || w;
+    }
+    if (!p.batchId) return w;
+    [w] = await sql`UPDATE withdrawals SET provider_ref = ${p.batchId} WHERE id = ${w.id} RETURNING *`;
+  }
+  const s = await paypalPayoutStatus(w.provider_ref).catch(() => null);
+  if (!s) return w;
+  if (s.status === "SUCCESS") {
+    const [r] = await sql`UPDATE withdrawals SET status = 'paid', paid_at = now(), receipt = ${s.txn}, failure = NULL
+      WHERE id = ${w.id} AND status IN ('processing', 'unclaimed') RETURNING *`;
+    return r || w;
+  }
+  if (s.status === "UNCLAIMED") {
+    const [r] = await sql`UPDATE withdrawals SET status = 'unclaimed' WHERE id = ${w.id} AND status = 'processing' RETURNING *`;
+    return r || w;
+  }
+  if (PAYOUT_FAILED.has(s.status)) {
+    return (await failWithdrawal(w.id, s.status === "RETURNED" ? "Not claimed on PayPal, so it came back to your wallet." : "PayPal couldn’t deliver this withdrawal. Your money is back in your wallet.")) || w;
+  }
+  return w;
+}
+
+export async function paypalWithdraw(user, amount, destination) {
+  if (!paypalReady()) throw new HttpError(503, "PayPal withdrawals aren’t switched on yet. Choose another method.");
+  if (!isEmail(destination)) throw new HttpError(400, "Enter the email address of your PayPal account.");
+  if (amount < 100) throw new HttpError(400, "The smallest PayPal withdrawal is 100 NSH ($1).");
+  const sql = db();
+  const id = newId("wd");
+  const cap = dailyCap();
+  const [row] = await sql`WITH lim AS (
+      SELECT
+        (SELECT coalesce(sum(nsh), 0) FROM topups WHERE user_id = ${user.id} AND mode = 'live' AND status = 'paid'
+          AND method IN ('paypal', 'card') AND paid_at > now() - make_interval(hours => ${holdHours()})) AS held,
+        (SELECT coalesce(sum(amount), 0) FROM withdrawals WHERE user_id = ${user.id} AND mode = 'live'
+          AND status <> 'failed' AND created_at > now() - interval '24 hours') AS today,
+        (SELECT amount FROM balances WHERE user_id = ${user.id} AND mode = 'live') AS balance
+    ), debit AS (
+      UPDATE balances SET amount = balances.amount - ${amount} FROM lim
+      WHERE balances.user_id = ${user.id} AND balances.mode = 'live'
+        AND balances.amount - lim.held >= ${amount} AND lim.today + ${amount} <= ${cap}
+      RETURNING balances.user_id
+    ), w AS (
+      INSERT INTO withdrawals (id, user_id, mode, method, amount, destination, status)
+      SELECT ${id}, user_id, 'live', 'PayPal', ${amount}, ${destination}, 'processing' FROM debit RETURNING id
+    ), l AS (
+      INSERT INTO ledger (user_id, mode, kind, amount, counterparty, method, status, ref)
+      SELECT ${user.id}, 'live', 'withdraw', ${-amount}, ${destination}, 'PayPal', 'pending', id FROM w
+    ) SELECT (SELECT count(*)::int FROM w) AS n, held, today, balance FROM lim`;
+  if (!row.n) {
+    const held = Number(row.held), today = Number(row.today), balance = Number(row.balance || 0);
+    if (today + amount > cap) {
+      throw new HttpError(400, `You can withdraw up to ${(cap / 100).toLocaleString("en-US")} USD a day. ${Math.max(0, cap - today).toLocaleString("en-US")} NSH left today.`);
+    }
+    if (balance >= amount && held > 0) {
+      throw new HttpError(400, `Money added by card or PayPal can be withdrawn ${holdHours()} hours after it arrives. You can withdraw up to ${Math.max(0, balance - held).toLocaleString("en-US")} NSH now.`);
+    }
+    throw new HttpError(400, "Your balance is too low for that amount.");
+  }
+
+  let [w] = await sql`SELECT * FROM withdrawals WHERE id = ${id}`;
+  const p = await paypalPayout(w).catch((err) => { console.error("[paypal] payout", err.message); return { unknown: true }; });
+  if (p.failed) {
+    await failWithdrawal(id, p.reason);
+    if (p.issue === "INSUFFICIENT_FUNDS") {
+      await mailAdmin("Top up PayPal: withdrawals are failing", `A ${(amount / 100).toFixed(2)} USD PayPal withdrawal (${id}) failed because the PayPal business balance is too low. The user's money went back to their wallet. Add funds to PayPal so withdrawals go through.`).catch(() => {});
+    }
+    throw new HttpError(400, p.reason);
+  }
+  if (p.batchId) [w] = await sql`UPDATE withdrawals SET provider_ref = ${p.batchId} WHERE id = ${id} RETURNING *`;
+  for (let i = 0; i < 4 && w.status === "processing" && w.provider_ref; i++) {
+    await new Promise((ok) => setTimeout(ok, 1500));
+    w = await settleWithdrawal(w);
+  }
+  if (w.status === "failed") throw new HttpError(400, w.failure);
+  return publicWithdrawal(w);
 }

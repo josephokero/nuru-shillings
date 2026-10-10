@@ -8,6 +8,7 @@ import {
 import {
   paypalReady, payheroReady, kesPerUsd, usdToKes, normalizePhone, paypalCreateOrder, paypalVerifyWebhook,
   payheroStk, mpesaReason, publicTopup, completeTopup, failTopup, settlePaypal, settleMpesa,
+  paypalWithdraw, settleWithdrawal,
 } from "./_pay.js";
 import { appsHandler, v1Connections, v1Deposits } from "./_apps.js";
 import { kycReady, startKyc, syncKyc, kycWebhook, KYC_DONE } from "./_kyc.js";
@@ -118,10 +119,15 @@ async function authLogout(req, res) {
 async function me(req, res, mode) {
   const user = await needUser(req);
   const sql = db();
+  const open = await sql`SELECT * FROM withdrawals WHERE user_id = ${user.id} AND status IN ('processing', 'unclaimed')
+    ORDER BY created_at LIMIT 3`;
+  await Promise.all(open.map((w) => settleWithdrawal(w).catch((err) => console.error("[withdraw] settle", w.id, err.message))));
   const [balances, activity, keys] = await Promise.all([
     sql`SELECT mode, amount FROM balances WHERE user_id = ${user.id}`,
-    sql`SELECT kind, amount, counterparty, method, status, ref, created_at FROM ledger
-      WHERE user_id = ${user.id} AND mode = ${mode} ORDER BY created_at DESC, id DESC LIMIT 30`,
+    sql`SELECT l.kind, l.amount, l.counterparty, l.method, l.ref, l.created_at,
+        CASE WHEN w.id IS NULL THEN l.status WHEN w.status = 'paid' THEN 'done' WHEN w.status = 'failed' THEN 'failed' ELSE 'pending' END AS status
+      FROM ledger l LEFT JOIN withdrawals w ON l.kind = 'withdraw' AND w.id = l.ref
+      WHERE l.user_id = ${user.id} AND l.mode = ${mode} ORDER BY l.created_at DESC, l.id DESC LIMIT 30`,
     sql`SELECT mode, last4, created_at FROM api_keys WHERE user_id = ${user.id} AND revoked_at IS NULL`,
   ]);
   const bal = { test: 0, live: 0 };
@@ -285,6 +291,7 @@ async function withdraw(req, res) {
   if (!amount) fail(400, "Enter an amount in NSH.");
   if (destination.length < 4) fail(400, `Enter your ${method === "M-Pesa" ? "M-Pesa phone number" : method === "PayPal" ? "PayPal email" : "card's last 4 digits"}.`);
   if (mode === "live" && !user.verified_at) fail(403, "Verify your identity before withdrawing. It’s free and done once.");
+  if (mode === "live" && method === "PayPal") return send(res, 200, { ok: true, ...(await paypalWithdraw(user, amount, destination)) });
   const status = mode === "live" ? "pending" : "done";
   const [done] = await db()`WITH debit AS (
       UPDATE balances SET amount = amount - ${amount}
@@ -394,8 +401,14 @@ async function paypalWebhook(req, res) {
   const verified = await paypalVerifyWebhook(req, event).catch(() => false);
   if (verified === false) return send(res, 400, { error: "Signature check failed." });
   const r = event.resource || {};
-  const orderId = event.event_type === "CHECKOUT.ORDER.APPROVED" ? r.id : r.supplementary_data?.related_ids?.order_id;
   const sql = db();
+  if (String(event.event_type || "").startsWith("PAYMENT.PAYOUTS")) {
+    const batchId = r.payout_batch_id || r.batch_header?.payout_batch_id;
+    const [w] = batchId ? await sql`SELECT * FROM withdrawals WHERE provider_ref = ${batchId}` : [];
+    if (w) await settleWithdrawal(w);
+    return send(res, 200, { ok: true });
+  }
+  const orderId = event.event_type === "CHECKOUT.ORDER.APPROVED" ? r.id : r.supplementary_data?.related_ids?.order_id;
   const [t] = orderId
     ? await sql`SELECT * FROM topups WHERE provider_ref = ${orderId}`
     : r.custom_id ? await sql`SELECT * FROM topups WHERE id = ${r.custom_id}` : [];

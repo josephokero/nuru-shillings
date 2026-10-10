@@ -20,6 +20,7 @@
     send: [ICONS.out, "Sent to"],
     receive: [ICONS.in, "Received from"],
     withdraw: [ICONS.bank, "Withdrawn to"],
+    withdraw_refund: [ICONS.back, "Withdrawal returned"],
     pay: [ICONS.bag, "Paid"],
     payment: [ICONS.in, "Payment from checkout"],
     refund: [ICONS.back, "Refund"],
@@ -73,13 +74,14 @@
     const { icon, title, meta } = describe(a);
     const income = a.amount > 0;
     const pending = a.status === "pending";
+    const [tag, tone] = pending ? ["Pending", "warn"] : a.status === "failed" ? ["Returned", "bad"] : ["Completed", "ok"];
     return `<li class="w-row">
       <div class="w-tx">
         <span class="w-ico ${income ? "in" : ""}">${icon}</span>
         <div class="w-what"><b>${Nsh.esc(title)}</b><span>${Nsh.esc(meta) || "&nbsp;"}</span><span class="w-date-sm">${dateOf(a.created_at)}</span></div>
       </div>
       <span class="w-date">${dateOf(a.created_at)}</span>
-      <span class="w-status"><span class="tag ${pending ? "warn" : "ok"}">${pending ? "Pending" : "Completed"}</span></span>
+      <span class="w-status"><span class="tag ${tone}">${tag}</span></span>
       <div class="w-amt ${income ? "in" : ""}"><b>${income ? "+" : "−"}${Nsh.nsh(Math.abs(a.amount))} NSH</b><span>${Nsh.usd(Math.abs(a.amount))}</span></div>
     </li>`;
   }
@@ -138,7 +140,7 @@
 
     const wds = acts.filter((a) => a.kind === "withdraw").slice(0, 5);
     $("#withdrawals").innerHTML = wds.length
-      ? wds.map((a) => `<li class="v-wd"><div><b>${Nsh.nsh(Math.abs(a.amount))} NSH</b><span>${Nsh.esc(a.method || "")} · ${dateOf(a.created_at)}</span></div><span class="tag ${a.status === "pending" ? "warn" : "ok"}">${a.status === "pending" ? "Pending" : "Paid"}</span></li>`).join("")
+      ? wds.map((a) => `<li class="v-wd"><div><b>${Nsh.nsh(Math.abs(a.amount))} NSH</b><span>${Nsh.esc(a.method || "")} · ${dateOf(a.created_at)}</span></div><span class="tag ${a.status === "pending" ? "warn" : a.status === "failed" ? "bad" : "ok"}">${a.status === "pending" ? "Pending" : a.status === "failed" ? "Returned" : "Paid"}</span></li>`).join("")
       : `<li class="v-muted">No withdrawals yet.</li>`;
 
     renderActivity();
@@ -424,7 +426,7 @@
     $("#wd-preview").textContent = Nsh.usd(wAmt);
     $("#wd-s-amount").textContent = `${Nsh.nsh(wAmt)} NSH`;
     $("#wd-s-to").textContent = dest ? `${m} · ${dest}` : m;
-    $("#wd-s-eta").textContent = "After payout review";
+    $("#wd-s-eta").textContent = m === "PayPal" ? "Instantly" : "After payout review";
     $("#wd-s-total").textContent = Nsh.usd(wAmt);
     $("#wd-s-after").textContent = wOver ? "—" : after(-wAmt);
     $("#wd-warn").hidden = !wOver;
@@ -639,11 +641,16 @@
     const amount = amountOf(wForm.amount.value);
     const method = wForm.method.value;
     Nsh.submit(wForm, $("#msg-withdraw"), async () => {
-      await Nsh.api("wallet/withdraw", { body: { mode: MODE, amount, method, destination: wForm.destination.value } });
-      savePrefs({ withdraw_method: method, withdraw_destination: wForm.destination.value });
+      const dest = wForm.destination.value.trim();
+      const r = await Nsh.api("wallet/withdraw", { body: { mode: MODE, amount, method, destination: dest } });
+      savePrefs({ withdraw_method: method, withdraw_destination: dest });
       await load();
       wForm.amount.value = "";
-      finish(wForm, { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.`, again: "Withdraw more" });
+      const done = method !== "PayPal" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.` }
+        : r.status === "paid" ? { title: "Sent to PayPal", text: `${Nsh.usd(amount)} is in the PayPal account for ${dest} now.` }
+        : r.status === "unclaimed" ? { title: "Sent to PayPal", text: `PayPal emailed ${dest} to claim ${Nsh.usd(amount)}. If it isn’t claimed within 30 days, it comes back to your wallet.` }
+        : { title: "Sending to PayPal", text: `${Nsh.usd(amount)} to ${dest}. It usually lands within a minute. Activity shows when it’s paid.` };
+      finish(wForm, { ...done, again: "Withdraw more" });
     }).then(refreshCheckout);
   });
 
