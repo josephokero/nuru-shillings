@@ -23,7 +23,7 @@ Business name
 Adding money, paying, withdrawing
 - Add money with PayPal, a supported card, or M-Pesa. Money added is available in the wallet immediately.
 - Pay any platform that connects the Nuru API, without leaving that platform's page.
-- Sell back at 100 NSH = 1 USD and withdraw to PayPal, a supported card, or M-Pesa in the verified name. Withdrawing is free. PayPal withdrawals are sent instantly to the PayPal email entered (smallest 100 NSH, up to 1,000 USD a day); if that email has no PayPal account yet, PayPal asks the person to claim it, and unclaimed money comes back after 30 days. Card and M-Pesa withdrawals are paid out after a short review. Money added by card or PayPal can be withdrawn 24 hours after it arrives. If the method rejects a withdrawal, the amount returns to the wallet.
+- Sell back at 100 NSH = 1 USD and withdraw to PayPal, a supported card, or M-Pesa in the verified name. Withdrawing is free. PayPal withdrawals are sent instantly to the PayPal email entered (smallest 100 NSH, up to 1,000 USD a day); if that email has no PayPal account yet, PayPal asks the person to claim it, and unclaimed money comes back after 30 days. M-Pesa withdrawals arrive in 1 to 8 hours, depending on traffic. Card withdrawals are paid out after a short review. Money added by card or PayPal can be withdrawn 24 hours after it arrives. If the method rejects a withdrawal, the amount returns to the wallet.
 
 Fees
 - Opening an account, the wallet, the API, the sandbox, adding money, and withdrawing are free. No monthly fee.

@@ -426,7 +426,7 @@
     $("#wd-preview").textContent = Nsh.usd(wAmt);
     $("#wd-s-amount").textContent = `${Nsh.nsh(wAmt)} NSH`;
     $("#wd-s-to").textContent = dest ? `${m} · ${dest}` : m;
-    $("#wd-s-eta").textContent = m === "PayPal" ? "Instantly" : "After payout review";
+    $("#wd-s-eta").textContent = m === "PayPal" ? "Instantly" : m === "M-Pesa" ? "In 1–8 hours" : "After payout review";
     $("#wd-s-total").textContent = Nsh.usd(wAmt);
     $("#wd-s-after").textContent = wOver ? "—" : after(-wAmt);
     $("#wd-warn").hidden = !wOver;
@@ -646,7 +646,8 @@
       savePrefs({ withdraw_method: method, withdraw_destination: dest });
       await load();
       wForm.amount.value = "";
-      const done = method !== "PayPal" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.` }
+      const done = method === "M-Pesa" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to M-Pesa ${dest}. It arrives in 1–8 hours, depending on traffic, and shows as pending until then.` }
+        : method !== "PayPal" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.` }
         : r.status === "paid" ? { title: "Sent to PayPal", text: `${Nsh.usd(amount)} is in the PayPal account for ${dest} now.` }
         : r.status === "unclaimed" ? { title: "Sent to PayPal", text: `PayPal emailed ${dest} to claim ${Nsh.usd(amount)}. If it isn’t claimed within 30 days, it comes back to your wallet.` }
         : { title: "Sending to PayPal", text: `${Nsh.usd(amount)} to ${dest}. It usually lands within a minute. Activity shows when it’s paid.` };
