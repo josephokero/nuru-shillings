@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product · Nuru Shillings</title>
+  <meta name="description" content="The Nuru wallet: add money with PayPal, a card, or M-Pesa, hold Nuru Shillings at 100 NSH = 1 USD, send, pay a company, and withdraw.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=83">
+</head>
+<body class="home subpage">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="/product" aria-current="page">Product</a>
+          <a href="/developers">Developers</a>
+          <a href="/business">Business</a>
+          <a href="/why-nuru">Why Nuru</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+    <main class="legal">
+      <div class="legal-sheet">
+        <span class="legal-tick tl"></span><span class="legal-tick tr"></span><span class="legal-tick bl"></span><span class="legal-tick br"></span>
+        <header class="legal-hero">
+          <h1>Product</h1>
+          <p>One wallet to add, hold, send, pay, and withdraw · Updated 10 October 2026</p>
+        </header>
+        <div class="legal-frame">
+          <article>
+            <div class="legal-lead">
+              <strong>The short version</strong>
+              <ul>
+                <li>Nuru Shillings (NSH) is one balance you can spend on any platform that connects the Nuru payments API.</li>
+                <li>The rate never moves: 100 NSH = 1 US dollar, to buy, to pay, to refund, and to sell.</li>
+                <li>Add money with PayPal, a card, or M-Pesa. Each method opens its own checkout, and you get a receipt on screen and by email.</li>
+                <li>Send to another Nuru account by email, pay a company at checkout, and withdraw to PayPal, a card, or M-Pesa.</li>
+                <li>The account, the wallet, adding money, sending, and withdrawing are free. There is no monthly fee.</li>
+              </ul>
+              <p>You can add, send, and pay as soon as you sign up. Verification is only needed to withdraw.</p>
+            </div>
+
+            <h2 id="what"><span class="n">01</span>What Nuru Shillings is</h2>
+            <p>Nuru Shillings is a wallet and a payment network. You buy Nuru Shillings once, hold them in your wallet, and spend them on any shop, app, marketplace, or site that accepts Nuru. The same balance works everywhere it is accepted, in every country.</p>
+            <p>When you pay a company, the checkout shows the company name and the amount. The payment is settled on Nuru’s private chain. It is not written to a public ledger where anyone can follow the amount, the time, and the path.</p>
+            <p>Nuru is payment infrastructure. It is not a bank, an investment, or a savings product. A balance does not earn interest, and its value is fixed at the published rate.</p>
+
+            <h2 id="wallet"><span class="n">02</span>The wallet</h2>
+            <p>Every account opens with a wallet. The overview shows:</p>
+            <ul>
+              <li><strong>Your balance</strong> in NSH, with the dollar value beside it;</li>
+              <li><strong>Available and pending</strong> amounts, so a withdrawal under review is never counted twice;</li>
+              <li><strong>Money in and money out</strong> for the period, and the number of movements;</li>
+              <li><strong>Recent activity</strong>, with a link to the full list;</li>
+              <li><strong>A converter</strong> that turns dollars into NSH and back, at 100 NSH to 1 USD.</li>
+            </ul>
+            <p>Each part of the wallet has its own page in the sidebar: Overview, Activity, Add money, Send money, Withdraw, and Account. On a phone the sidebar folds into a menu.</p>
+
+            <h2 id="add"><span class="n">03</span>Adding money</h2>
+            <p>Any wallet can add money with three methods, straight after sign-up. They are separate: you choose one, and that method’s own checkout opens.</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Method</th><th>Where you pay</th><th>When it lands</th></tr>
+                <tr><td>PayPal</td><td>You are taken to PayPal, log in, and approve the payment.</td><td>As soon as PayPal confirms the capture.</td></tr>
+                <tr><td>Card</td><td>You are taken to PayPal’s secure card page. No PayPal account is needed. Visa, Mastercard, American Express, Discover, JCB, and Diners Club are accepted.</td><td>As soon as the card payment is captured.</td></tr>
+                <tr><td>M-Pesa</td><td>A prompt is sent to your Safaricom number. You enter your M-Pesa PIN on your phone.</td><td>As soon as M-Pesa confirms the payment.</td></tr>
+              </table>
+            </div>
+            <h3>Amounts</h3>
+            <ul>
+              <li>You choose a whole amount from 1 to 10,000 US dollars. Every dollar becomes 100 NSH.</li>
+              <li>For M-Pesa, the checkout shows the amount in Kenyan shillings before you confirm. A single M-Pesa payment can be up to KES 250,000.</li>
+              <li>The summary beside the form shows the amount, the method, what lands in your wallet, and your balance afterwards.</li>
+            </ul>
+            <h3>How M-Pesa works</h3>
+            <ol>
+              <li><strong>Prompt sent.</strong> You enter your number and choose Send M-Pesa prompt. Nuru asks M-Pesa to send a payment request to that phone.</li>
+              <li><strong>Enter your PIN.</strong> A pop-up appears on your phone with the amount. You enter your M-Pesa PIN. The wallet shows a countdown and waits for M-Pesa.</li>
+              <li><strong>Confirmed or declined.</strong> If M-Pesa confirms, the wallet is credited and the receipt appears. If you cancel, the PIN is wrong, the balance is too low, or the prompt times out, the wallet tells you why and nothing is charged.</li>
+            </ol>
+            <h3>Receipts</h3>
+            <p>Every successful payment shows a receipt at once and sends the same receipt to your email. It lists the receipt number, the date, the method you paid with, the amount paid, the M-Pesa or PayPal transaction number, the NSH added, and your new balance. A payment is credited once, even if the confirmation arrives more than once.</p>
+
+            <h2 id="send"><span class="n">04</span>Sending money</h2>
+            <p>You can send Nuru Shillings to anyone with a Nuru account by entering the email they signed up with. The money moves at once and appears in both activity lists. People you sent to before are shown as shortcuts.</p>
+            <ul>
+              <li>Sending is free. The person receives the full amount.</li>
+              <li>You cannot send more than your available balance, and you cannot send to yourself.</li>
+              <li>If no account uses that email, nothing is sent. Ask them to sign up first.</li>
+            </ul>
+
+            <h2 id="pay"><span class="n">05</span>Paying a company</h2>
+            <p>When a platform accepts Nuru, it sends you to a Nuru checkout that shows the company name and the amount. You confirm from your wallet. If your balance covers it, the payment is <code>paid</code> and the company is told at once. If it does not, nothing moves.</p>
+            <p>The buyer pays exactly the amount shown. Nuru adds nothing on top; the company pays the 1% fee. If the company refunds, the full amount returns to your wallet at the same rate.</p>
+
+            <h2 id="withdraw"><span class="n">06</span>Selling and withdrawing</h2>
+            <p>You can sell your balance back at 100 NSH to 1 USD and withdraw it to PayPal, a card, or M-Pesa in your verified name. Withdrawing is free.</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>To</th><th>What you enter</th><th>Timing</th></tr>
+                <tr><td>PayPal</td><td>Your PayPal email</td><td>Sent after payout review</td></tr>
+                <tr><td>M-Pesa</td><td>Your Safaricom number</td><td>Sent after payout review</td></tr>
+                <tr><td>Card</td><td>The last 4 digits of your card</td><td>Sent after payout review</td></tr>
+              </table>
+            </div>
+            <p>The amount leaves your available balance as soon as you submit, and the withdrawal shows as pending in your activity until it is sent. If the method rejects it, the amount returns to your wallet.</p>
+
+            <h2 id="activity"><span class="n">07</span>Activity and records</h2>
+            <p>The Activity page lists every movement in a table: what it was, the date, the method, the status, and the amount. You can:</p>
+            <ul>
+              <li>filter by money in, money out, or pending;</li>
+              <li>search by name, email, method, or amount;</li>
+              <li>download the list as a CSV file for your own records.</li>
+            </ul>
+
+            <h2 id="account"><span class="n">08</span>Your account</h2>
+            <h3>Sign-in</h3>
+            <p>There is no password. You enter your email, and we send a sign-in link that works once. On that device you stay logged in, even after closing the browser, until you log out.</p>
+            <h3>Profile</h3>
+            <p>You can add a profile picture. It is stored privately with your account and shown in your wallet. Your choices, such as your last payment method and your M-Pesa number, are remembered so checkout is faster next time.</p>
+            <h3>Verification</h3>
+            <p>You can add money, send, and pay without verifying. Before your first withdrawal, you verify once: a photo of your national ID, passport, or driving licence, and a quick selfie. It takes about two minutes and is free. Your name and country come from the ID, and withdrawals then go only to accounts in that name.</p>
+
+            <h2 id="modes"><span class="n">09</span>What you can do before verifying</h2>
+            <p>The wallet is always real money at 100 NSH = 1 USD. There is no practice mode in the wallet; Sandbox is only for developers, in <a href="/developers">Business tools</a>.</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Action</th><th>Before verifying</th><th>After verifying</th></tr>
+                <tr><td>Add money</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Send to another wallet</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Pay a company</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Withdraw</td><td>No</td><td>Yes, to accounts in your name</td></tr>
+                <tr><td>Take live payments as a company</td><td>No</td><td>Yes</td></tr>
+              </table>
+            </div>
+
+            <h2 id="fees"><span class="n">10</span>Fees and the rate</h2>
+            <div class="legal-table">
+              <table>
+                <tr><th>Item</th><th>Price</th></tr>
+                <tr><td>Opening an account</td><td>Free</td></tr>
+                <tr><td>Adding money</td><td>Free from Nuru</td></tr>
+                <tr><td>Sending to another wallet</td><td>Free</td></tr>
+                <tr><td>Paying a company</td><td>Free for the buyer</td></tr>
+                <tr><td>Withdrawing</td><td>Free</td></tr>
+                <tr><td>Monthly fee</td><td>None</td></tr>
+              </table>
+            </div>
+            <p>PayPal, your card issuer, or M-Pesa may charge their own fees under their own terms. Those are not Nuru fees. The full list is in the <a href="/terms#fees">Terms</a>.</p>
+
+            <h2 id="safety"><span class="n">11</span>Privacy and safety</h2>
+            <ul>
+              <li>Card numbers and PayPal passwords are entered on PayPal’s page. Nuru never sees them.</li>
+              <li>Your M-Pesa PIN is entered on your own phone. Nuru never asks for it.</li>
+              <li>A payment is only credited after PayPal or M-Pesa confirms it from their own records.</li>
+              <li>Checkout shows the company, not the person paying.</li>
+            </ul>
+            <p>Read more on the <a href="/security">Security</a> page and in the <a href="/privacy">Privacy Notice</a>.</p>
+
+            <h2 id="start"><span class="n">12</span>Getting started</h2>
+            <ol>
+              <li><a href="/signup">Start free</a> with your email and open the sign-in link.</li>
+              <li>Add money with PayPal, a card, or M-Pesa.</li>
+              <li>Send to a friend or pay a company that accepts Nuru.</li>
+              <li>When you want to withdraw, verify with your ID and a selfie on the Account page.</li>
+            </ol>
+            <p>Questions go to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>, or visit the <a href="/help">Help centre</a>.</p>
+            <p class="legal-end">Nuru Shillings · Product · 10 October 2026</p>
+          </article>
+          <aside class="legal-toc">
+            <nav class="legal-docs">
+              <strong>Explore</strong>
+              <a class="active" href="/product">Product</a>
+              <a href="/developers">Developers</a>
+              <a href="/business">Business</a>
+              <a href="/why-nuru">Why Nuru</a>
+              <a href="/docs">Docs</a>
+            </nav>
+            <details class="legal-onpage" open>
+              <summary>On this page</summary>
+              <small>Wallet</small>
+              <a href="#what">What Nuru Shillings is</a>
+              <a href="#wallet">The wallet</a>
+              <a href="#add">Adding money</a>
+              <a href="#send">Sending money</a>
+              <a href="#pay">Paying a company</a>
+              <a href="#withdraw">Selling and withdrawing</a>
+              <a href="#activity">Activity and records</a>
+              <small>Account</small>
+              <a href="#account">Your account</a>
+              <a href="#modes">Before verifying</a>
+              <a href="#fees">Fees and the rate</a>
+              <a href="#safety">Privacy and safety</a>
+              <a href="#start">Getting started</a>
+            </details>
+          </aside>
+        </div>
+      </div>
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/docs">Read the API&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/product">Product</a>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard#add">Add money</a>
+        <a href="/dashboard#activity">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/developers">Developers</a>
+        <a href="/business">Business</a>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/why-nuru">Why Nuru</a>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <script src="legal.js?v=2"></script>
+  <script src="assistant.js?v=2"></script>
+  <script src="nav.js?v=2"></script>
+</body>
+</html>

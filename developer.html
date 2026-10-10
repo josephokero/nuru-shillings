@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="app.css?v=1">
+  <link rel="stylesheet" href="app.css?v=3">
+  <link rel="stylesheet" href="dev-apps.css?v=2">
 </head>
 <body>
   <header class="top" id="top"></header>
@@ -26,8 +27,8 @@
       <span><b>Sandbox.</b> Test keys, test payments, test webhooks. No real money.</span>
     </div>
     <div class="banner" id="verify-note" hidden>
-      <span><b>Verify yourself</b> in your wallet to unlock the live key.</span>
-      <a class="btn sm primary" href="/dashboard">Go to wallet</a>
+      <span><b>Verify your identity</b> in your wallet to unlock the live key. A quick ID photo and selfie, once.</span>
+      <a class="btn sm primary" href="/dashboard#account">Verify now</a>
     </div>
 
     <div class="grid">
@@ -57,6 +58,8 @@
         </form>
       </section>
     </div>
+
+    <section class="card" id="dev-apps"></section>
 
     <section class="card">
       <div class="card-head">
@@ -102,7 +105,9 @@
     <a href="/terms">Terms</a>
     <a href="/help">Help</a>
   </footer>
-  <script src="nsh.js?v=1"></script>
+  <script src="nsh.js?v=2"></script>
   <script src="developer.js?v=10"></script>
+  <script src="nuru.js?v=1"></script>
+  <script src="dev-apps.js?v=2"></script>
 </body>
 </html>

@@ -38,7 +38,7 @@ async function readJson(req) {
   let raw = "";
   for await (const chunk of req) {
     raw += chunk;
-    if (raw.length > 64_000) break;
+    if (raw.length > 600_000) break;
   }
   try { return raw ? JSON.parse(raw) : {}; } catch { return {}; }
 }

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Business · Nuru Shillings</title>
+  <meta name="description" content="Accept Nuru Shillings in your shop, app, or marketplace. Checkout shows your company name, payouts are free, and you pay 1% only when a payment is paid.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="reference.css?v=83">
+</head>
+<body class="home subpage">
+  <div class="reference-site">
+    <header class="ref-nav">
+      <div class="ref-nav-left">
+        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <nav aria-label="Main navigation">
+          <a href="/product">Product</a>
+          <a href="/developers">Developers</a>
+          <a href="/business" aria-current="page">Business</a>
+          <a href="/why-nuru">Why Nuru</a>
+        </nav>
+      </div>
+      <div class="ref-actions">
+        <a class="ref-ghost" href="/docs">Docs</a>
+        <a class="ref-ghost" href="/signin">Log in</a>
+        <a class="ref-light" href="/signup">Start free</a>
+      </div>
+    </header>
+    <main class="legal">
+      <div class="legal-sheet">
+        <span class="legal-tick tl"></span><span class="legal-tick tr"></span><span class="legal-tick bl"></span><span class="legal-tick br"></span>
+        <header class="legal-hero">
+          <h1>Business</h1>
+          <p>Take payment inside your own platform · Updated 10 October 2026</p>
+        </header>
+        <div class="legal-frame">
+          <article>
+            <div class="legal-lead">
+              <strong>The short version</strong>
+              <ul>
+                <li>Any shop, app, marketplace, or site can accept Nuru Shillings from any wallet, in any country.</li>
+                <li>Checkout shows your company name and the amount. The buyer’s name is not put on display.</li>
+                <li>You pay 1% of each payment that is paid. No setup fee, no monthly fee, and no fee on refusals.</li>
+                <li>Your earnings land in your Nuru balance and can be withdrawn to PayPal, a card, or M-Pesa for free.</li>
+                <li>Start in Sandbox today. Verify once to take live payments.</li>
+              </ul>
+              <p>Developers can go straight to the <a href="/developers">Developers</a> overview or the full <a href="/docs">Docs</a>.</p>
+            </div>
+
+            <h2 id="who"><span class="n">01</span>Who it is for</h2>
+            <p>Nuru is for any business that already sells something online and wants another way to get paid, one that works across borders and keeps the buyer private.</p>
+            <ul>
+              <li><strong>Shops</strong> selling physical or digital goods;</li>
+              <li><strong>Apps and SaaS</strong> selling plans, credits, or features;</li>
+              <li><strong>Marketplaces</strong> that collect for many sellers;</li>
+              <li><strong>Creators and communities</strong> selling access or content;</li>
+              <li><strong>Agencies and freelancers</strong> sending invoices.</li>
+            </ul>
+
+            <h2 id="buyers"><span class="n">02</span>What your customers see</h2>
+            <p>You create a payment, and the buyer is sent to a Nuru checkout that shows your company name and the amount. They confirm from their wallet. If they do not have a wallet yet, they can create one on the spot with their email and return to the same checkout.</p>
+            <ul>
+              <li>The buyer pays exactly the amount you set. Nuru adds no fee on their side.</li>
+              <li>Buyers without a balance can add money first with PayPal, a card, or M-Pesa.</li>
+              <li>The payment is settled on Nuru’s private chain. It is not written to a public ledger.</li>
+            </ul>
+
+            <h2 id="paid"><span class="n">03</span>How you get paid</h2>
+            <p>When a payment is paid, the amount less 1% is added to your Nuru balance at once. Your server receives <code>payment.paid</code> on its webhook, and the payment appears in Business tools with its reference.</p>
+            <p>You can spend that balance, send it, or withdraw it at 100 NSH to 1 USD to PayPal, a card, or M-Pesa in your verified name. Withdrawing is free and is sent after payout review.</p>
+
+            <h2 id="pricing"><span class="n">04</span>Pricing</h2>
+            <div class="legal-table">
+              <table>
+                <tr><th>Item</th><th>Price</th></tr>
+                <tr><td>Account and Business tools</td><td>Free</td></tr>
+                <tr><td>API, Sandbox, keys, and webhooks</td><td>Free</td></tr>
+                <tr><td>Monthly fee</td><td>None</td></tr>
+                <tr><td>A payment that is paid</td><td>1% (1 NSH per 100 NSH)</td></tr>
+                <tr><td>A payment that is never paid</td><td>Free</td></tr>
+                <tr><td>A refund</td><td>Free. The fee is returned to you</td></tr>
+                <tr><td>Withdrawing your earnings</td><td>Free</td></tr>
+              </table>
+            </div>
+            <div class="legal-table">
+              <table>
+                <tr><th>Sale</th><th>Fee</th><th>You receive</th></tr>
+                <tr><td>250 NSH (2.50 USD)</td><td>3 NSH</td><td>247 NSH</td></tr>
+                <tr><td>1,800 NSH (18.00 USD)</td><td>18 NSH</td><td>1,782 NSH</td></tr>
+                <tr><td>10,000 NSH (100.00 USD)</td><td>100 NSH</td><td>9,900 NSH</td></tr>
+              </table>
+            </div>
+            <p>Every payment shows its own fee, so you never need to calculate it.</p>
+
+            <h2 id="tools"><span class="n">05</span>Business tools</h2>
+            <p><a href="/developer">Business tools</a> is the dashboard for taking payments. From it you can:</p>
+            <ul>
+              <li>create and replace Sandbox and Live keys;</li>
+              <li>save a webhook URL and send a test event;</li>
+              <li>create a payment by hand and open its checkout link, without writing code;</li>
+              <li>see every payment, its status, its fee, and your reference;</li>
+              <li>refund a paid payment in one click;</li>
+              <li>see every webhook event Nuru sent and the reply your server gave.</li>
+            </ul>
+
+            <h2 id="uses"><span class="n">06</span>Ways to use it</h2>
+            <div class="legal-table">
+              <table>
+                <tr><th>Use</th><th>How it works</th></tr>
+                <tr><td>Shop checkout</td><td>The price in dollars is charged in NSH. You ship when the status is <code>paid</code>.</td></tr>
+                <tr><td>Subscriptions</td><td>Each period is a new payment with its own reference. A missed period is a payment that is never paid, not a silent gap.</td></tr>
+                <tr><td>Marketplaces</td><td>Your platform creates the payment, then settles with its sellers from the result.</td></tr>
+                <tr><td>Apps</td><td>Sell a feature or a credit pack. Unlock it on <code>payment.paid</code>.</td></tr>
+                <tr><td>Invoices</td><td>The invoice number is the reference. Send the checkout link by email or chat.</td></tr>
+                <tr><td>Refunds</td><td>A returned order is one refund call. The buyer sees the money back in their wallet.</td></tr>
+              </table>
+            </div>
+
+            <h2 id="categories"><span class="n">07</span>Accepted businesses</h2>
+            <p>Card processors often refuse whole categories, including adult content. Nuru does not refuse a lawful business for its category. A shop, an app, a marketplace, or an adult site can take payment.</p>
+            <p>Nuru does not accept businesses that are illegal where they or their buyers are, including fraud, money laundering, sanctions evasion, weapons, illegal drugs, stolen data, material that exploits children, unlicensed gambling, and pyramid or “guaranteed return” schemes. The full list is in <a href="/terms#use">Acceptable use</a>.</p>
+
+            <h2 id="refunds"><span class="n">08</span>Refunds and complaints</h2>
+            <p>You set your own refund policy and show it on your site. A refund always returns the full amount to the buyer at the same rate, and returns the 1% fee to you. Your balance must cover the amount you received.</p>
+            <p>You are responsible for what you sell, for delivery, and for your own customer service. If a buyer contacts Nuru about an order, we ask them to contact you first with the payment id.</p>
+
+            <h2 id="verify"><span class="n">09</span>Verification and compliance</h2>
+            <p>Before you take live payments, you verify your identity once with a photo of your ID and a quick selfie. It is free. We may ask for more information if details do not match or if the law requires it.</p>
+            <p>You are responsible for taxes on your sales and income. Privacy on Nuru means a payment is not exposed on a public ledger. It does not mean Nuru will hide a transaction from a lawful request.</p>
+
+            <h2 id="start"><span class="n">10</span>Getting started</h2>
+            <ol>
+              <li><a href="/signup">Start free</a> with your business email.</li>
+              <li>Open Business tools and create a Sandbox key.</li>
+              <li>Create a test payment, by hand or with the API, and save a webhook.</li>
+              <li>Verify your identity with your ID and a selfie, then create a Live key.</li>
+              <li>Send buyers to the checkout link and deliver on <code>paid</code>.</li>
+            </ol>
+
+            <h2 id="contact"><span class="n">11</span>Talk to us</h2>
+            <p>For larger volumes, a marketplace setup, or help with an integration, write to <a href="mailto:norashillings@benuru.com">norashillings@benuru.com</a>. For a problem with a live payment, write to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a> with the payment id.</p>
+            <p class="legal-end">Nuru Shillings · Business · 10 October 2026</p>
+          </article>
+          <aside class="legal-toc">
+            <nav class="legal-docs">
+              <strong>Explore</strong>
+              <a href="/product">Product</a>
+              <a href="/developers">Developers</a>
+              <a class="active" href="/business">Business</a>
+              <a href="/why-nuru">Why Nuru</a>
+              <a href="/docs">Docs</a>
+            </nav>
+            <details class="legal-onpage" open>
+              <summary>On this page</summary>
+              <small>Overview</small>
+              <a href="#who">Who it is for</a>
+              <a href="#buyers">What your customers see</a>
+              <a href="#paid">How you get paid</a>
+              <a href="#pricing">Pricing</a>
+              <small>Running it</small>
+              <a href="#tools">Business tools</a>
+              <a href="#uses">Ways to use it</a>
+              <a href="#categories">Accepted businesses</a>
+              <a href="#refunds">Refunds and complaints</a>
+              <a href="#verify">Verification and compliance</a>
+              <small>Next</small>
+              <a href="#start">Getting started</a>
+              <a href="#contact">Talk to us</a>
+            </details>
+          </aside>
+        </div>
+      </div>
+      <section class="ref-cta">
+        <div class="cta-backlight" aria-hidden="true">
+          <svg class="cta-stripe" viewBox="0 0 1200 320" preserveAspectRatio="none" focusable="false">
+            <defs>
+              <linearGradient id="cta-blue" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0e6e78" stop-opacity="0"/>
+                <stop offset="22%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="50%" stop-color="#3ec6c0" stop-opacity=".8"/>
+                <stop offset="78%" stop-color="#0e6e78" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#0e6e78" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M-80 250 C 160 40, 420 20, 640 150 S 980 310, 1300 70" stroke="url(#cta-blue)"/>
+            <path d="M-80 290 C 220 110, 500 90, 720 190 S 1040 330, 1300 130" stroke="url(#cta-blue)"/>
+          </svg>
+        </div>
+        <h2>Built for you, and your business</h2>
+        <div class="ref-buttons">
+          <a class="ref-light ref-pill" href="/signup">Start free</a>
+          <a class="ref-dark ref-pill" href="/docs">Read the API&nbsp; ↗</a>
+        </div>
+      </section>
+    </main>
+    <footer class="ref-footer">
+      <div class="foot-brand">
+        <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
+        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+      </div>
+      <div>
+        <strong>Wallet</strong>
+        <a href="/product">Product</a>
+        <a href="/dashboard">Open wallet</a>
+        <a href="/dashboard#add">Add money</a>
+        <a href="/dashboard#activity">Activity</a>
+      </div>
+      <div>
+        <strong>Platform</strong>
+        <a href="/developers">Developers</a>
+        <a href="/business">Business</a>
+        <a href="/docs#create">Payments API</a>
+        <a href="/docs#webhooks">Webhooks</a>
+      </div>
+      <div>
+        <strong>Company</strong>
+        <a href="/why-nuru">Why Nuru</a>
+        <a href="/about">About</a>
+        <a href="/help">Help centre</a>
+        <a href="/community">Community</a>
+        <a href="mailto:norashillings@benuru.com">Contact</a>
+      </div>
+      <div class="foot-base">
+        <span>© 2026 Nuru Shillings</span>
+        <nav>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/security">Security</a>
+          <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
+        </nav>
+      </div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+    </footer>
+  </div>
+  <script src="legal.js?v=2"></script>
+  <script src="assistant.js?v=2"></script>
+  <script src="nav.js?v=2"></script>
+</body>
+</html>

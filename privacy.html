@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="reference.css?v=78">
+  <link rel="stylesheet" href="reference.css?v=83">
 </head>
 <body class="home subpage">
   <div class="reference-site">
@@ -17,10 +17,10 @@
       <div class="ref-nav-left">
         <a class="ref-brand" href="/"><span>Nuru</span></a>
         <nav aria-label="Main navigation">
-          <a href="/#product">Product</a>
-          <a href="/docs">Developers</a>
-          <a href="/#business">Business</a>
-          <a href="/about">About</a>
+          <a href="/product">Product</a>
+          <a href="/developers">Developers</a>
+          <a href="/business">Business</a>
+          <a href="/why-nuru">Why Nuru</a>
         </nav>
       </div>
       <div class="ref-actions">
@@ -41,7 +41,7 @@
             <div class="legal-lead">
               <strong>The short version</strong>
               <ul>
-                <li>We collect what it takes to run a wallet and a payment: your email, your name and country once you verify, your balance, and payment records. There is no password.</li>
+                <li>We collect what it takes to run a wallet and a payment: your email, the result of your ID check with your name and country once you verify, your balance, and payment records. There is no password.</li>
                 <li>Checkout shows the company name. Your name is not shown to the buyer or written to a public ledger.</li>
                 <li>We do not sell personal information. We do not run advertising trackers. We do not offer sign-in with Google or any other company.</li>
                 <li>We share only what a payment needs: the payment result with the company, and a withdrawal with the method you chose.</li>
@@ -76,7 +76,8 @@
             </ul>
             <h3>When you verify</h3>
             <ul>
-              <li>The name on the account and your country. Verification is free and done once before live money moves.</li>
+              <li>A photo of your identity document (national ID, passport, or driving licence) and a short live selfie. Our identity partner, Didit, reads the document, checks that it is genuine, and matches your face to its photo. Verification is free and done once before you withdraw or take live payments.</li>
+              <li>We keep only the result of the check, the session reference, and the name and country read from your document. Your document photos, selfie, and face data stay with Didit, which processes them only to verify you, under its contract with us.</li>
               <li>If the details do not match, or the law requires it, we may ask for more information. We will tell you why when we ask.</li>
             </ul>
             <h3>When you contact us</h3>
@@ -121,7 +122,7 @@
               <table>
                 <tr><th>Purpose</th><th>Information</th><th>Legal basis</th></tr>
                 <tr><td>Open your account and sign you in</td><td>Email, sign-in link hash, session hash</td><td>Contract</td></tr>
-                <tr><td>Verify you before live money moves</td><td>Name, country</td><td>Contract; legal obligation</td></tr>
+                <tr><td>Verify you before you withdraw or take live payments</td><td>Identity document, selfie, name, country</td><td>Contract; legal obligation; your consent for the selfie and face match</td></tr>
                 <tr><td>Add money, pay, refund, and withdraw at 100 NSH = 1 USD</td><td>Balance, payment records, method</td><td>Contract</td></tr>
                 <tr><td>Show the company name and return the result to the platform</td><td>Payment record</td><td>Contract</td></tr>
                 <tr><td>Charge the 1% fee and return it on a refund</td><td>Payment record</td><td>Contract</td></tr>
@@ -146,6 +147,7 @@
             <ul>
               <li><strong>With the company you pay</strong> — the payment result listed in section 09.</li>
               <li><strong>With your payment method</strong> — PayPal, your card issuer, or your mobile-money provider receives what it needs to process money you add or withdraw, such as the amount and the account, card, or phone number you gave.</li>
+              <li><strong>With our identity partner</strong> — Didit receives your document photo and selfie when you choose to verify, and returns the result to us.</li>
               <li><strong>With service providers</strong> who host, secure, or send email for the Service, under a written contract that allows them to use the information only to provide that service to us.</li>
               <li><strong>With authorities</strong> when the law that applies to Nuru requires it, or to respond to a lawful order. Where the law allows, we tell you first.</li>
               <li><strong>To protect people and the Service</strong> — to investigate fraud or a breach of the Terms, or to protect the safety of a person.</li>
@@ -169,7 +171,7 @@
               <table>
                 <tr><th>Information</th><th>How long</th></tr>
                 <tr><td>Account details</td><td>While the account is open, then up to 2 years to handle disputes</td></tr>
-                <tr><td>Verification name and country</td><td>While the account is open, then as long as the law requires</td></tr>
+                <tr><td>Verification result, name, and country</td><td>While the account is open, then as long as the law requires</td></tr>
                 <tr><td>Payment and refund records</td><td>While the account is open, then as long as accounting and financial law requires</td></tr>
                 <tr><td>Webhook events</td><td>90 days</td></tr>
                 <tr><td>Support emails</td><td>2 years after the request is closed</td></tr>
@@ -313,18 +315,21 @@
       </div>
       <div>
         <strong>Wallet</strong>
+        <a href="/product">Product</a>
         <a href="/dashboard">Open wallet</a>
-        <a href="/dashboard">Add money</a>
-        <a href="/dashboard">Activity</a>
+        <a href="/dashboard#add">Add money</a>
+        <a href="/dashboard#activity">Activity</a>
       </div>
       <div>
         <strong>Platform</strong>
+        <a href="/developers">Developers</a>
+        <a href="/business">Business</a>
         <a href="/docs#create">Payments API</a>
         <a href="/docs#webhooks">Webhooks</a>
-        <a href="/docs#endpoints">Endpoints</a>
       </div>
       <div>
         <strong>Company</strong>
+        <a href="/why-nuru">Why Nuru</a>
         <a href="/about">About</a>
         <a href="/help">Help centre</a>
         <a href="/community">Community</a>
@@ -343,6 +348,7 @@
     </footer>
   </div>
   <script src="legal.js?v=2"></script>
-  <script src="assistant.js?v=1"></script>
+  <script src="assistant.js?v=2"></script>
+  <script src="nav.js?v=2"></script>
 </body>
 </html>

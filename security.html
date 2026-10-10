@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="reference.css?v=78">
+  <link rel="stylesheet" href="reference.css?v=83">
 </head>
 <body class="home subpage">
   <div class="reference-site">
@@ -17,10 +17,10 @@
       <div class="ref-nav-left">
         <a class="ref-brand" href="/"><span>Nuru</span></a>
         <nav aria-label="Main navigation">
-          <a href="/#product">Product</a>
-          <a href="/docs">Developers</a>
-          <a href="/#business">Business</a>
-          <a href="/about">About</a>
+          <a href="/product">Product</a>
+          <a href="/developers">Developers</a>
+          <a href="/business">Business</a>
+          <a href="/why-nuru">Why Nuru</a>
         </nav>
       </div>
       <div class="ref-actions">
@@ -43,7 +43,7 @@
               <ul>
                 <li>Payments settle on a private chain. Checkout shows the company name, not the person who paid.</li>
                 <li>There are no passwords. You sign in with a one-time email link, and there is no third-party login.</li>
-                <li>Live money and live keys stay locked until you verify your name and country.</li>
+                <li>Withdrawals and live keys stay locked until you verify your identity with your ID and a live selfie.</li>
                 <li>Secret keys belong on your server. Webhooks must use https. Confirm every payment before you deliver.</li>
                 <li>We never ask you to forward a sign-in link or share a secret key, M-Pesa PIN, or card security code.</li>
                 <li>Found a weakness? Report it to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Section 15 explains how.</li>
@@ -60,7 +60,7 @@
               <table>
                 <tr><th>Area</th><th>Nuru does</th><th>You do</th></tr>
                 <tr><td>Sign-in</td><td>Sends one-time links that expire in 20 minutes; stores only hashes; offers no third-party login</td><td>Keep your email account secure; log out on shared devices</td></tr>
-                <tr><td>Verification</td><td>Locks live money and live keys until you verify</td><td>Give a true name and country</td></tr>
+                <tr><td>Verification</td><td>Locks withdrawals and live keys until an ID and live-selfie check is approved</td><td>Use your own valid ID</td></tr>
                 <tr><td>API keys</td><td>Separates test and live keys; creates a live key only after verification; stores keys as hashes</td><td>Keep keys on your server; report a leak at once</td></tr>
                 <tr><td>Payments</td><td>Records the status, amount, company, and reference; settles privately</td><td>Store your reference; deliver only when paid</td></tr>
                 <tr><td>Webhooks</td><td>Accepts https endpoints only; sends the payment id so you can confirm it</td><td>Confirm with <code>GET /v1/payments/:id</code>; ignore duplicates</td></tr>
@@ -85,10 +85,10 @@
             <h3>Limits</h3>
             <p>We limit how many links can be requested for one email address and from one IP address in a short time. A hidden form field also catches automated form-fillers. Together they stop simple scripts from opening accounts in bulk or flooding an inbox.</p>
             <h3>Sessions</h3>
-            <p>A session is kept in an HttpOnly, Secure cookie that page scripts cannot read. It lasts up to 30 days on that device, or until you log out. Logging out ends the session on our servers at once. Always log out on a shared or public computer.</p>
+            <p>A session is kept in an HttpOnly, Secure cookie that page scripts cannot read. You stay signed in on that device, even after closing the browser, until you log out. A session that is not used for 365 days ends on its own. Logging out ends the session on our servers at once. Always log out on a shared or public computer.</p>
 
             <h2 id="verify"><span class="n">07</span>The verification gate</h2>
-            <p>Until you verify the name on the account and your country, a wallet cannot add, send, pay, or withdraw live money, and Business tools cannot create a live key. Sandbox and the test key work before verification and can never move a live balance. Verification is free and done once.</p>
+            <p>A new wallet can add money, send, and pay at once. Money can only leave Nuru after you verify your identity with a photo of your ID and a live selfie, which our identity partner matches to the document. Your browser never decides the result: the server confirms it directly with the identity partner. Until then, a wallet cannot withdraw, and Business tools cannot create a live key or a live payment. Withdrawals go only to a PayPal account, card, or M-Pesa number in your verified name, after payout review. Sandbox and the test key never move a live balance. Verification is free and done once.</p>
 
             <h2 id="keys"><span class="n">08</span>API keys</h2>
             <div class="legal-table">
@@ -171,7 +171,7 @@
             </ul>
 
             <h2 id="limits"><span class="n">16</span>Limits of this page</h2>
-            <p>This page states the product rules and the controls Nuru is built around. It does not claim a banking licence, deposit insurance, or a completed third-party audit. The commitments you can rely on are the ones written here and in the Terms: the rate is fixed at 100 NSH = 1 USD, settlement is private, checkout shows the company name, live money waits for verification, and a refund uses the original payment id.</p>
+            <p>This page states the product rules and the controls Nuru is built around. It does not claim a banking licence, deposit insurance, or a completed third-party audit. The commitments you can rely on are the ones written here and in the Terms: the rate is fixed at 100 NSH = 1 USD, settlement is private, checkout shows the company name, withdrawals wait for verification, and a refund uses the original payment id.</p>
 
             <h2 id="contact"><span class="n">17</span>Contact</h2>
             <p>Security reports and account help: <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Include the payment id if it is about a payment. Never send a sign-in link or a secret key.</p>
@@ -244,18 +244,21 @@
       </div>
       <div>
         <strong>Wallet</strong>
+        <a href="/product">Product</a>
         <a href="/dashboard">Open wallet</a>
-        <a href="/dashboard">Add money</a>
-        <a href="/dashboard">Activity</a>
+        <a href="/dashboard#add">Add money</a>
+        <a href="/dashboard#activity">Activity</a>
       </div>
       <div>
         <strong>Platform</strong>
+        <a href="/developers">Developers</a>
+        <a href="/business">Business</a>
         <a href="/docs#create">Payments API</a>
         <a href="/docs#webhooks">Webhooks</a>
-        <a href="/docs#endpoints">Endpoints</a>
       </div>
       <div>
         <strong>Company</strong>
+        <a href="/why-nuru">Why Nuru</a>
         <a href="/about">About</a>
         <a href="/help">Help centre</a>
         <a href="/community">Community</a>
@@ -274,6 +277,7 @@
     </footer>
   </div>
   <script src="legal.js?v=2"></script>
-  <script src="assistant.js?v=1"></script>
+  <script src="assistant.js?v=2"></script>
+  <script src="nav.js?v=2"></script>
 </body>
 </html>

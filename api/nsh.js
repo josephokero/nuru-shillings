@@ -1,8 +1,20 @@
 import {
   db, send, fail, body, cookie, sessionCookie, clientIp, isEmail, isMode, amountOf, safeWebhook,
-  sha, secret, newId, fee, mailLink, deliver, publicPayment, HttpError,
+  sha, secret, newId, fee, mailLink, mailWelcome, deliver, publicPayment, HttpError,
+  bunnyPut, bunnyGet, bunnyDelete,
   APP_URL, SESSION_COOKIE, SESSION_DAYS, SANDBOX_START,
 } from "./_lib.js";
+
+import {
+  paypalReady, payheroReady, kesPerUsd, usdToKes, normalizePhone, paypalCreateOrder, paypalVerifyWebhook,
+  payheroStk, mpesaReason, publicTopup, completeTopup, failTopup, settlePaypal, settleMpesa,
+} from "./_pay.js";
+import { appsHandler, v1Connections, v1Deposits } from "./_apps.js";
+import { kycReady, startKyc, syncKyc, kycWebhook, KYC_DONE } from "./_kyc.js";
+
+const AVATAR_DIR = "nuru-shillings/avatars";
+const AVATAR_NAME = /^[A-Za-z0-9_-]{20,40}\.(jpg|png|webp)$/;
+const avatarUrl = (key) => (key ? `/api/avatar?k=${encodeURIComponent(key.split("/").pop())}` : null);
 
 function routeOf(req) {
   const url = new URL(req.url, "http://local");
@@ -15,9 +27,19 @@ async function sessionUser(req) {
   const token = cookie(req, SESSION_COOKIE);
   if (!token) return null;
   const sql = db();
-  const [user] = await sql`SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id
+  const [user] = await sql`SELECT u.*, s.expires_at AS session_expires FROM sessions s JOIN users u ON u.id = s.user_id
     WHERE s.token_hash = ${sha(token)} AND s.expires_at > now()`;
+  if (user) user.session_token = token;
   return user || null;
+}
+
+/* Sliding session: every visit pushes expiry a full year out, so people stay logged in until they log out. */
+async function renewSession(user) {
+  const left = new Date(user.session_expires).getTime() - Date.now();
+  if (left > (SESSION_DAYS - 1) * 86400000) return {};
+  await db()`UPDATE sessions SET expires_at = now() + make_interval(days => ${SESSION_DAYS}), last_seen_at = now()
+    WHERE token_hash = ${sha(user.session_token)}`;
+  return { "Set-Cookie": sessionCookie(user.session_token, SESSION_DAYS * 86400) };
 }
 
 async function needUser(req) {
@@ -77,6 +99,7 @@ async function authVerify(req, res) {
       sql`INSERT INTO balances (user_id, mode, amount) VALUES (${user.id}, 'test', ${SANDBOX_START}), (${user.id}, 'live', 0) ON CONFLICT DO NOTHING`,
       sql`INSERT INTO ledger (user_id, mode, kind, amount, counterparty) VALUES (${user.id}, 'test', 'add', ${SANDBOX_START}, 'Sandbox starting balance')`,
     ]);
+    await mailWelcome(used[0].email).catch((err) => console.error("[auth] welcome", err));
   }
   const session = secret(32);
   await sql`INSERT INTO sessions (token_hash, user_id, expires_at)
@@ -110,21 +133,96 @@ async function me(req, res, mode) {
     name: user.name,
     country: user.country,
     verified: Boolean(user.verified_at),
+    kyc: user.verified_at ? "approved" : user.kyc_session ? user.kyc_status || "not_started" : "none",
+    kyc_ready: kycReady(),
+    avatar: avatarUrl(user.avatar_key),
+    prefs: user.prefs || {},
+    member_since: user.created_at,
+    payments: { paypal: paypalReady(), card: paypalReady(), mpesa: payheroReady(), kes_per_usd: kesPerUsd() },
     balances: bal,
     activity: activity.map((a) => ({ ...a, amount: Number(a.amount) })),
     keys: keyMap,
     webhooks: { test: user.webhook_test, live: user.webhook_live },
+  }, await renewSession(user));
+}
+
+/* ---------- profile ---------- */
+
+const IMAGE_TYPES = { jpeg: "jpg", png: "png", webp: "webp" };
+function imageBytes(dataUrl) {
+  const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ""));
+  if (!m) fail(400, "Choose a JPG, PNG, or WebP picture.");
+  const bytes = Buffer.from(m[2], "base64");
+  if (bytes.length < 100 || bytes.length > 400000) fail(400, "That picture is too large. Use one under 400 KB.");
+  const sig = bytes.subarray(0, 12);
+  const ok = m[1] === "jpeg" ? sig[0] === 0xff && sig[1] === 0xd8
+    : m[1] === "png" ? sig.toString("hex", 0, 4) === "89504e47"
+    : sig.toString("ascii", 0, 4) === "RIFF" && sig.toString("ascii", 8, 12) === "WEBP";
+  if (!ok) fail(400, "That file is not a valid picture.");
+  return { bytes, ext: IMAGE_TYPES[m[1]], type: `image/${m[1]}` };
+}
+
+async function setAvatar(req, res) {
+  const user = await needUser(req);
+  const { bytes, ext, type } = imageBytes((await body(req, 600000)).image);
+  const key = `${AVATAR_DIR}/${secret(18)}.${ext}`;
+  await bunnyPut(key, bytes, type);
+  await db()`UPDATE users SET avatar_key = ${key} WHERE id = ${user.id}`;
+  if (user.avatar_key) await bunnyDelete(user.avatar_key);
+  send(res, 200, { avatar: avatarUrl(key) });
+}
+
+async function removeAvatar(req, res) {
+  const user = await needUser(req);
+  await db()`UPDATE users SET avatar_key = NULL WHERE id = ${user.id}`;
+  if (user.avatar_key) await bunnyDelete(user.avatar_key);
+  send(res, 200, { avatar: null });
+}
+
+async function getAvatar(req, res) {
+  const name = new URL(req.url, "http://local").searchParams.get("k") || "";
+  if (!AVATAR_NAME.test(name)) fail(404, "Not found.");
+  const bytes = await bunnyGet(`${AVATAR_DIR}/${name}`);
+  if (!bytes) fail(404, "Not found.");
+  const ext = name.split(".").pop();
+  res.statusCode = 200;
+  res.setHeader("Content-Type", ext === "jpg" ? "image/jpeg" : `image/${ext}`);
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.end(bytes);
+}
+
+async function savePrefs(req, res) {
+  const user = await needUser(req);
+  const b = await body(req);
+  const clean = {};
+  if (isMode(b.mode)) clean.mode = b.mode;
+  if (METHODS.has(b.add_method)) clean.add_method = b.add_method;
+  if (METHODS.has(b.withdraw_method)) clean.withdraw_method = b.withdraw_method;
+  if (typeof b.withdraw_destination === "string") clean.withdraw_destination = b.withdraw_destination.trim().slice(0, 120);
+  if (typeof b.mpesa_phone === "string" && /^[\d\s+]{9,16}$/.test(b.mpesa_phone.trim())) clean.mpesa_phone = b.mpesa_phone.trim();
+  if (!Object.keys(clean).length) fail(400, "Nothing to save.");
+  const [row] = await db()`UPDATE users SET prefs = COALESCE(prefs, '{}'::jsonb) || ${JSON.stringify(clean)}::jsonb
+    WHERE id = ${user.id} RETURNING prefs`;
+  send(res, 200, { prefs: row.prefs });
+}
+
+async function verifyStart(req, res) {
+  const user = await needUser(req);
+  send(res, 200, { url: await startKyc(user) });
+}
+
+async function verifyStatus(req, res) {
+  let user = await needUser(req);
+  if (!user.verified_at && user.kyc_session && !KYC_DONE.has(user.kyc_status)) user = await syncKyc(user);
+  send(res, 200, {
+    verified: Boolean(user.verified_at),
+    kyc: user.verified_at ? "approved" : user.kyc_session ? user.kyc_status || "not_started" : "none",
   });
 }
 
-async function verify(req, res) {
-  const user = await needUser(req);
-  const b = await body(req);
-  const name = String(b.name || "").trim().replace(/\s+/g, " ");
-  const country = String(b.country || "").trim();
-  if (name.length < 3 || name.length > 80 || !name.includes(" ")) fail(400, "Enter your first and last name.");
-  if (country.length < 2 || country.length > 60) fail(400, "Choose your country.");
-  await db()`UPDATE users SET name = ${name}, country = ${country}, verified_at = COALESCE(verified_at, now()) WHERE id = ${user.id}`;
+async function diditWebhook(req, res) {
+  await kycWebhook(await body(req, 400000)).catch((err) => console.error("[didit] webhook", err));
   send(res, 200, { ok: true });
 }
 
@@ -138,7 +236,7 @@ async function addMoney(req, res) {
   if (!Number.isInteger(usd) || usd < 1 || usd > 10000) fail(400, "Enter a whole amount from 1 to 10,000 USD.");
   const method = METHODS.has(b.method) ? b.method : fail(400, "Choose PayPal, Card, or M-Pesa.");
   if (mode === "live") {
-    if (!user.verified_at) fail(403, "Verify your name and country before adding live money.");
+    if (!user.verified_at) fail(403, "Verify your identity before adding live money.");
     fail(503, "Live top-ups through PayPal, card, and M-Pesa are not switched on yet. Your live balance can still receive payments and transfers.");
   }
   const amount = usd * 100;
@@ -159,7 +257,6 @@ async function sendMoney(req, res) {
   if (!isEmail(to)) fail(400, "Enter the email of a Nuru account.");
   if (to === user.email) fail(400, "You cannot send to yourself.");
   if (!amount) fail(400, "Enter an amount in NSH.");
-  if (mode === "live" && !user.verified_at) fail(403, "Verify your name and country before sending live money.");
   const sql = db();
   const [target] = await sql`SELECT id FROM users WHERE email = ${to}`;
   if (!target) fail(404, "No Nuru account uses that email. Ask them to sign up first.");
@@ -187,7 +284,7 @@ async function withdraw(req, res) {
   const destination = String(b.destination || "").trim().slice(0, 120);
   if (!amount) fail(400, "Enter an amount in NSH.");
   if (destination.length < 4) fail(400, `Enter your ${method === "M-Pesa" ? "M-Pesa phone number" : method === "PayPal" ? "PayPal email" : "card's last 4 digits"}.`);
-  if (mode === "live" && !user.verified_at) fail(403, "Verify your name and country before withdrawing.");
+  if (mode === "live" && !user.verified_at) fail(403, "Verify your identity before withdrawing. It’s free and done once.");
   const status = mode === "live" ? "pending" : "done";
   const [done] = await db()`WITH debit AS (
       UPDATE balances SET amount = amount - ${amount}
@@ -198,6 +295,137 @@ async function withdraw(req, res) {
     ) SELECT count(*)::int AS n FROM debit`;
   if (!done.n) fail(400, "Your balance is too low for that amount.");
   send(res, 200, { ok: true, status });
+}
+
+/* ---------- real top-ups: PayPal, card (PayPal guest checkout), M-Pesa (PayHero STK) ---------- */
+
+const TOPUP_METHODS = new Set(["paypal", "card", "mpesa"]);
+
+async function topupStart(req, res) {
+  const user = await needUser(req);
+  const b = await body(req);
+  if (b.mode !== "live") fail(400, "Real payments are for Live. Sandbox top-ups are free test money.");
+  const method = TOPUP_METHODS.has(b.method) ? b.method : fail(400, "Choose PayPal, Card, or M-Pesa.");
+  const usd = Number(b.usd);
+  if (!Number.isInteger(usd) || usd < 1 || usd > 10000) fail(400, "Enter a whole amount from 1 to 10,000 USD.");
+  if (method === "mpesa" ? !payheroReady() : !paypalReady()) fail(503, `${method === "mpesa" ? "M-Pesa" : "PayPal"} is not available right now. Try another method.`);
+
+  const sql = db();
+  const [recent] = await sql`SELECT count(*)::int AS n FROM topups WHERE user_id = ${user.id} AND created_at > now() - interval '10 minutes'`;
+  if (recent.n >= 8) fail(429, "Too many payment attempts. Wait a few minutes and try again.");
+
+  const t = { id: newId("top"), user_id: user.id, mode: "live", method, usd, nsh: usd * 100, kes: null, phone: null };
+  if (method === "mpesa") {
+    t.phone = normalizePhone(b.phone);
+    t.kes = usdToKes(usd);
+    if (t.kes > 250000) fail(400, "M-Pesa allows up to KES 250,000 per payment. Use a smaller amount.");
+  }
+  await sql`INSERT INTO topups (id, user_id, mode, method, usd, nsh, kes, phone)
+    VALUES (${t.id}, ${user.id}, 'live', ${method}, ${usd}, ${t.nsh}, ${t.kes}, ${t.phone})`;
+
+  try {
+    if (method === "mpesa") {
+      const stk = await payheroStk(t);
+      await sql`UPDATE topups SET provider_ref = ${t.id},
+        meta = meta || ${JSON.stringify({ payhero_reference: stk.reference, checkout_request_id: stk.checkoutRequestId, stk_sent_at: new Date().toISOString() })}::jsonb
+        WHERE id = ${t.id}`;
+      return send(res, 200, { id: t.id, kes: t.kes, phone: publicTopup(t).phone });
+    }
+    const order = await paypalCreateOrder(t);
+    await sql`UPDATE topups SET provider_ref = ${order.orderId} WHERE id = ${t.id}`;
+    send(res, 200, { id: t.id, redirect: order.url });
+  } catch (err) {
+    await failTopup(t.id, err.message || "Could not start the payment.");
+    throw err;
+  }
+}
+
+async function ownTopup(req) {
+  const user = await needUser(req);
+  const id = new URL(req.url, "http://local").searchParams.get("id") || "";
+  const [t] = await db()`SELECT * FROM topups WHERE id = ${id} AND user_id = ${user.id}`;
+  if (!t) fail(404, "No payment with that id.");
+  return t;
+}
+
+async function topupStatus(req, res) {
+  let t = await ownTopup(req);
+  if (t.status === "pending" && t.provider_ref) {
+    const age = Date.now() - new Date(t.created_at).getTime();
+    if (t.method === "mpesa" && age > 4000) t = await settleMpesa(t);
+    else if (t.method !== "mpesa") t = await settlePaypal(t);
+    if (t.status === "pending" && t.method === "mpesa" && age > 5 * 60000) {
+      t = (await failTopup(t.id, "We did not get a confirmation from M-Pesa. If money left your account, contact support with this receipt number.")) || t;
+    }
+  }
+  if (t.status === "paid") {
+    const [bal] = await db()`SELECT amount FROM balances WHERE user_id = ${t.user_id} AND mode = ${t.mode}`;
+    return send(res, 200, { ...publicTopup(t), balance: Number(bal?.amount || 0) });
+  }
+  send(res, 200, publicTopup(t));
+}
+
+function redirect(res, url) {
+  res.statusCode = 302;
+  res.setHeader("Location", url);
+  res.setHeader("Cache-Control", "no-store");
+  res.end();
+}
+
+async function paypalReturn(req, res) {
+  const url = new URL(req.url, "http://local");
+  const id = url.searchParams.get("t") || "";
+  const token = url.searchParams.get("token") || "";
+  const [t] = await db()`SELECT * FROM topups WHERE id = ${id}`;
+  if (t && t.provider_ref === token && t.status === "pending") {
+    await settlePaypal(t).catch((err) => console.error("[paypal] return", err));
+  }
+  redirect(res, `${APP_URL}/dashboard?topup=${encodeURIComponent(id)}#add`);
+}
+
+async function paypalCancel(req, res) {
+  const id = new URL(req.url, "http://local").searchParams.get("t") || "";
+  await failTopup(id, "You cancelled the payment on PayPal.", "cancelled");
+  redirect(res, `${APP_URL}/dashboard?topup=${encodeURIComponent(id)}#add`);
+}
+
+async function paypalWebhook(req, res) {
+  const event = await body(req, 200000);
+  const verified = await paypalVerifyWebhook(req, event).catch(() => false);
+  if (verified === false) return send(res, 400, { error: "Signature check failed." });
+  const r = event.resource || {};
+  const orderId = event.event_type === "CHECKOUT.ORDER.APPROVED" ? r.id : r.supplementary_data?.related_ids?.order_id;
+  const sql = db();
+  const [t] = orderId
+    ? await sql`SELECT * FROM topups WHERE provider_ref = ${orderId}`
+    : r.custom_id ? await sql`SELECT * FROM topups WHERE id = ${r.custom_id}` : [];
+  if (t) {
+    if (["CHECKOUT.ORDER.APPROVED", "PAYMENT.CAPTURE.COMPLETED", "PAYMENT.CAPTURE.DENIED", "PAYMENT.CAPTURE.DECLINED"].includes(event.event_type)) {
+      await settlePaypal(t);
+    } else if (["PAYMENT.CAPTURE.REFUNDED", "PAYMENT.CAPTURE.REVERSED"].includes(event.event_type)) {
+      await sql`UPDATE topups SET meta = meta || ${JSON.stringify({ reversed: event.event_type, reversed_at: event.create_time })}::jsonb WHERE id = ${t.id}`;
+      console.warn("[paypal] capture reversed", t.id, event.event_type);
+    }
+  }
+  send(res, 200, { ok: true });
+}
+
+async function payheroWebhook(req, res) {
+  const raw = await body(req, 100000);
+  const p = raw.response && typeof raw.response === "object" ? { ...raw, ...raw.response } : raw;
+  const ref = String(p.ExternalReference || p.external_reference || p.reference || "");
+  const [t] = ref ? await db()`SELECT * FROM topups WHERE id = ${ref} AND method = 'mpesa'` : [];
+  if (!t || t.status === "paid") return send(res, 200, { ok: true });
+
+  const code = Number(p.ResultCode ?? p.result_code ?? -1);
+  let settled = t;
+  for (let i = 0; i < 3 && settled.status !== "paid" && settled.status !== "cancelled"; i++) {
+    if (i) await new Promise((r) => setTimeout(r, 2000));
+    settled = await settleMpesa(settled);
+  }
+  // A callback alone never credits money: only PayHero's own status record can. A failure code may close it.
+  if (settled.status === "pending" && code > 0) await failTopup(t.id, mpesaReason(code, p.ResultDesc));
+  send(res, 200, { ok: true });
 }
 
 /* ---------- business tools (session) ---------- */
@@ -216,7 +444,7 @@ async function rollKey(req, res) {
   const user = await needUser(req);
   const b = await body(req);
   const mode = isMode(b.mode) ? b.mode : fail(400, "Choose Sandbox or Live.");
-  if (mode === "live" && !user.verified_at) fail(403, "Verify your name and country to get a live key.");
+  if (mode === "live" && !user.verified_at) fail(403, "Verify your identity to get a live key.");
   const key = `nsh_${mode}_${secret(24)}`;
   const sql = db();
   await sql.transaction([
@@ -309,7 +537,7 @@ async function devPayment(req, res) {
   const user = await needUser(req);
   const b = await body(req);
   const mode = isMode(b.mode) ? b.mode : fail(400, "Choose Sandbox or Live.");
-  if (mode === "live" && !user.verified_at) fail(403, "Verify your name and country first.");
+  if (mode === "live" && !user.verified_at) fail(403, "Verify your identity first.");
   send(res, 200, publicPayment(await createPayment(user, mode, b)));
 }
 
@@ -331,7 +559,6 @@ async function checkoutGet(req, res) {
 
 async function checkoutPay(req, res) {
   const user = await needUser(req);
-  if (!user.verified_at) fail(403, "Verify your name and country in your wallet before paying.");
   const b = await body(req);
   const id = String(b.id || "");
   const sql = db();
@@ -368,6 +595,8 @@ async function v1(req, res, parts) {
   const user = await keyUser(req);
   const mode = user.mode;
   const [resource, id] = parts;
+  if (resource === "connections") return await v1Connections(req, res, user, parts.slice(1));
+  if (resource === "deposits") return await v1Deposits(req, res, user, parts.slice(1));
   if (resource === "payments" && !id && req.method === "POST") {
     return send(res, 200, publicPayment(await createPayment(user, mode, await body(req))));
   }
@@ -406,7 +635,19 @@ export default async function handler(req, res) {
     if (route === "auth/verify" && post) return await authVerify(req, res);
     if (route === "auth/logout" && post) return await authLogout(req, res);
     if (route === "me" && req.method === "GET") return await me(req, res, mode);
-    if (route === "wallet/verify" && post) return await verify(req, res);
+    if (route === "wallet/verify/start" && post) return await verifyStart(req, res);
+    if (route === "wallet/verify/status" && req.method === "GET") return await verifyStatus(req, res);
+    if (route === "webhooks/didit" && post) return await diditWebhook(req, res);
+    if (route === "profile/avatar" && post) return await setAvatar(req, res);
+    if (route === "profile/avatar/remove" && post) return await removeAvatar(req, res);
+    if (route === "profile/prefs" && post) return await savePrefs(req, res);
+    if (route === "avatar" && req.method === "GET") return await getAvatar(req, res);
+    if (route === "topup/start" && post) return await topupStart(req, res);
+    if (route === "topup/status" && req.method === "GET") return await topupStatus(req, res);
+    if (route === "topup/paypal/return" && req.method === "GET") return await paypalReturn(req, res);
+    if (route === "topup/paypal/cancel" && req.method === "GET") return await paypalCancel(req, res);
+    if (route === "webhooks/paypal" && post) return await paypalWebhook(req, res);
+    if (route === "webhooks/payhero" && post) return await payheroWebhook(req, res);
     if (route === "wallet/add" && post) return await addMoney(req, res);
     if (route === "wallet/send" && post) return await sendMoney(req, res);
     if (route === "wallet/withdraw" && post) return await withdraw(req, res);
@@ -418,6 +659,8 @@ export default async function handler(req, res) {
     if (route === "dev/refund" && post) return await devRefund(req, res);
     if (route === "checkout" && req.method === "GET") return await checkoutGet(req, res);
     if (route === "checkout/pay" && post) return await checkoutPay(req, res);
+    const appRoute = appsHandler(req.method, route);
+    if (appRoute) return await appRoute(req, res, { needUser, sessionUser });
     send(res, 404, { error: "Not found." });
   } catch (err) {
     if (err instanceof HttpError) return send(res, err.status, { error: err.message });

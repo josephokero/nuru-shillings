@@ -7,128 +7,408 @@
   <title>Wallet · Nuru Shillings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="app.css?v=1">
+  <link rel="stylesheet" href="app.css?v=5">
+  <link rel="stylesheet" href="wallet.css?v=9">
+  <link rel="stylesheet" href="tour.css?v=1">
+  <link rel="stylesheet" href="apps.css?v=3">
 </head>
-<body>
-  <header class="top" id="top"></header>
-  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
-  <main class="page" id="page" hidden>
-    <div class="page-head">
-      <div>
-        <h1>Wallet</h1>
-        <p>100 Nuru Shillings = 1 US dollar</p>
+<body class="wallet-page">
+  <aside class="side" id="side" aria-label="Menu">
+    <div class="side-head"><a class="brand" href="/">Nuru</a></div>
+    <div class="side-nav sk-side">
+      <div class="sk" style="width:50px;height:10px;margin:14px 12px 10px"></div>
+      <div class="sk sk-link"></div><div class="sk sk-link"></div><div class="sk sk-link"></div><div class="sk sk-link"></div><div class="sk sk-link"></div>
+      <div class="sk" style="width:60px;height:10px;margin:22px 12px 10px"></div>
+      <div class="sk sk-link"></div><div class="sk sk-link"></div>
+    </div>
+  </aside>
+  <div class="side-scrim" id="side-scrim"></div>
+
+  <div class="app-main">
+    <header class="app-top">
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-controls="side" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="app-title">
+        <h1 id="view-title">Home</h1>
+        <p id="view-sub">Welcome back</p>
+      </div>
+      <div class="app-actions" id="top-actions">
+        <a class="btn hide-md" href="#withdraw"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18M12 3l9 5H3z"/></svg><span>Withdraw</span></a>
+        <a class="btn hide-md" href="#send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg><span>Send</span></a>
+        <a class="btn primary add-top" href="#add" aria-label="Add money"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add money</span></a>
+      </div>
+    </header>
+
+    <main class="wallet" id="page" hidden>
+      <div class="w-strip verify" id="verify-note" hidden>
+        <span><b>Verify once to withdraw.</b> Adding, sending, and paying work right away. Withdrawals need a quick ID and selfie check, once. Free.</span>
+        <a class="btn sm primary" href="#account">Verify now</a>
+      </div>
+
+      <!-- Home -->
+      <section class="view" data-view="home">
+        <div class="w-top">
+          <div class="w-balance">
+            <div class="w-balance-head">
+              <small id="bal-label">Total balance</small>
+              
+            </div>
+            <strong class="w-amount"><span id="bal">0</span><em>NSH</em></strong>
+            <div class="w-usd" id="bal-usd">$0.00</div>
+            <div class="w-actions">
+              <a class="w-action primary" href="#add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add money</a>
+              <a class="w-action" href="#send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>Send</a>
+              <a class="w-action" href="#withdraw"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18M12 3l9 5H3z"/></svg>Withdraw</a>
+            </div>
+            <dl class="w-balance-foot">
+              <div><dt>Available</dt><dd data-f="avail">0 NSH</dd></div>
+              <div><dt>Pending</dt><dd data-f="pending">0 NSH</dd></div>
+              <div><dt>Rate</dt><dd>100 NSH = $1</dd></div>
+            </dl>
+          </div>
+
+          <form class="w-card w-convert" id="convert">
+            <div class="w-card-head"><h2>Convert</h2><span class="w-count">No spread</span></div>
+            <label class="w-conv-field">
+              <span>You pay</span>
+              <div><input name="usd" inputmode="decimal" value="25" aria-label="Amount in USD"><em>USD</em></div>
+            </label>
+            <div class="w-conv-swap" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+            <div class="w-conv-field out">
+              <span>You get</span>
+              <div><b id="conv-out">2,500</b><em>NSH</em></div>
+            </div>
+            <button class="btn primary block" type="submit">Add this amount</button>
+          </form>
+        </div>
+
+        <div class="w-stats" aria-label="Last 30 days">
+          <div class="w-stat">
+            <span class="w-stat-ico in"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7 7 17M16 17H7V8"/></svg></span>
+            <div><small>Money in</small><b id="st-in">0 NSH</b><span id="st-in-usd">$0.00 · last 30 days</span></div>
+          </div>
+          <div class="w-stat">
+            <span class="w-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+            <div><small>Money out</small><b id="st-out">0 NSH</b><span id="st-out-usd">$0.00 · last 30 days</span></div>
+          </div>
+          <div class="w-stat">
+            <span class="w-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+            <div><small>Transactions</small><b id="st-count">0</b><span>last 30 days</span></div>
+          </div>
+        </div>
+
+        <div class="w-two">
+          <div class="w-card w-activity">
+            <div class="w-card-head">
+              <h2>Recent activity</h2>
+              <a class="w-more" href="#activity">View all <i aria-hidden="true"></i></a>
+            </div>
+            <div class="w-thead" aria-hidden="true"><span>Transaction</span><span>Date</span><span>Status</span><span>Amount</span></div>
+            <ul class="w-list" id="recent"></ul>
+          </div>
+
+          <div class="w-col">
+            <a class="w-card w-account-mini" href="#account">
+              <div class="w-me">
+                <span class="w-avatar" data-f="avatar">N</span>
+                <div class="w-me-text"><b data-f="email"></b><span class="tag" data-f="tag">Not verified</span></div>
+              </div>
+              <ul class="w-steps">
+                <li class="done"><i></i>Email confirmed</li>
+                <li data-f="step"><i></i>ID and selfie</li>
+                <li data-f="step"><i></i>Withdrawals unlocked</li>
+              </ul>
+              <span class="w-more w-mini-foot">Manage account <i aria-hidden="true"></i></span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Activity -->
+      <section class="view" data-view="activity" hidden>
+        <div class="w-card w-activity">
+          <div class="w-card-head w-tools">
+            <div class="w-filter" role="tablist" aria-label="Filter activity">
+              <button type="button" class="on" data-filter="all">All</button>
+              <button type="button" data-filter="in">Money in</button>
+              <button type="button" data-filter="out">Money out</button>
+              <button type="button" data-filter="pending">Pending</button>
+            </div>
+            <div class="w-tools-right">
+              <label class="w-search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/></svg><input id="act-search" type="search" placeholder="Search activity" aria-label="Search activity"></label>
+              <button class="btn sm" type="button" id="act-csv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Export</span></button>
+            </div>
+          </div>
+          <div class="w-thead" aria-hidden="true"><span>Transaction</span><span>Date</span><span>Status</span><span>Amount</span></div>
+          <ul class="w-list" id="activity"></ul>
+          <div class="w-list-foot" id="act-foot"></div>
+        </div>
+      </section>
+
+      <!-- Add money -->
+      <section class="view" data-view="add" hidden>
+        <div class="co">
+          <form class="w-card co-main" id="panel-add">
+            <div class="co-body">
+              <div class="co-top"><span class="co-label">Amount</span><span class="co-avail">Balance <b data-f="balance">0 NSH</b></span></div>
+              <label class="co-amount"><span class="co-cur">$</span><input name="usd" inputmode="numeric" value="50" required autocomplete="off" aria-label="Amount in US dollars"></label>
+              <p class="co-eq"><b id="add-preview">5,000 NSH</b> will be added to your wallet</p>
+              <div class="co-chips" id="chips">
+                <button type="button" data-usd="10">$10</button>
+                <button type="button" data-usd="25">$25</button>
+                <button type="button" data-usd="50" class="on">$50</button>
+                <button type="button" data-usd="100">$100</button>
+                <button type="button" data-usd="250">$250</button>
+              </div>
+
+              <span class="co-label">Pay with</span>
+              <div class="co-methods">
+                <label class="co-method"><input type="radio" name="method" value="PayPal" checked><span class="co-mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7zM3 7l12-4v4M16.5 13.5h.01"/></svg></span><span class="co-mt"><b>PayPal</b><small>Pay from your PayPal account</small></span><i class="co-radio"></i></label>
+                <label class="co-method"><input type="radio" name="method" value="Card"><span class="co-mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3zM3 10h18M7 15h3"/></svg></span><span class="co-mt"><b>Card</b><small>Visa or Mastercard</small></span><i class="co-radio"></i></label>
+                <label class="co-method"><input type="radio" name="method" value="M-Pesa"><span class="co-mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2"/></svg></span><span class="co-mt"><b>M-Pesa</b><small>Mobile money</small></span><i class="co-radio"></i></label>
+              </div>
+
+              <label class="field co-field" id="mpesa-field" hidden><span>M-Pesa phone number</span><input class="input" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0712 345 678"></label>
+
+              <p class="co-note" id="add-note">Choose an amount. 100 NSH are added for every dollar.</p>
+              <button class="btn primary block co-pay" type="submit" id="add-btn">Add $50.00</button>
+              <p class="co-trust" id="add-trust" hidden></p>
+              <p class="msg" id="msg-add"></p>
+            </div>
+            <div class="co-done" hidden></div>
+          </form>
+
+          <aside class="co-side">
+            <div class="w-card co-summary">
+              <div class="co-sum-head"><h3>Summary</h3></div>
+              <dl>
+                <div><dt>Amount</dt><dd id="add-s-usd">$50.00</dd></div>
+                <div><dt>Pay with</dt><dd id="add-s-method">PayPal</dd></div>
+                <div id="add-s-kes-row" hidden><dt>You pay in KES</dt><dd id="add-s-kes">—</dd></div>
+                <div><dt>Rate</dt><dd>100 NSH = $1.00</dd></div>
+                <div><dt>Fee</dt><dd class="free">Free</dd></div>
+              </dl>
+              <div class="co-total"><span>You get</span><b id="add-s-total">5,000 NSH</b></div>
+              <div class="co-after"><span>Balance after</span><span id="add-s-after">—</span></div>
+            </div>
+            <p class="co-secure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>Secure checkout. Your connection is encrypted.</p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Send -->
+      <section class="view" data-view="send" hidden>
+        <div class="co">
+          <form class="w-card co-main" id="panel-send">
+            <div class="co-body">
+              <span class="co-label">To</span>
+              <label class="co-to"><span class="w-avatar sm" id="to-avatar">@</span><input name="to" type="email" required autocomplete="email" placeholder="Their Nuru account email" aria-label="Recipient email"></label>
+              <div class="co-people" id="people"></div>
+
+              <div class="co-top"><span class="co-label">Amount</span><span class="co-avail">Available <b data-f="balance">0 NSH</b></span></div>
+              <label class="co-amount"><input name="amount" inputmode="numeric" placeholder="0" required autocomplete="off" aria-label="Amount in NSH"><span class="co-unit">NSH</span></label>
+              <p class="co-eq" id="send-eq">≈ $0.00</p>
+              <div class="co-chips">
+                <button type="button" data-nsh="500">500</button>
+                <button type="button" data-nsh="1000">1,000</button>
+                <button type="button" data-nsh="2500">2,500</button>
+                <button type="button" data-nsh="5000">5,000</button>
+              </div>
+
+              <p class="co-warn" id="send-warn" hidden>That’s more than your balance.</p>
+              <button class="btn primary block co-pay" type="submit" id="send-btn">Send</button>
+              <p class="msg" id="msg-send"></p>
+            </div>
+            <div class="co-done" hidden></div>
+          </form>
+
+          <aside class="co-side">
+            <div class="w-card co-summary">
+              <div class="co-sum-head"><h3>Summary</h3></div>
+              <dl>
+                <div><dt>To</dt><dd id="send-s-to">—</dd></div>
+                <div><dt>You send</dt><dd id="send-s-amount">0 NSH</dd></div>
+                <div><dt>Fee</dt><dd class="free">Free</dd></div>
+                <div><dt>Arrives</dt><dd>Instantly</dd></div>
+              </dl>
+              <div class="co-total"><span>They get</span><b id="send-preview">0 NSH</b></div>
+              <div class="co-after"><span>Your balance after</span><span id="send-s-after">—</span></div>
+            </div>
+            <p class="co-secure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>Only send to people you know. Transfers can’t be reversed.</p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Withdraw -->
+      <section class="view" data-view="withdraw" hidden>
+        <div class="co">
+          <form class="w-card co-main" id="panel-withdraw">
+            <div class="co-body">
+              <div class="co-top"><span class="co-label">Amount</span><span class="co-avail">Available <b data-f="balance">0 NSH</b></span></div>
+              <div class="co-amount-row">
+                <label class="co-amount"><input name="amount" inputmode="numeric" placeholder="0" required autocomplete="off" aria-label="Amount in NSH"><span class="co-unit">NSH</span></label>
+                <button class="co-max" type="button" id="wd-max">Max</button>
+              </div>
+              <p class="co-eq">You receive <b id="wd-preview">$0.00</b></p>
+
+              <span class="co-label">Send to</span>
+              <div class="co-methods">
+                <label class="co-method"><input type="radio" name="method" value="PayPal" checked><span class="co-mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7zM3 7l12-4v4M16.5 13.5h.01"/></svg></span><span class="co-mt"><b>PayPal</b><small>To your PayPal email</small></span><i class="co-radio"></i></label>
+                <label class="co-method"><input type="radio" name="method" value="M-Pesa"><span class="co-mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2"/></svg></span><span class="co-mt"><b>M-Pesa</b><small>To your phone number</small></span><i class="co-radio"></i></label>
+                <label class="co-method"><input type="radio" name="method" value="Card"><span class="co-mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3zM3 10h18M7 15h3"/></svg></span><span class="co-mt"><b>Card</b><small>Back to a card you used</small></span><i class="co-radio"></i></label>
+              </div>
+              <label class="field co-field"><span id="dest-label">PayPal email</span><input class="input" name="destination" required placeholder="you@example.com" autocomplete="off"></label>
+
+              <p class="co-warn" id="wd-warn" hidden>That’s more than your balance.</p>
+              <button class="btn primary block co-pay" type="submit" id="wd-btn">Withdraw</button>
+              <p class="msg" id="msg-withdraw"></p>
+            </div>
+            <div class="co-done" hidden></div>
+          </form>
+
+          <aside class="co-side">
+            <div class="w-card co-summary">
+              <div class="co-sum-head"><h3>Summary</h3></div>
+              <dl>
+                <div><dt>You sell</dt><dd id="wd-s-amount">0 NSH</dd></div>
+                <div><dt>Rate</dt><dd>100 NSH = $1.00</dd></div>
+                <div><dt>Fee</dt><dd class="free">Free</dd></div>
+                <div><dt>To</dt><dd id="wd-s-to">PayPal</dd></div>
+                <div><dt>Arrives</dt><dd id="wd-s-eta">Instantly</dd></div>
+              </dl>
+              <div class="co-total"><span>You receive</span><b id="wd-s-total">$0.00</b></div>
+              <div class="co-after"><span>Balance after</span><span id="wd-s-after">—</span></div>
+            </div>
+            <div class="w-card co-summary co-recent">
+              <h3>Recent withdrawals</h3>
+              <ul class="v-people" id="withdrawals"></ul>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Apps -->
+      <section class="view" data-view="apps" hidden><div id="apps-root"></div></section>
+
+      <!-- Account -->
+      <section class="view" data-view="account" hidden>
+        <div class="v-grid">
+          <div class="v-stack">
+            <section class="w-card v-form">
+              <div class="av">
+                <button class="av-pic" type="button" id="av-pick" aria-label="Change profile picture">
+                  <span class="w-avatar xl" data-f="avatar">N</span>
+                  <i class="av-cam" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg></i>
+                </button>
+                <div class="av-text">
+                  <b data-f="email" id="acc-email"></b>
+                  <span class="tag" data-f="tag" id="verified-tag">Not verified</span>
+                  <div class="av-actions">
+                    <button class="btn sm primary" type="button" id="av-change">Upload photo</button>
+                    <button class="btn sm" type="button" id="av-remove" hidden>Remove</button>
+                  </div>
+                </div>
+                <input type="file" id="av-file" accept="image/jpeg,image/png,image/webp" hidden>
+              </div>
+              <p class="msg" id="msg-av"></p>
+              <dl class="w-kv">
+                <div><dt>Name</dt><dd id="acc-name">—</dd></div>
+                <div><dt>Country</dt><dd id="acc-country">—</dd></div>
+                <div><dt>Sign-in</dt><dd>Email link</dd></div>
+                <div><dt>Member since</dt><dd id="acc-since">—</dd></div>
+              </dl>
+            </section>
+
+            <form class="w-card v-form" id="panel-verify">
+              <h2>Verify your identity</h2>
+              <p class="note">Once, free, about 2 minutes. You can add, send, and pay without it. It’s needed to withdraw.</p>
+              <ol class="kyc-how">
+                <li><b>Photo of your ID</b><span>National ID, passport, or driving licence</span></li>
+                <li><b>Quick selfie</b><span>A short live check that it’s really you</span></li>
+                <li><b>Withdrawals unlocked</b><span>Your name and country come from the ID</span></li>
+              </ol>
+              <p class="kyc-state" id="kyc-state" hidden></p>
+              <button class="btn primary block w-submit" type="submit" id="kyc-btn" data-busy="Opening…">Verify with ID</button>
+              <p class="msg" id="msg-verify"></p>
+              <p class="kyc-fine">Checks are done by Didit, our identity partner. We keep the result, your name, and your country. Your ID photos stay with Didit. <a href="/privacy">Privacy</a></p>
+            </form>
+          </div>
+          <aside class="v-side">
+            <div class="w-card v-info">
+              <h3>Verification</h3>
+              <ul class="w-steps">
+                <li class="done"><i></i>Email confirmed</li>
+                <li data-f="step"><i></i>ID and selfie</li>
+                <li data-f="step"><i></i>Withdrawals unlocked</li>
+              </ul>
+            </div>
+            <div class="w-card v-info">
+              <h3>Session</h3>
+              <p class="v-muted">You stay logged in on this device, even after closing the browser, until you log out. You sign in with a one-time email link, so there is no password to leak.</p>
+              <button class="btn block" type="button" data-logout>Log out</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div class="wallet w-skeleton" id="loading" aria-busy="true" aria-label="Loading your wallet">
+      <div class="w-top">
+        <div class="w-card sk-card sk-balance">
+          <div class="sk" style="width:120px;height:12px"></div>
+          <div class="sk" style="width:min(260px,70%);height:48px;margin-top:16px;border-radius:12px"></div>
+          <div class="sk" style="width:110px;height:12px;margin-top:12px"></div>
+          <div class="sk-row" style="margin-top:24px">
+            <div class="sk sk-pill" style="width:124px"></div>
+            <div class="sk sk-pill" style="width:88px"></div>
+            <div class="sk sk-pill" style="width:110px"></div>
+          </div>
+          <div class="sk-foot">
+            <div><div class="sk" style="width:56px;height:10px"></div><div class="sk" style="width:84px;height:12px;margin-top:8px"></div></div>
+            <div><div class="sk" style="width:56px;height:10px"></div><div class="sk" style="width:64px;height:12px;margin-top:8px"></div></div>
+            <div><div class="sk" style="width:40px;height:10px"></div><div class="sk" style="width:90px;height:12px;margin-top:8px"></div></div>
+          </div>
+        </div>
+        <div class="w-card sk-card">
+          <div class="sk" style="width:76px;height:12px"></div>
+          <div class="sk" style="height:68px;margin-top:18px;border-radius:12px"></div>
+          <div class="sk" style="height:68px;margin-top:10px;border-radius:12px"></div>
+          <div class="sk sk-pill" style="width:100%;margin-top:14px"></div>
+        </div>
+      </div>
+      <div class="w-stats">
+        <div class="w-card sk-card sk-stat"><div class="sk sk-dot"></div><div><div class="sk" style="width:64px;height:10px"></div><div class="sk" style="width:100px;height:16px;margin-top:8px"></div></div></div>
+        <div class="w-card sk-card sk-stat"><div class="sk sk-dot"></div><div><div class="sk" style="width:64px;height:10px"></div><div class="sk" style="width:84px;height:16px;margin-top:8px"></div></div></div>
+        <div class="w-card sk-card sk-stat"><div class="sk sk-dot"></div><div><div class="sk" style="width:76px;height:10px"></div><div class="sk" style="width:36px;height:16px;margin-top:8px"></div></div></div>
+      </div>
+      <div class="w-two">
+        <div class="w-card sk-card">
+          <div class="sk-row" style="justify-content:space-between"><div class="sk" style="width:110px;height:14px"></div><div class="sk" style="width:60px;height:12px"></div></div>
+          <div class="sk-list">
+            <div class="sk-item"><div class="sk sk-dot"></div><div style="flex:1"><div class="sk" style="width:40%;height:12px"></div><div class="sk" style="width:25%;height:10px;margin-top:8px"></div></div><div class="sk" style="width:84px;height:12px"></div></div>
+            <div class="sk-item"><div class="sk sk-dot"></div><div style="flex:1"><div class="sk" style="width:32%;height:12px"></div><div class="sk" style="width:20%;height:10px;margin-top:8px"></div></div><div class="sk" style="width:64px;height:12px"></div></div>
+            <div class="sk-item"><div class="sk sk-dot"></div><div style="flex:1"><div class="sk" style="width:46%;height:12px"></div><div class="sk" style="width:28%;height:10px;margin-top:8px"></div></div><div class="sk" style="width:74px;height:12px"></div></div>
+          </div>
+        </div>
+        <div class="w-card sk-card">
+          <div class="sk-row"><div class="sk sk-dot" style="width:44px;height:44px;flex-basis:44px"></div><div style="flex:1"><div class="sk" style="width:70%;height:12px"></div><div class="sk" style="width:76px;height:16px;margin-top:8px;border-radius:999px"></div></div></div>
+          <div class="sk" style="width:60%;height:11px;margin-top:22px"></div>
+          <div class="sk" style="width:50%;height:11px;margin-top:14px"></div>
+          <div class="sk" style="width:45%;height:11px;margin-top:14px"></div>
+        </div>
       </div>
     </div>
 
-    <div class="banner sandbox" id="sandbox-note" hidden>
-      <span><b>Sandbox.</b> Test money only. Nothing here is real.</span>
-    </div>
-    <div class="banner" id="verify-note" hidden>
-      <span><b>Verify yourself</b> to use Live. It’s free and takes a minute.</span>
-      <button class="btn sm primary" type="button" data-open="verify">Verify</button>
-    </div>
+    <footer class="app-foot">
+      <span>© 2026 Nuru Shillings</span>
+      <nav><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Security</a><a href="/help">Help</a></nav>
+    </footer>
+  </div>
 
-    <section class="card">
-      <div class="balance">
-        <div>
-          <small id="bal-label">Balance</small>
-          <strong><span id="bal">0</span><em>NSH</em></strong>
-          <div class="usd" id="bal-usd">$0.00</div>
-        </div>
-        <div class="actions">
-          <button class="btn primary" type="button" data-open="add">Add money</button>
-          <button class="btn" type="button" data-open="send">Send</button>
-          <button class="btn" type="button" data-open="withdraw">Withdraw</button>
-        </div>
-      </div>
-
-      <form class="panel" id="panel-add" hidden>
-        <h3>Add money</h3>
-        <p class="note" id="add-note">Choose an amount. 100 NSH are added for every dollar.</p>
-        <div class="chips" id="chips">
-          <button type="button" data-usd="10">$10</button>
-          <button type="button" data-usd="25">$25</button>
-          <button type="button" data-usd="50" class="on">$50</button>
-          <button type="button" data-usd="100">$100</button>
-        </div>
-        <div class="row">
-          <label class="field"><span>Amount in USD</span><input class="input" name="usd" inputmode="numeric" value="50" required></label>
-          <label class="field"><span>Pay with</span><select class="input" name="method"><option>PayPal</option><option>Card</option><option>M-Pesa</option></select></label>
-        </div>
-        <button class="btn primary" type="submit" style="margin-top:16px">Add <span id="add-preview">5,000 NSH</span></button>
-        <p class="msg" id="msg-add"></p>
-      </form>
-
-      <form class="panel" id="panel-send" hidden>
-        <h3>Send</h3>
-        <p class="note">Send Nuru Shillings to anyone with a Nuru account. Free and instant.</p>
-        <div class="row">
-          <label class="field"><span>Their email</span><input class="input" name="to" type="email" required placeholder="friend@example.com"></label>
-          <label class="field"><span>Amount in NSH</span><input class="input" name="amount" inputmode="numeric" required placeholder="1000"></label>
-        </div>
-        <button class="btn primary" type="submit" style="margin-top:16px">Send</button>
-        <p class="msg" id="msg-send"></p>
-      </form>
-
-      <form class="panel" id="panel-withdraw" hidden>
-        <h3>Withdraw</h3>
-        <p class="note">Sell at 100 NSH = 1 USD and withdraw for free.</p>
-        <div class="row">
-          <label class="field"><span>Amount in NSH</span><input class="input" name="amount" inputmode="numeric" required placeholder="1000"></label>
-          <label class="field"><span>To</span><select class="input" name="method"><option>PayPal</option><option>M-Pesa</option><option>Card</option></select></label>
-        </div>
-        <label class="field"><span id="dest-label">PayPal email</span><input class="input" name="destination" required placeholder="you@example.com"></label>
-        <button class="btn primary" type="submit" style="margin-top:16px">Withdraw</button>
-        <p class="msg" id="msg-withdraw"></p>
-      </form>
-
-      <form class="panel" id="panel-verify" hidden>
-        <h3>Verify yourself</h3>
-        <p class="note">Your name and country, once. Free. Needed before live money moves.</p>
-        <div class="row">
-          <label class="field"><span>Full name</span><input class="input" name="name" required autocomplete="name" placeholder="First and last name"></label>
-          <label class="field"><span>Country</span><input class="input" name="country" required autocomplete="country-name" list="countries" placeholder="Kenya"></label>
-        </div>
-        <datalist id="countries">
-          <option>Kenya</option><option>Uganda</option><option>Tanzania</option><option>Rwanda</option><option>Nigeria</option><option>Ghana</option><option>South Africa</option><option>Ethiopia</option><option>United States</option><option>United Kingdom</option><option>Canada</option><option>Germany</option><option>France</option><option>India</option><option>United Arab Emirates</option><option>Australia</option>
-        </datalist>
-        <button class="btn primary" type="submit" style="margin-top:16px">Verify</button>
-        <p class="msg" id="msg-verify"></p>
-      </form>
-    </section>
-
-    <section class="card">
-      <div class="card-head">
-        <div><h2>Activity</h2><p id="act-note">Everything that moved your balance.</p></div>
-      </div>
-      <ul class="list" id="activity"></ul>
-    </section>
-
-    <section class="card">
-      <div class="card-head">
-        <div><h2>Account</h2><p>Signed in with a link sent to your email.</p></div>
-        <span class="tag" id="verified-tag">Not verified</span>
-      </div>
-      <div class="card-body">
-        <dl class="kv">
-          <dt>Email</dt><dd id="acc-email"></dd>
-          <dt>Name</dt><dd id="acc-name">—</dd>
-          <dt>Country</dt><dd id="acc-country">—</dd>
-        </dl>
-      </div>
-    </section>
-  </main>
-  <div class="loading" id="loading"><div class="spinner"></div></div>
-  <footer class="foot">
-    <a href="/docs">Docs</a>
-    <a href="/security">Security</a>
-    <a href="/privacy">Privacy</a>
-    <a href="/terms">Terms</a>
-    <a href="/help">Help</a>
-  </footer>
-  <script src="nsh.js?v=1"></script>
-  <script src="app.js?v=10"></script>
+  <script src="nsh.js?v=6"></script>
+  <script src="app.js?v=19"></script>
+  <script src="tour.js?v=2"></script>
+  <script src="apps.js?v=3"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="app.css?v=1">
+  <link rel="stylesheet" href="app.css?v=3">
 </head>
 <body>
   <header class="auth-top">
@@ -20,7 +20,7 @@
       <div class="spinner"></div>
     </div>
   </main>
-  <script src="nsh.js?v=1"></script>
+  <script src="nsh.js?v=2"></script>
   <script>
     (async () => {
       const card = document.querySelector("#card");
@@ -47,9 +47,10 @@
       const bal = me.balances.live;
       view(`${head}
         <div class="actions">
-          <button class="btn primary block" id="pay" ${bal < Number(p.amount) || !me.verified ? "disabled" : ""}>Pay ${Nsh.nsh(p.amount)} NSH</button>
+          <button class="btn primary block" id="pay" ${bal < Number(p.amount) ? "disabled" : ""}>Pay ${Nsh.nsh(p.amount)} NSH</button>
+          ${bal < Number(p.amount) ? `<a class="btn block" href="/dashboard#add">Add money to your wallet</a>` : ""}
         </div>
-        <p class="msg" id="msg">${!me.verified ? "Verify yourself in your wallet before paying." : bal < Number(p.amount) ? `Your live balance is ${Nsh.nsh(bal)} NSH.` : `Paying from ${Nsh.esc(me.email)} · balance ${Nsh.nsh(bal)} NSH`}</p>
+        <p class="msg" id="msg">${bal < Number(p.amount) ? `Your balance is ${Nsh.nsh(bal)} NSH. Add money, then come back to this page.` : `Paying from ${Nsh.esc(me.email)} · balance ${Nsh.nsh(bal)} NSH`}</p>
         <p class="auth-foot">Only ${Nsh.esc(p.company)} is shown on this payment.</p>`);
       const btn = document.querySelector("#pay");
       btn?.addEventListener("click", async () => {

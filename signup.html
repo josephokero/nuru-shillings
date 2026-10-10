@@ -7,11 +7,12 @@
   <meta name="description" content="Open a free Nuru Shillings wallet with your email. No password.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@16,500&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="app.css?v=1">
+  <link rel="stylesheet" href="app.css?v=3">
+  <link rel="stylesheet" href="site-footer.css?v=1">
 </head>
-<body>
+<body class="auth">
   <header class="auth-top">
     <a class="brand" href="/">Nuru</a>
     <a class="btn sm" href="/signin">Log In</a>
@@ -23,7 +24,7 @@
         <form id="form" novalidate>
           <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email" placeholder="you@example.com" autofocus></label>
-          <button class="btn primary block" type="submit">Continue with Email</button>
+          <button class="btn primary block" type="submit" data-busy="Continuing…">Continue with Email</button>
           <p class="msg" id="msg" role="status"></p>
         </form>
         <p class="auth-alt">Already have an account? <a class="link" href="/signin">Log in</a></p>
@@ -42,7 +43,13 @@
       </section>
     </div>
   </main>
-  <script src="nsh.js?v=1"></script>
-  <script src="auth-page.js?v=2"></script>
+  <footer class="site-footer"><div class="foot-brand"><p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p><p class="foot-rate">100 Nuru Shillings = 1 US dollar</p></div>
+    <div><strong>Wallet</strong><a href="/product">Product</a><a href="/dashboard">Open wallet</a><a href="/dashboard#add">Add money</a><a href="/dashboard#activity">Activity</a></div>
+    <div><strong>Platform</strong><a href="/developers">Developers</a><a href="/business">Business</a><a href="/docs#create">Payments API</a><a href="/docs#webhooks">Webhooks</a></div>
+    <div><strong>Company</strong><a href="/why-nuru">Why Nuru</a><a href="/about">About</a><a href="/help">Help centre</a><a href="/community">Community</a><a href="mailto:norashillings@benuru.com">Contact</a></div>
+    <div class="foot-base"><span>© 2026 Nuru Shillings</span><nav><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Security</a><a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a></nav></div>
+    <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div></footer>
+  <script src="nsh.js?v=2"></script>
+  <script src="auth-page.js?v=4"></script>
 </body>
 </html>

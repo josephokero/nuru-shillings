@@ -10,15 +10,15 @@
   ];
   const LOCAL = [
     [/rate|worth|dollar|usd|convert/i, "100 Nuru Shillings equal 1 US dollar. The same rate is used to buy, pay, refund, and sell back. 10 USD is 1,000 NSH."],
-    [/add|deposit|top ?up|buy|fund/i, "Open your wallet and choose Add money. You can use PayPal, a supported card, or M-Pesa. The money is in your wallet immediately at 100 NSH to 1 USD. You verify your name and country once before live money moves."],
+    [/add|deposit|top ?up|buy|fund/i, "Open your wallet and choose Add money. You can use PayPal, a supported card, or M-Pesa. The money is in your wallet immediately at 100 NSH to 1 USD. You can do this right after sign-up, no verification needed."],
     [/withdraw|cash ?out|sell/i, "Sell your balance back at 100 NSH to 1 USD and withdraw to PayPal, a supported card, or M-Pesa in your verified name. Withdrawing is free. If the method rejects it, the amount returns to your wallet."],
     [/fee|cost|price|charge|1%/i, "Opening an account, adding money, and withdrawing are free. A company pays 1% of each payment that is paid. The buyer pays no Nuru fee. A refund returns the payment and the fee."],
     [/regist|company name|business name|incorporat/i, "Your business does not have to be a registered company. You give it a name, Nuru records that name on its own servers, and that is the only name a checkout shows."],
     [/private|privacy|anonym|name shown|identity|trace|public/i, "Checkout shows the company name only. Your name is not shown to other buyers, and payments are not written to a public ledger. They stay on Nuru's private chain."],
     [/adult|categor|blocked|refus|allowed/i, "Shops, services, subscriptions, marketplaces, apps, and adult sites can take payment on their own page. Nuru does not refuse a site because card networks refuse its category. Anything illegal, fraud, weapons, drugs, stolen data, or material that exploits children is not allowed."],
     [/refund/i, "A company refunds with the original payment id. The full amount returns to the buyer's wallet and the 1% fee returns to the company. Each payment can be refunded once."],
-    [/api|webhook|developer|key|integrat|sandbox/i, "Create a payment with one request: amount, unit NSH, reference, and company. Keep the secret key on your server. Webhooks send payment.paid and payment.refunded. Switch to Sandbox to test for free, and open Business tools from your wallet for keys and webhooks. See the Docs page."],
-    [/verify|verification|kyc/i, "Verification is free and done once: confirm the name on the account and your country. Until then a wallet cannot add money, pay, or withdraw."],
+    [/api|webhook|developer|key|integrat|sandbox/i, "Create a payment with one request: amount, unit NSH, reference, and company. Keep the secret key on your server. Webhooks send payment.paid and payment.refunded. Open Business tools from your wallet for keys, webhooks, and the free Sandbox for testing. See the Docs page."],
+    [/verify|verification|kyc/i, "You can add money, send, and pay without verifying. Verification is only needed before you withdraw: a photo of your ID and a quick selfie, once, for free. Start it from the Account page."],
     [/password|sign ?in|sign ?up|log ?in|login|link/i, "There is no password. Enter your email on the sign-in page and open the link we send; it works once and expires after 20 minutes. If it does not arrive, check spam and choose Resend. Nuru never asks you to forward a sign-in link."],
     [/support|contact|email|help|human|agent/i, "Write to " + SUPPORT + " with your payment id if it is about a payment. You can also use the Help centre or Community pages."],
   ];

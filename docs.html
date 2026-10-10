@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="reference.css?v=81">
+  <link rel="stylesheet" href="reference.css?v=83">
 </head>
 <body class="home subpage">
   <div class="reference-site">
@@ -17,10 +17,10 @@
       <div class="ref-nav-left">
         <a class="ref-brand" href="/"><span>Nuru</span></a>
         <nav aria-label="Main navigation">
-          <a href="/#product">Product</a>
-          <a href="/docs">Developers</a>
-          <a href="/#business">Business</a>
-          <a href="/about">About</a>
+          <a href="/product">Product</a>
+          <a href="/developers">Developers</a>
+          <a href="/business">Business</a>
+          <a href="/why-nuru">Why Nuru</a>
         </nav>
       </div>
       <div class="ref-actions">
@@ -67,7 +67,7 @@
             <h3>Open Business tools</h3>
             <p>From your wallet, choose <strong>Business tools</strong>. This is where you create keys, save a webhook, create payments by hand, refund them, and see every event Nuru sent. The <strong>Sandbox / Live</strong> switch at the top decides which mode you are working in.</p>
             <h3>Verify before Live</h3>
-            <p>Sandbox works immediately. Before you can create a live key, you confirm the name on the account and your country, once. Verification is free. Until it is done, live money cannot move in or out of the account.</p>
+            <p>Sandbox works immediately. Before you can create a live key, you verify your identity once with a photo of your ID and a quick selfie. Verification is free. Until it is done, the account cannot create live payments or withdraw.</p>
 
             <h2 id="quickstart"><span class="n">03</span>Quick start</h2>
             <p>This takes about two minutes in Sandbox.</p>
@@ -242,7 +242,7 @@
             <ul>
               <li>The page shows your company name and the amount.</li>
               <li>A buyer without an account can create one on the spot with their email. They return to the same checkout after opening the sign-in link.</li>
-              <li>The buyer must be verified and have enough live balance. If not, the page tells them what to do and nothing is charged.</li>
+              <li>The buyer needs enough balance. If they do not have it, the page offers to add money first, and nothing is charged until they pay.</li>
               <li>A payment can be paid only once. A second attempt is refused.</li>
               <li>You cannot pay your own payment.</li>
             </ul>
@@ -284,6 +284,10 @@
                 <tr><td><code>payment.paid</code></td><td>A payment becomes <code>paid</code>.</td></tr>
                 <tr><td><code>payment.refunded</code></td><td>A payment is refunded.</td></tr>
                 <tr><td><code>webhook.test</code></td><td>You call <code>POST /v1/webhooks/test</code> or choose Send test event.</td></tr>
+                <tr><td><code>deposit.succeeded</code></td><td>Someone confirms a deposit to one of your apps. See <a href="#apps">Deposits from apps</a>.</td></tr>
+                <tr><td><code>deposit.declined</code></td><td>Someone declines a deposit.</td></tr>
+                <tr><td><code>connection.created</code></td><td>Someone connects their wallet to one of your apps.</td></tr>
+                <tr><td><code>connection.revoked</code></td><td>Someone disconnects one of your apps.</td></tr>
               </table>
             </div>
             <p>Nuru sends a <code>POST</code> request with a JSON body and these headers: <code>Content-Type: application/json</code>, <code>User-Agent: NuruShillings-Webhooks/1</code>, and <code>Nuru-Event-Id</code>.</p>
@@ -334,7 +338,106 @@
   }
 });</pre>
 
-            <h2 id="errors"><span class="n">15</span>Errors</h2>
+            <h2 id="apps"><span class="n">15</span>Deposits from apps</h2>
+            <p>Let people add funds to your app, game or platform straight from their Nuru wallet. It works like PayPal, but simpler: your server sets the amount, Nuru opens a window that matches your brand, and the person confirms or declines. Money only moves when they confirm.</p>
+            <ul>
+              <li><strong>Deposits only.</strong> Apps can ask people to add funds. Apps cannot take money on their own and cannot send withdrawals through the API.</li>
+              <li><strong>Every amount is confirmed.</strong> The first time, confirming also connects your app to their wallet. After that they only confirm the amount.</li>
+              <li><strong>Instant receipts.</strong> When a deposit succeeds, the person and you both get an email, it shows in both wallets, and your webhook receives <code>deposit.succeeded</code>.</li>
+              <li><strong>Fees.</strong> Free for the person. You pay 1% of each deposit, taken before it reaches your balance.</li>
+            </ul>
+            <h3>1. Create an app</h3>
+            <p>In Business tools, open <strong>Apps</strong> and choose <strong>New app</strong>. Add the name people will see, your website and at least one return URL. Pick how the deposit window looks: <strong>Dark</strong> or <strong>Light</strong>, a button colour, and an optional logo link. The window always shows <em>Powered by Nuru Shillings</em>. You get an app id such as <code>app_5d1c…</code>. Choose <strong>Test the popup</strong> to try it with Sandbox money.</p>
+            <h3>2. Create a deposit on your server</h3>
+            <pre class="doc-code"><b>POST</b> /v1/deposits
+Authorization: Bearer nsh_test_…
+
+{
+  "app": "app_5d1c90e2b7a4f0136c88",
+  "amount": "500",
+  "reference": "order_2231",
+  "description": "500 coins for Acme Games"
+}</pre>
+            <div class="legal-table">
+              <table>
+                <tr><th>Field</th><th>Meaning</th></tr>
+                <tr><td><code>app</code></td><td>Required. Your app id.</td></tr>
+                <tr><td><code>amount</code></td><td>Required. Whole NSH as a string. The person sees exactly this amount and cannot change it.</td></tr>
+                <tr><td><code>reference</code></td><td>Your order or user id, up to 100 characters. Shown to the person and sent back to you.</td></tr>
+                <tr><td><code>description</code></td><td>A short line shown under the amount, up to 140 characters.</td></tr>
+                <tr><td><code>connection</code></td><td>Optional. A connection id, so only that wallet can confirm. See step 5.</td></tr>
+                <tr><td><code>return_url</code></td><td>Optional. One of the app’s return URLs, used when you redirect instead of opening the popup.</td></tr>
+              </table>
+            </div>
+            <pre class="doc-code">{
+  "id": "dep_41f0d2a7c9e15b3a8d60",
+  "object": "deposit",
+  "status": "pending",
+  "mode": "test",
+  "app": "app_5d1c90e2b7a4f0136c88",
+  "amount": "500",
+  "unit": "NSH",
+  "fee": "5",
+  "net": "495",
+  "reference": "order_2231",
+  "description": "500 coins for Acme Games",
+  "connection": null,
+  "user": null,
+  "url": "https://norashillings.benuru.com/deposit?id=dep_41f0d2a7c9e15b3a8d60",
+  "expires": "2026-10-10T10:10:03.000Z",
+  "completed": null
+}</pre>
+            <p>A deposit stays open for 30 minutes. Cancel one that’s no longer needed with <code>POST /v1/deposits/:id/cancel</code>.</p>
+            <h3>3. Open the deposit window</h3>
+            <p><strong>Inside your app (popup).</strong> Add the Nuru script and pass it the <code>url</code>. The person stays on your page. Nuru opens a small secure window and dims your page until they finish.</p>
+            <pre class="doc-code">&lt;script src="https://norashillings.benuru.com/nuru.js"&gt;&lt;/script&gt;
+
+button.onclick = async () => {
+  const deposit = await fetch("/api/nuru-deposit", { method: "POST" }).then((r) => r.json());
+  const { status } = await Nuru.deposit(deposit.url);
+  if (status === "succeeded") showMessage("Coins added!");
+};</pre>
+            <p><code>status</code> is <code>succeeded</code>, <code>declined</code>, <code>cancelled</code>, <code>expired</code>, <code>closed</code> (the window was closed) or <code>blocked</code> (the browser blocked the popup; Nuru then opens the page in the same tab). You can also pass <code>onSuccess</code>, <code>onDecline</code> and <code>onClose</code> callbacks.</p>
+            <p><strong>Outside your app (redirect).</strong> Send the person to <code>url</code>. If you set <code>return_url</code>, they come back to <code>return_url?deposit=dep_…&amp;status=succeeded&amp;reference=…</code> after they finish.</p>
+            <p>If they are not logged in to Nuru, the window asks them to log in or create a free wallet first, then returns to the deposit. People using a live wallet verify their name and country once.</p>
+            <h3>4. Confirm on your server</h3>
+            <p>The popup result and the return URL are for your interface only. Before you credit the person, check the deposit with your secret key, or wait for the <code>deposit.succeeded</code> webhook:</p>
+            <pre class="doc-code"><b>GET</b> /v1/deposits/dep_41f0d2a7c9e15b3a8d60
+
+{ "id": "dep_41f0…", "status": "succeeded", "amount": "500", "net": "495",
+  "reference": "order_2231", "connection": "con_7a20…",
+  "user": { "name": "Amina Otieno", "email": "amina@example.com" }, … }</pre>
+            <p>Credit the order once, when <code>status</code> is <code>succeeded</code> and the <code>reference</code> and <code>amount</code> match. <code>GET /v1/deposits</code> lists your latest 50.</p>
+            <h3>5. Remember the wallet (optional)</h3>
+            <p>A successful deposit returns a <code>connection</code> id. Save it with the person’s account and send it as <code>connection</code> next time, so only their wallet can confirm. To link a wallet before any deposit, send them to the connect link shown for your app in Business tools. They come back to <code>redirect_uri?code=…&amp;state=…</code>, and you swap the code within 10 minutes:</p>
+            <pre class="doc-code"><b>POST</b> /v1/connections/exchange
+
+{ "code": "Jx3…" }   →   { "id": "con_7a20…", "object": "connection", "status": "active", "user": { … } }</pre>
+            <p>People see every app they’ve used under <strong>Apps</strong> in their wallet and can disconnect any time. Disconnecting cancels their open deposit requests.</p>
+            <h3>When a request is refused</h3>
+            <p>These responses include a <code>code</code> field as well as <code>error</code>:</p>
+            <div class="legal-table">
+              <table>
+                <tr><th>Status</th><th><code>code</code></th><th>Meaning</th></tr>
+                <tr><td>400</td><td><code>app_required</code> / <code>invalid_amount</code></td><td>Missing app id, or the amount is not a whole number of NSH.</td></tr>
+                <tr><td>400</td><td><code>invalid_return_url</code></td><td><code>return_url</code> is not one of the app’s return URLs.</td></tr>
+                <tr><td>403</td><td><code>connection_revoked</code></td><td>The person disconnected your app. Create the deposit without <code>connection</code>.</td></tr>
+                <tr><td>404</td><td><code>app_not_found</code> / <code>deposit_not_found</code> / <code>connection_not_found</code></td><td>Wrong id, another account’s id, or the other mode.</td></tr>
+                <tr><td>400</td><td><code>invalid_code</code></td><td>The connect code expired or was already used.</td></tr>
+              </table>
+            </div>
+            <h3>Events</h3>
+            <div class="legal-table">
+              <table>
+                <tr><th>Type</th><th>Sent when</th></tr>
+                <tr><td><code>deposit.succeeded</code></td><td>The person confirmed. The money is in your balance. <code>data</code> is the deposit.</td></tr>
+                <tr><td><code>deposit.declined</code></td><td>The person declined. No money moved.</td></tr>
+                <tr><td><code>connection.created</code></td><td>Someone connects your app for the first time.</td></tr>
+                <tr><td><code>connection.revoked</code></td><td>Someone disconnects your app.</td></tr>
+              </table>
+            </div>
+
+            <h2 id="errors"><span class="n">16</span>Errors</h2>
             <p>A failed request returns a status code and a message written for the developer:</p>
             <pre class="doc-code">{
   "error": "amount must be a whole number of NSH as a string, for example \"1800\"."
@@ -351,7 +454,7 @@
             </div>
             <p>Requests that fail with 4xx do not change anything. Fix the request before you retry it.</p>
 
-            <h2 id="golive"><span class="n">16</span>Going live</h2>
+            <h2 id="golive"><span class="n">17</span>Going live</h2>
             <ol>
               <li>Your integration works end to end in Sandbox, including a refund and a webhook.</li>
               <li>Your account is verified, and you created a live key in Business tools with the switch on <strong>Live</strong>.</li>
@@ -363,7 +466,7 @@
             </ol>
             <p>Read the <a href="/security">Security</a> page for how to keep keys and webhooks safe, and the <a href="/terms">Terms</a> for the rules that apply to taking payments.</p>
 
-            <h2 id="support"><span class="n">17</span>Support and changes</h2>
+            <h2 id="support"><span class="n">18</span>Support and changes</h2>
             <p>Questions about the API or a live payment go to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Include the payment id and the time of the request. Never send your secret key.</p>
             <p>This document describes version 1. We may add new fields to responses and new event types without notice, so your code should ignore fields it does not recognise. If we need to remove or change an existing field, we will announce it by email and on this page before it takes effect.</p>
             <p class="legal-end">Nuru Shillings · Documentation · Payments API version 1 · 10 October 2026</p>
@@ -396,6 +499,7 @@
               <a href="#checkout">Checkout</a>
               <a href="#refunds">Refund a payment</a>
               <a href="#webhooks">Webhooks</a>
+              <a href="#apps">Deposits from apps</a>
               <a href="#errors">Errors</a>
               <small>Launch</small>
               <a href="#golive">Going live</a>
@@ -434,18 +538,21 @@
       </div>
       <div>
         <strong>Wallet</strong>
+        <a href="/product">Product</a>
         <a href="/dashboard">Open wallet</a>
-        <a href="/dashboard">Add money</a>
-        <a href="/dashboard">Activity</a>
+        <a href="/dashboard#add">Add money</a>
+        <a href="/dashboard#activity">Activity</a>
       </div>
       <div>
         <strong>Platform</strong>
+        <a href="/developers">Developers</a>
+        <a href="/business">Business</a>
         <a href="/docs#create">Payments API</a>
         <a href="/docs#webhooks">Webhooks</a>
-        <a href="/docs#modes">Sandbox</a>
       </div>
       <div>
         <strong>Company</strong>
+        <a href="/why-nuru">Why Nuru</a>
         <a href="/about">About</a>
         <a href="/help">Help centre</a>
         <a href="/community">Community</a>
@@ -464,6 +571,7 @@
     </footer>
   </div>
   <script src="legal.js?v=2"></script>
-  <script src="assistant.js?v=1"></script>
+  <script src="assistant.js?v=2"></script>
+  <script src="nav.js?v=2"></script>
 </body>
 </html>

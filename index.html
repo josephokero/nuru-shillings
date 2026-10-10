@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="vercel-theme.css">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="reference.css?v=78">
+  <link rel="stylesheet" href="reference.css?v=83">
 </head>
 <body class="home">
   <div class="reference-site">
@@ -19,10 +19,10 @@
       <div class="ref-nav-left">
         <a class="ref-brand" href="/"><span>Nuru</span></a>
         <nav aria-label="Main navigation">
-          <a href="#product">Product</a>
-          <a href="#developers">Developers</a>
-          <a href="#business">Business</a>
-          <a href="#why">Why Nuru</a>
+          <a href="/product">Product</a>
+          <a href="/developers">Developers</a>
+          <a href="/business">Business</a>
+          <a href="/why-nuru">Why Nuru</a>
         </nav>
       </div>
       <div class="ref-actions">
@@ -87,7 +87,7 @@
                 <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 V7 L8 4 L13 7 V13 H3 Z M6.5 13 V9.5 H9.5 V13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg><span><b>Company name only</b><small>The buyer sees Northwind. The person who paid is not on the payment.</small></span></li>
                 <li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 8 H10 M5 6.5 A2.2 2.2 0 1 1 5 9.5 H7 M11 9.5 A2.2 2.2 0 1 1 11 6.5 H9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><b>Private chain</b><small>The payment is not written to a public ledger, so it cannot be traced there.</small></span></li>
                 <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.4 8.1 L7.2 9.8 L10.7 6.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Earnings stay unlocked</b><small>Nuru does not hold the payout on a network that can freeze it.</small></span></li>
-                <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 5.2 V8.2 L10 9.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><b>Verify once, then use it</b><small>Opening the account is free. You confirm your name before live money moves.</small></span></li>
+                <li><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 5.2 V8.2 L10 9.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><b>Start using it right away</b><small>Opening the account is free. Add, send, and pay at once. Verify once before you withdraw.</small></span></li>
               </ul>
               <footer><img src="logo.svg" alt="" width="14" height="14"> Northwind</footer>
             </div>
@@ -270,7 +270,7 @@
         <h2>Free to start.<br>1% when a payment is paid.</h2>
         <div class="fact-row">
           <article><small>Setup</small><strong>Free</strong><p>Open a wallet with your email and start. No monthly fee.</p></article>
-          <article><small>Before live money</small><strong>Verify yourself</strong><p>Confirm your name and country once. Then add, pay, withdraw, or take live payments.</p></article>
+          <article><small>Before you withdraw</small><strong>Verify yourself</strong><p>Add, send, and pay right away. Verify once with your ID and a selfie to withdraw or take live payments.</p></article>
           <article><small>Each paid payment</small><strong>1%</strong><p>The company pays 1 NSH for every 100 NSH that is paid. The buyer pays no fee. Refusals are free.</p></article>
         </div>
       </section>
@@ -306,18 +306,21 @@
       </div>
       <div>
         <strong>Wallet</strong>
+        <a href="/product">Product</a>
         <a href="/dashboard">Open wallet</a>
-        <a href="/dashboard">Add money</a>
-        <a href="/dashboard">Activity</a>
+        <a href="/dashboard#add">Add money</a>
+        <a href="/dashboard#activity">Activity</a>
       </div>
       <div>
         <strong>Platform</strong>
+        <a href="/developers">Developers</a>
+        <a href="/business">Business</a>
         <a href="/docs#create">Payments API</a>
         <a href="/docs#webhooks">Webhooks</a>
-        <a href="/docs#sandbox">Sandbox</a>
       </div>
       <div>
         <strong>Company</strong>
+        <a href="/why-nuru">Why Nuru</a>
         <a href="/about">About</a>
         <a href="/help">Help centre</a>
         <a href="/community">Community</a>
@@ -728,6 +731,7 @@ Authorization: Bearer nsh_live_••••••••4f2a
       <a href="#questions">Questions</a>
     </div>
   </footer>
-  <script src="assistant.js?v=1"></script>
+  <script src="assistant.js?v=2"></script>
+  <script src="nav.js?v=2"></script>
 </body>
 </html>

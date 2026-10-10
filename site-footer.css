@@ -1,0 +1,84 @@
+/* Homepage footer, standalone for pages that don't load reference.css */
+.site-footer {
+  position: relative;
+  width: min(1400px, 84vw);
+  margin: 0 auto;
+  padding: 64px 0 28px;
+  display: grid;
+  grid-template-columns: minmax(240px, 1.45fr) repeat(3, minmax(0, 1fr));
+  gap: 28px 32px;
+  align-items: start;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+  text-align: left;
+}
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #3a3a3a;
+  box-shadow: 0 1px 0 rgba(255,255,255,.07), 0 18px 36px rgba(0,0,0,.55);
+}
+.site-footer .foot-brand { display: flex; flex-direction: column; gap: 16px; max-width: 340px; }
+.site-footer .foot-brand p { margin: 0; color: #8d8d8d; font-size: 14px; line-height: 1.55; }
+.site-footer .foot-rate { color: #d4d4d4; font-size: 13px; letter-spacing: -.01em; }
+.site-footer strong { display: block; margin: 0 0 14px; color: #f2f2f2; font-size: 13px; font-weight: 550; letter-spacing: -.02em; }
+.site-footer > div > a { display: block; margin: 0; padding: 7px 0; color: #8a8a8a; font-size: 14px; line-height: 1.35; transition: color .15s; }
+.site-footer > div > a:hover { color: #fff; }
+.site-footer .foot-base {
+  grid-column: 1 / -1;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid #343434;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #6e6e6e;
+  font-size: 13px;
+}
+.site-footer .foot-base nav { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.site-footer .foot-base a { color: #8a8a8a; font-size: 13px; transition: color .15s; }
+.site-footer .foot-base a:hover { color: #fff; }
+.site-footer .foot-mark { grid-column: 1 / -1; margin: 8px 0 0; padding: 28px 0 96px; }
+.site-footer .foot-name {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  padding: .02em 0 .06em;
+  color: transparent;
+  font-family: Newsreader, Georgia, serif;
+  font-size: clamp(32px, 7vw, 104px);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  white-space: nowrap;
+  background-image: linear-gradient(90deg, #fff 0%, #fff 72%, transparent 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 1100px) {
+  .site-footer { width: min(1100px, calc(100% - 40px)); }
+}
+@media (max-width: 980px) {
+  .site-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 48px; }
+  .site-footer .foot-brand,
+  .site-footer .foot-base,
+  .site-footer .foot-mark { grid-column: 1 / -1; }
+}
+@media (max-width: 800px) {
+  .site-footer { width: 100%; padding: 40px 20px 28px; grid-template-columns: 1fr; }
+  .site-footer::before { left: 20px; right: 20px; }
+  .site-footer .foot-base { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .site-footer .foot-mark { padding: 20px 0 56px; }
+  .site-footer .foot-name { font-size: clamp(30px, 10vw, 48px); white-space: normal; }
+}
+@media (max-width: 420px) {
+  .site-footer .foot-name { font-size: clamp(24px, 8vw, 34px); }
+}

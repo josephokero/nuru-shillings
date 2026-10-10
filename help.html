@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="reference.css?v=78">
+  <link rel="stylesheet" href="reference.css?v=83">
 </head>
 <body class="home subpage">
   <div class="reference-site">
@@ -17,10 +17,10 @@
       <div class="ref-nav-left">
         <a class="ref-brand" href="/"><span>Nuru</span></a>
         <nav aria-label="Main navigation">
-          <a href="/#product">Product</a>
-          <a href="/docs">Developers</a>
-          <a href="/#business">Business</a>
-          <a href="/about">About</a>
+          <a href="/product">Product</a>
+          <a href="/developers">Developers</a>
+          <a href="/business">Business</a>
+          <a href="/why-nuru">Why Nuru</a>
         </nav>
       </div>
       <div class="ref-actions">
@@ -53,16 +53,16 @@
               <h2 id="start">Getting started</h2>
               <div class="help-list">
                 <details class="help-q"><summary>How do I open an account?</summary><div>
-                  <p>Go to <a href="/signup">Start free</a>. Enter your email and choose Continue with Email. We send you a link; open it and your wallet is ready. There is no password. The account is free, and it starts with 10,000 Sandbox NSH to try things out.</p>
+                  <p>Go to <a href="/signup">Start free</a>. Enter your email and choose Continue with Email. We send you a link; open it and your wallet is ready. There is no password. The account is free, and you can add money, send, and pay straight away.</p>
                 </div></details>
                 <details class="help-q"><summary>The sign-in email did not arrive.</summary><div>
                   <p>Check your spam or promotions folder, then choose Resend on the sign-in page. Each link works once and expires after 20 minutes, so always use the newest one.</p>
                 </div></details>
                 <details class="help-q"><summary>What are Sandbox and Live?</summary><div>
-                  <p>Use the switch at the top of your wallet. Sandbox uses practice money so you can try adding, sending, and taking payments safely. Live is real money and needs you to verify once.</p>
+                  <p>Your wallet is always Live, which is real money. Sandbox is a practice mode for developers in Business tools, so they can test taking payments without moving real money.</p>
                 </div></details>
-                <details class="help-q"><summary>Why do I need to verify, and what does it cost?</summary><div>
-                  <p>Before live money moves, you confirm the name on the account and your country, once. It is free. Until it is done, the wallet cannot add money, pay, or withdraw.</p>
+                <details class="help-q"><summary>Do I need to verify, and what does it cost?</summary><div>
+                  <p>Not to get started. You can add money, send, and pay without verifying. Before your first withdrawal, you verify once: a photo of your national ID, passport, or driving licence, and a quick selfie. It takes about two minutes and is free. Your name and country come from the ID, and withdrawals then go only to accounts in that name.</p>
                 </div></details>
                 <details class="help-q"><summary>What is one Nuru Shilling worth?</summary><div>
                   <p>100 Nuru Shillings equal 1 US dollar. The same rate is used when you buy, pay, get a refund, or sell back. 10 USD is 1,000 NSH. 18 USD is 1,800 NSH.</p>
@@ -162,7 +162,7 @@
             </section>
 
             <h2 id="contact">Contact support</h2>
-            <p>A person reads every message. Include the payment id if it is about a payment. Do not include a password or a secret key.</p>
+            <p>A person reads every message. Include the payment id if it is about a payment. Do not include a sign-in link or a secret key.</p>
             <form class="nx-formbox" data-contact="help">
               <div class="row">
                 <label>Name<input name="name" autocomplete="name" maxlength="120"></label>
@@ -232,18 +232,21 @@
       </div>
       <div>
         <strong>Wallet</strong>
+        <a href="/product">Product</a>
         <a href="/dashboard">Open wallet</a>
-        <a href="/dashboard">Add money</a>
-        <a href="/dashboard">Activity</a>
+        <a href="/dashboard#add">Add money</a>
+        <a href="/dashboard#activity">Activity</a>
       </div>
       <div>
         <strong>Platform</strong>
+        <a href="/developers">Developers</a>
+        <a href="/business">Business</a>
         <a href="/docs#create">Payments API</a>
         <a href="/docs#webhooks">Webhooks</a>
-        <a href="/docs#sandbox">Sandbox</a>
       </div>
       <div>
         <strong>Company</strong>
+        <a href="/why-nuru">Why Nuru</a>
         <a href="/about">About</a>
         <a href="/help">Help centre</a>
         <a href="/community">Community</a>
@@ -263,6 +266,7 @@
   </div>
   <script src="legal.js?v=2"></script>
   <script src="help.js?v=1"></script>
-  <script src="assistant.js?v=1"></script>
+  <script src="assistant.js?v=2"></script>
+  <script src="nav.js?v=2"></script>
 </body>
 </html>

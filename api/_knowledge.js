@@ -10,12 +10,12 @@ Rate
 
 Accounts
 - Open an account with just an email address. Nuru emails a sign-in link; opening it creates the account and signs in. There is no password.
-- A sign-in link works once and expires after 20 minutes. If it does not arrive, check spam and use Resend. Sessions last up to 30 days or until logout.
+- A sign-in link works once and expires after 20 minutes. If it does not arrive, check spam and use Resend. You stay signed in on that device, even after closing the browser, until you log out.
 - There is no sign-in with Google or any other company.
 - Everyone lands in the wallet after signing in. Business tools (the developer dashboard with keys, webhooks, and payments) is one click away from the wallet.
-- The wallet has a Sandbox / Live switch. Sandbox is practice money: every new account starts with 10,000 Sandbox NSH. Live is real money.
+- The wallet is always real money (Live). There is no Sandbox in the wallet. Sandbox is only for developers, inside Business tools, with practice money.
 - Users must be 18 or older (or the age of majority where they live). One personal wallet per person.
-- Before live money moves, the user verifies once by confirming the account name and country. Verification is free. Until then a wallet cannot add money, pay, or withdraw.
+- A new wallet can add money, send, and pay right away without verifying. Before the first withdrawal, the user verifies once on the Account page: a photo of a national ID, passport, or driving licence plus a short live selfie, checked by our identity partner Didit. It takes about two minutes and is free. The verified name and country come from the ID. If a check is declined, the user can try again with clearer photos; if it is in review, withdrawals unlock as soon as it is approved. Businesses also verify before creating a live key or live payments.
 
 Business name
 - A business does not have to be a registered company to use Nuru. The user gives the business a name, Nuru records that name on its own servers, and that is the only name a checkout shows. The personal name of the owner is not shown to buyers.
@@ -51,7 +51,7 @@ Developers
 - Docs: /docs on this site.
 
 Pages on this site
-- Help centre: /help. Community help: /community. Docs: /docs. Terms: /terms. Privacy: /privacy. Security: /security. About: /about. Wallet: /dashboard. Business tools: /developer. Sign up: /signup. Log in: /signin.
+- Help centre: /help. Community help: /community. Docs: /docs. Terms: /terms. Privacy: /privacy. Security: /security. About: /about. Product overview: /product. Developers overview: /developers. Business overview: /business. Why Nuru: /why-nuru. Wallet: /dashboard. Business tools: /developer. Sign up: /signup. Log in: /signin.
 
 Contact
 - Account and payment support: ${SUPPORT_EMAIL}
