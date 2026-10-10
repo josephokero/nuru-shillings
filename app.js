@@ -691,26 +691,40 @@
     }).then(renderKyc);
   });
 
-  async function kycReturned() {
-    const msg = $("#msg-verify");
-    for (let i = 0; i < 6; i++) {
+  function showVerified() {
+    const note = $("#kyc-state");
+    note.hidden = false;
+    note.className = "kyc-state ok";
+    note.textContent = `You’re verified${me.name ? ` as ${me.name}` : ""}. Withdrawals are unlocked.`;
+    $("#panel-verify").hidden = false;
+    $("#kyc-btn").hidden = true;
+    $("#msg-verify").textContent = "";
+  }
+
+  /* While a check is open, keep the page in step with Didit: quick polls right after returning, then every 15s. */
+  const KYC_OPEN = ["in_progress", "awaiting_user", "resubmitted", "in_review"];
+  const CHECKING = "Checking your result…";
+  let kycTimer = 0;
+  function watchKyc(wait = 15000, quick = 0) {
+    clearTimeout(kycTimer);
+    if (me.verified || !(quick > 0 || KYC_OPEN.includes(me.kyc))) return;
+    kycTimer = setTimeout(async () => {
+      if (document.hidden) return;
       const r = await checkKyc().catch(() => null);
-      if (!r) return;
-      if (r.verified) {
-        const note = $("#kyc-state");
-        note.hidden = false;
-        note.className = "kyc-state ok";
-        note.textContent = "You’re verified. Withdrawals are unlocked.";
-        $("#panel-verify").hidden = false;
-        $("#kyc-btn").hidden = true;
-        return;
-      }
-      if (r.kyc !== "in_progress" && r.kyc !== "not_started") return;
-      msg.className = "msg";
-      msg.textContent = "Checking your result…";
-      await new Promise((ok) => setTimeout(ok, 2500));
-    }
-    msg.textContent = "";
+      if (r?.verified) return showVerified();
+      const settled = r && r.kyc !== "not_started" && !KYC_OPEN.includes(r.kyc);
+      const msg = $("#msg-verify");
+      if ((settled || quick <= 1) && msg.textContent === CHECKING) msg.textContent = "";
+      if (!settled) watchKyc(quick > 1 ? 3000 : 15000, quick - 1);
+    }, wait);
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && me) watchKyc(0); });
+
+  function kycReturned() {
+    const msg = $("#msg-verify");
+    msg.className = "msg";
+    msg.textContent = CHECKING;
+    watchKyc(0, 8);
   }
 
   (async () => {
@@ -726,7 +740,7 @@
       route();
       if (returned) confirmReturn(returned);
       if (fromKyc) kycReturned();
-      else if (!me.verified && ["in_progress", "in_review", "awaiting_user", "resubmitted"].includes(me.kyc)) checkKyc().catch(() => {});
+      else watchKyc(0);
       $("#loading").hidden = true;
       $("#page").hidden = false;
     } catch (err) {

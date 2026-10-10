@@ -1,4 +1,4 @@
-import { db, HttpError, APP_URL } from "./_lib.js";
+import { db, HttpError, APP_URL, mailKyc } from "./_lib.js";
 
 /* ---------- identity checks: Didit (ID document + live selfie + face match) ---------- */
 
@@ -54,19 +54,25 @@ export async function syncKyc(user) {
   if (d.session_id !== user.kyc_session || String(d.vendor_data) !== String(user.id)) return user;
   const status = statusOf(d.status);
   const sql = db();
+  let changed;
   if (status === "approved") {
     const docs = d.id_verifications || [];
     const doc = docs.find((v) => statusOf(v.status) === "approved") || docs[0] || {};
     const name = tidy(doc.full_name || [doc.first_name, doc.last_name].filter(Boolean).join(" ")) || null;
     const country = tidy(doc.issuing_state_name || doc.nationality || doc.issuing_state) || null;
-    const [u] = await sql`UPDATE users SET kyc_status = 'approved',
-        name = COALESCE(${name}, name), country = COALESCE(${country}, country), verified_at = COALESCE(verified_at, now())
-      WHERE id = ${user.id} AND kyc_session = ${d.session_id} RETURNING *`;
-    return u || user;
+    [changed] = await sql`UPDATE users SET kyc_status = 'approved',
+        name = COALESCE(${name}, name), country = COALESCE(${country}, country), verified_at = now()
+      WHERE id = ${user.id} AND kyc_session = ${d.session_id} AND verified_at IS NULL RETURNING *`;
+  } else {
+    [changed] = await sql`UPDATE users SET kyc_status = ${status}
+      WHERE id = ${user.id} AND kyc_session = ${d.session_id} AND kyc_status IS DISTINCT FROM ${status} RETURNING *`;
   }
-  const [u] = await sql`UPDATE users SET kyc_status = ${status}
-    WHERE id = ${user.id} AND kyc_session = ${d.session_id} RETURNING *`;
-  return u || user;
+  /* The webhook and the dashboard can sync at the same moment; only the update that changed the row sends mail. */
+  if (changed && (status === "approved" || status === "declined")) {
+    await mailKyc(changed.email, status, changed).catch((err) => console.error("[mail] kyc", err.message));
+  }
+  const [fresh] = await sql`SELECT * FROM users WHERE id = ${user.id}`;
+  return fresh || user;
 }
 
 export async function kycWebhook(payload) {

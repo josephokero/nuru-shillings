@@ -312,6 +312,35 @@ export async function mailDeposit(to, d, role) {
   });
 }
 
+export async function mailKyc(to, outcome, u) {
+  const approved = outcome === "approved";
+  const when = new Date(u.verified_at || Date.now()).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Nairobi" });
+  const rows = approved ? [["Name", u.name || "—"], ["Country", u.country || "—"], ["Verified", `${when} EAT`], ["Withdrawals", "Unlocked"]] : [];
+  const body = rows.length ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-top:1px solid #262626">${rows.map(([k, v]) => `
+          <tr>
+            <td style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#6e6e6e">${esc(k)}</td>
+            <td align="right" style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#fff;font-weight:500">${esc(v)}</td>
+          </tr>`).join("")}
+        </table>` : "";
+  const title = approved ? "You’re verified" : "We couldn’t verify you";
+  const lead = approved
+    ? "Your identity check is approved. Withdrawals are now unlocked on your Nuru Shillings wallet."
+    : "Your identity check wasn’t approved this time. You can try again from your wallet whenever you’re ready.";
+  const note = approved
+    ? "Your name and country now come from your ID. If anything looks wrong, reply to this email."
+    : "Use a valid ID that hasn’t expired, take the photos in good light, and keep your face fully visible.";
+  const action = approved ? "Open my wallet" : "Try again";
+  const link = `${APP_URL}/dashboard#account`;
+  const reason = "You're receiving this because you started an identity check on Nuru Shillings.";
+  return resendMail({
+    to: [to],
+    subject: approved ? "You’re verified · withdrawals unlocked" : "Your identity check wasn’t approved",
+    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}${rows.length ? "\n\n" : ""}${note}\n\n${action}: ${link}\n\n—\nSent to ${to}. ${reason}\nNuru Shillings · ${APP_URL}`,
+    html: emailLayout({ preheader: lead, title, lead, body, action, link, note, to, reason }),
+  });
+}
+
 export async function deliver(userId, mode, type, payment) {
   const sql = db();
   const event = {
