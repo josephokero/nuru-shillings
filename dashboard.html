@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
   <link rel="stylesheet" href="app.css?v=5">
-  <link rel="stylesheet" href="wallet.css?v=9">
+  <link rel="stylesheet" href="wallet.css?v=10">
   <link rel="stylesheet" href="tour.css?v=1">
   <link rel="stylesheet" href="apps.css?v=3">
 </head>
@@ -280,11 +280,21 @@
               <div class="co-total"><span>You receive</span><b id="wd-s-total">$0.00</b></div>
               <div class="co-after"><span>Balance after</span><span id="wd-s-after">—</span></div>
             </div>
-            <div class="w-card co-summary co-recent">
-              <h3>Recent withdrawals</h3>
-              <ul class="v-people" id="withdrawals"></ul>
-            </div>
           </aside>
+        </div>
+        <div class="w-card w-activity wd-history">
+          <div class="w-card-head w-tools">
+            <h2>Withdrawal history</h2>
+            <div class="w-filter" role="tablist" aria-label="Filter withdrawals">
+              <button type="button" class="on" data-wdf="all">All</button>
+              <button type="button" data-wdf="pending">Pending</button>
+              <button type="button" data-wdf="paid">Completed</button>
+              <button type="button" data-wdf="failed">Returned</button>
+            </div>
+          </div>
+          <div class="w-thead" aria-hidden="true"><span>Withdrawal</span><span>Date</span><span>Status</span><span>Amount</span></div>
+          <ul class="w-list" id="wd-history"></ul>
+          <div class="w-list-foot" id="wd-foot"></div>
         </div>
       </section>
 
@@ -407,7 +417,7 @@
   </div>
 
   <script src="nsh.js?v=6"></script>
-  <script src="app.js?v=22"></script>
+  <script src="app.js?v=23"></script>
   <script src="tour.js?v=2"></script>
   <script src="apps.js?v=3"></script>
 </body>

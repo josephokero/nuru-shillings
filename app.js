@@ -138,13 +138,59 @@
     $("#people").innerHTML = people.map((p) => `<button type="button" data-to="${Nsh.esc(p)}"><span class="w-avatar sm">${Nsh.esc(p.charAt(0).toUpperCase())}</span><span>${Nsh.esc(p)}</span></button>`).join("");
     refreshCheckout();
 
-    const wds = acts.filter((a) => a.kind === "withdraw").slice(0, 5);
-    $("#withdrawals").innerHTML = wds.length
-      ? wds.map((a) => `<li class="v-wd"><div><b>${Nsh.nsh(Math.abs(a.amount))} NSH</b><span>${Nsh.esc(a.method || "")} · ${dateOf(a.created_at)}</span></div><span class="tag ${a.status === "pending" ? "warn" : a.status === "failed" ? "bad" : "ok"}">${a.status === "pending" ? "Pending" : a.status === "failed" ? "Returned" : "Paid"}</span></li>`).join("")
-      : `<li class="v-muted">No withdrawals yet.</li>`;
-
+    renderWithdrawals();
     renderActivity();
     if (current === "home") $("#view-sub").textContent = greet();
+  }
+
+  const WD_STATUS = {
+    processing: ["Sending", "warn"],
+    pending: ["Pending", "warn"],
+    unclaimed: ["Awaiting claim", "warn"],
+    review: ["In review", "warn"],
+    paid: ["Completed", "ok"],
+    failed: ["Returned", "bad"],
+  };
+  const wdDone = (w) => w.status === "paid" || w.status === "failed";
+  let wdFilter = "all";
+  let wdTimer;
+
+  function wdNote(w) {
+    if (w.status === "failed") return w.failure || "Returned to your wallet";
+    if (w.status === "unclaimed") return "PayPal emailed this address. Claim it within 30 days or it comes back to your wallet";
+    if (w.status === "review") return "We’re checking this payout. No action needed";
+    if (w.status === "processing") return "Sending to PayPal";
+    if (w.status === "pending") return w.method === "M-Pesa" ? "Arrives in 1–8 hours, depending on traffic" : "Waiting for payout review";
+    if (w.receipt) return `PayPal receipt ${w.receipt}`;
+    return w.paid_at ? `Paid ${dateOf(w.paid_at)}` : "Paid";
+  }
+
+  function wdRow(w) {
+    const [tag, tone] = WD_STATUS[w.status] || WD_STATUS.pending;
+    const icon = w.status === "failed" ? ICONS.back : ICONS.bank;
+    return `<li class="w-row">
+      <div class="w-tx">
+        <span class="w-ico">${icon}</span>
+        <div class="w-what"><b>${Nsh.esc(`${w.method} · ${w.destination}`)}</b><span>${Nsh.esc(wdNote(w))}</span><span class="w-date-sm">${dateOf(w.created_at)}</span></div>
+      </div>
+      <span class="w-date">${dateOf(w.created_at)}</span>
+      <span class="w-status"><span class="tag ${tone}">${tag}</span></span>
+      <div class="w-amt${w.status === "failed" ? " wd-returned" : ""}"><b>−${Nsh.nsh(w.amount)} NSH</b><span>${Nsh.usd(w.amount)}</span></div>
+    </li>`;
+  }
+
+  function renderWithdrawals() {
+    const all = me.withdrawals || [];
+    const list = all.filter((w) => wdFilter === "all" || (wdFilter === "pending" ? !wdDone(w) : w.status === wdFilter));
+    $("#wd-history").innerHTML = list.length
+      ? list.map(wdRow).join("")
+      : empty(all.length ? "Nothing here" : "No withdrawals yet", all.length ? "No withdrawals match this filter." : "Every withdrawal shows up here with its status.");
+    const open = all.filter((w) => !wdDone(w)).length;
+    $("#wd-foot").textContent = all.length ? `${all.length} ${all.length === 1 ? "withdrawal" : "withdrawals"}${open ? ` · ${open} in progress` : ""}` : "";
+    clearTimeout(wdTimer);
+    if (all.some((w) => w.status === "processing")) {
+      wdTimer = setTimeout(() => { if (current === "withdraw" && !document.hidden) load().catch(() => {}); }, 15000);
+    }
   }
 
   function filtered() {
@@ -216,6 +262,12 @@
       filter = f.dataset.filter;
       $$("[data-filter]").forEach((b) => b.classList.toggle("on", b === f));
       renderActivity();
+    }
+    const wf = e.target.closest("[data-wdf]");
+    if (wf) {
+      wdFilter = wf.dataset.wdf;
+      $$("[data-wdf]").forEach((b) => b.classList.toggle("on", b === wf));
+      renderWithdrawals();
     }
     const to = e.target.closest("[data-to]");
     if (to) {
@@ -650,7 +702,7 @@
         : method !== "PayPal" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.` }
         : r.status === "paid" ? { title: "Sent to PayPal", text: `${Nsh.usd(amount)} is in the PayPal account for ${dest} now.` }
         : r.status === "unclaimed" ? { title: "Sent to PayPal", text: `PayPal emailed ${dest} to claim ${Nsh.usd(amount)}. If it isn’t claimed within 30 days, it comes back to your wallet.` }
-        : { title: "Sending to PayPal", text: `${Nsh.usd(amount)} to ${dest}. It usually lands within a minute. Activity shows when it’s paid.` };
+        : { title: "Sending to PayPal", text: `${Nsh.usd(amount)} to ${dest}. It usually lands within a minute. Withdrawal history shows when it’s paid.` };
       finish(wForm, { ...done, again: "Withdraw more" });
     }).then(refreshCheckout);
   });

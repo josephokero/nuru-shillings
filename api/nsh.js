@@ -122,13 +122,17 @@ async function me(req, res, mode) {
   const open = await sql`SELECT * FROM withdrawals WHERE user_id = ${user.id} AND status IN ('processing', 'unclaimed')
     ORDER BY created_at LIMIT 3`;
   await Promise.all(open.map((w) => settleWithdrawal(w).catch((err) => console.error("[withdraw] settle", w.id, err.message))));
-  const [balances, activity, keys] = await Promise.all([
+  const [balances, activity, keys, withdrawals] = await Promise.all([
     sql`SELECT mode, amount FROM balances WHERE user_id = ${user.id}`,
     sql`SELECT l.kind, l.amount, l.counterparty, l.method, l.ref, l.created_at,
         CASE WHEN w.id IS NULL THEN l.status WHEN w.status = 'paid' THEN 'done' WHEN w.status = 'failed' THEN 'failed' ELSE 'pending' END AS status
       FROM ledger l LEFT JOIN withdrawals w ON l.kind = 'withdraw' AND w.id = l.ref
       WHERE l.user_id = ${user.id} AND l.mode = ${mode} ORDER BY l.created_at DESC, l.id DESC LIMIT 30`,
     sql`SELECT mode, last4, created_at FROM api_keys WHERE user_id = ${user.id} AND revoked_at IS NULL`,
+    sql`SELECT coalesce(w.id, l.ref) AS id, -l.amount AS amount, l.method, l.counterparty AS destination, l.created_at,
+        coalesce(w.status, CASE l.status WHEN 'pending' THEN 'pending' ELSE 'paid' END) AS status, w.failure, w.receipt, w.paid_at
+      FROM ledger l LEFT JOIN withdrawals w ON w.id = l.ref
+      WHERE l.user_id = ${user.id} AND l.mode = ${mode} AND l.kind = 'withdraw' ORDER BY l.created_at DESC, l.id DESC LIMIT 50`,
   ]);
   const bal = { test: 0, live: 0 };
   for (const b of balances) bal[b.mode] = Number(b.amount);
@@ -147,6 +151,7 @@ async function me(req, res, mode) {
     payments: { paypal: paypalReady(), card: paypalReady(), mpesa: payheroReady(), kes_per_usd: kesPerUsd() },
     balances: bal,
     activity: activity.map((a) => ({ ...a, amount: Number(a.amount) })),
+    withdrawals: withdrawals.map((w) => ({ ...w, amount: Number(w.amount) })),
     keys: keyMap,
     webhooks: { test: user.webhook_test, live: user.webhook_live },
   }, await renewSession(user));
@@ -293,12 +298,16 @@ async function withdraw(req, res) {
   if (mode === "live" && !user.verified_at) fail(403, "Verify your identity before withdrawing. It’s free and done once.");
   if (mode === "live" && method === "PayPal") return send(res, 200, { ok: true, ...(await paypalWithdraw(user, amount, destination)) });
   const status = mode === "live" ? "pending" : "done";
+  const id = newId("wd");
   const [done] = await db()`WITH debit AS (
       UPDATE balances SET amount = amount - ${amount}
       WHERE user_id = ${user.id} AND mode = ${mode} AND amount >= ${amount} RETURNING user_id
+    ), w AS (
+      INSERT INTO withdrawals (id, user_id, mode, method, amount, destination, status, paid_at)
+      SELECT ${id}, user_id, ${mode}, ${method}, ${amount}, ${destination}, ${mode === "live" ? "pending" : "paid"}, CASE WHEN ${mode} = 'live' THEN NULL ELSE now() END FROM debit
     ), row AS (
-      INSERT INTO ledger (user_id, mode, kind, amount, counterparty, method, status)
-      SELECT ${user.id}, ${mode}, 'withdraw', ${-amount}, ${destination}, ${method}, ${status} FROM debit
+      INSERT INTO ledger (user_id, mode, kind, amount, counterparty, method, status, ref)
+      SELECT ${user.id}, ${mode}, 'withdraw', ${-amount}, ${destination}, ${method}, ${status}, ${id} FROM debit
     ) SELECT count(*)::int AS n FROM debit`;
   if (!done.n) fail(400, "Your balance is too low for that amount.");
   send(res, 200, { ok: true, status });

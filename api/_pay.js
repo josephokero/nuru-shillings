@@ -151,6 +151,8 @@ const PAYOUT_ERRORS = {
   INSUFFICIENT_FUNDS: "PayPal withdrawals are paused for a moment. Your money is back in your wallet. Try again soon or choose another method.",
   VALIDATION_ERROR: "PayPal didn’t accept that email address. Check it and try again. Your money is back in your wallet.",
   RECEIVER_UNREGISTERED: "That email isn’t a PayPal account. Check it and try again. Your money is back in your wallet.",
+  AUTHORIZATION_ERROR: "PayPal withdrawals aren’t available right now. Your money is back in your wallet. Choose M-Pesa or try again later.",
+  NOT_AUTHORIZED: "PayPal withdrawals aren’t available right now. Your money is back in your wallet. Choose M-Pesa or try again later.",
 };
 
 /** The request id makes a repeated call return the original payout instead of paying twice. */
@@ -447,6 +449,9 @@ export async function paypalWithdraw(user, amount, destination) {
     await failWithdrawal(id, p.reason);
     if (p.issue === "INSUFFICIENT_FUNDS") {
       await mailAdmin("Top up PayPal: withdrawals are failing", `A ${(amount / 100).toFixed(2)} USD PayPal withdrawal (${id}) failed because the PayPal business balance is too low. The user's money went back to their wallet. Add funds to PayPal so withdrawals go through.`).catch(() => {});
+    }
+    if (p.issue === "AUTHORIZATION_ERROR" || p.issue === "NOT_AUTHORIZED") {
+      await mailAdmin("Enable PayPal Payouts: withdrawals are failing", `A ${(amount / 100).toFixed(2)} USD PayPal withdrawal (${id}) was refused because Payouts isn't enabled on the PayPal business account. The user's money went back to their wallet. In developer.paypal.com open Apps & Credentials (Live), select the app, turn on Payouts under Features, and ask PayPal support to approve Payouts if it shows as unavailable.`).catch(() => {});
     }
     throw new HttpError(400, p.reason);
   }
