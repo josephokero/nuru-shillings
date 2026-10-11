@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Withdrawal approvals · Nora Shillings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css?v=5">
+  <link rel="stylesheet" href="admin.css?v=1">
+</head>
+<body class="ad">
+  <header class="ad-top">
+    <a class="brand" href="/">Nora</a>
+    <span class="ad-badge">Admin</span>
+    <a class="btn sm ad-back" href="/dashboard">Back to wallet</a>
+  </header>
+  <main class="ad-wrap">
+    <div class="ad-head">
+      <div>
+        <h1>Withdrawal approvals</h1>
+        <p>Send each M-Pesa withdrawal from your M-Pesa, then enter the code from the SMS to mark it sent. The user gets an email either way.</p>
+      </div>
+      <button class="btn sm" type="button" id="ad-refresh">Refresh</button>
+    </div>
+    <section id="ad-open" aria-live="polite"><div class="spinner"></div></section>
+    <h2 class="ad-sub">Recently handled</h2>
+    <ul class="ad-recent" id="ad-recent"></ul>
+  </main>
+  <script src="nsh.js?v=7"></script>
+  <script src="admin.js?v=1"></script>
+</body>
+</html>

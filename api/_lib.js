@@ -316,6 +316,36 @@ export async function mailDeposit(to, d, role) {
   });
 }
 
+export async function mailWithdrawal(to, w, outcome) {
+  const paid = outcome === "paid";
+  const nsh = `${Number(w.amount).toLocaleString("en-US")} NSH`;
+  const usd = `$${(Number(w.amount) / 100).toFixed(2)}`;
+  const dest = `${w.method} ${w.destination}`;
+  const rows = paid
+    ? [["Amount", `${nsh} (${usd})`], ["Sent to", dest], [w.method === "M-Pesa" ? "M-Pesa code" : "Receipt", w.receipt || "—"], ["Withdrawal", w.id]]
+    : [["Amount", `${nsh} (${usd})`], ["Was going to", dest], ["Reason", w.failure || "—"], ["Withdrawal", w.id]];
+  const body = `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-top:1px solid #262626">${rows.map(([k, v]) => `
+          <tr>
+            <td style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#6e6e6e">${esc(k)}</td>
+            <td align="right" style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#fff;font-weight:500">${esc(v)}</td>
+          </tr>`).join("")}
+        </table>`;
+  const title = paid ? `${usd} sent to your ${w.method}` : "Your withdrawal was returned";
+  const lead = paid
+    ? `Your withdrawal of ${nsh} has been sent to ${dest}.`
+    : `We couldn’t send your withdrawal, so ${nsh} is back in your Nora Shillings wallet.`;
+  const note = paid ? "If it hasn’t arrived within an hour, reply to this email with the withdrawal number." : "You can withdraw again any time from your wallet.";
+  const link = `${APP_URL}/dashboard#withdraw`;
+  const reason = "You're receiving this because you withdrew from your Nora Shillings wallet.";
+  return resendMail({
+    to: [to],
+    subject: paid ? `Withdrawal sent · ${usd} to ${w.method}` : `Withdrawal returned · ${nsh} back in your wallet`,
+    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\n${note}\n\nOpen your wallet: ${link}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
+    html: emailLayout({ preheader: lead, title, lead, body, action: "Open my wallet", link, note, to, reason }),
+  });
+}
+
 export async function mailKyc(to, outcome, u) {
   const approved = outcome === "approved";
   const when = new Date(u.verified_at || Date.now()).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Nairobi" });

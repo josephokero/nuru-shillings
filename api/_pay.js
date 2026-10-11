@@ -362,7 +362,7 @@ export const publicWithdrawal = (w) => ({
 export async function failWithdrawal(id, reason) {
   const [w] = await db()`WITH w AS (
       UPDATE withdrawals SET status = 'failed', failure = ${reason}, refunded_at = now()
-      WHERE id = ${id} AND status IN ('pending', 'processing', 'unclaimed') RETURNING *
+      WHERE id = ${id} AND status IN ('pending', 'processing', 'unclaimed', 'review') RETURNING *
     ), b AS (
       UPDATE balances SET amount = balances.amount + w.amount FROM w
       WHERE balances.user_id = w.user_id AND balances.mode = w.mode RETURNING 1

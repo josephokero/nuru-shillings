@@ -11,6 +11,7 @@ import {
   paypalWithdraw, settleWithdrawal,
 } from "./_pay.js";
 import { appsHandler, v1Connections, v1Deposits } from "./_apps.js";
+import { adminHandler, isAdmin, notifyWithdrawal } from "./_admin.js";
 import { kycReady, startKyc, syncKyc, kycWebhook, KYC_DONE } from "./_kyc.js";
 
 const AVATAR_DIR = "nuru-shillings/avatars";
@@ -152,6 +153,7 @@ async function me(req, res, mode) {
     balances: bal,
     activity: activity.map((a) => ({ ...a, amount: Number(a.amount) })),
     withdrawals: withdrawals.map((w) => ({ ...w, amount: Number(w.amount) })),
+    admin: isAdmin(user),
     keys: keyMap,
     webhooks: { test: user.webhook_test, live: user.webhook_live },
   }, await renewSession(user));
@@ -310,6 +312,7 @@ async function withdraw(req, res) {
       SELECT ${user.id}, ${mode}, 'withdraw', ${-amount}, ${destination}, ${method}, ${status}, ${id} FROM debit
     ) SELECT count(*)::int AS n FROM debit`;
   if (!done.n) fail(400, "Your balance is too low for that amount.");
+  if (mode === "live") await notifyWithdrawal({ id, method, amount, destination });
   send(res, 200, { ok: true, status });
 }
 
@@ -673,6 +676,7 @@ export default async function handler(req, res) {
     if (route === "wallet/add" && post) return await addMoney(req, res);
     if (route === "wallet/send" && post) return await sendMoney(req, res);
     if (route === "wallet/withdraw" && post) return await withdraw(req, res);
+    if (route.startsWith("admin/")) return await adminHandler(route, req, res, await needUser(req));
     if (route === "dev/overview" && req.method === "GET") return await devOverview(req, res, mode);
     if (route === "dev/keys" && post) return await rollKey(req, res);
     if (route === "dev/webhook" && post) return await devWebhook(req, res);

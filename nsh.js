@@ -77,6 +77,7 @@ const Nsh = (() => {
         <p class="side-label">Business</p>
         <a href="/developer">${SIDE_ICONS.store}<span>Business tools</span></a>
         <a href="/docs">${SIDE_ICONS.code}<span>API docs</span></a>
+        ${me.admin ? `<p class="side-label">Admin</p><a href="/admin">${SIDE_ICONS.bank}<span>Approvals</span></a>` : ""}
         <p class="side-label">Support</p>
         <a href="/help">${SIDE_ICONS.help}<span>Help centre</span></a>
         <a href="/community">${SIDE_ICONS.people}<span>Community</span></a>

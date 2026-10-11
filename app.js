@@ -74,7 +74,7 @@
     const { icon, title, meta } = describe(a);
     const income = a.amount > 0;
     const pending = a.status === "pending";
-    const [tag, tone] = pending ? ["Pending", "warn"] : a.status === "failed" ? ["Returned", "bad"] : ["Completed", "ok"];
+    const [tag, tone] = pending ? [a.kind === "withdraw" ? "Processing" : "Pending", "warn"] : a.status === "failed" ? ["Returned", "bad"] : ["Completed", "ok"];
     return `<li class="w-row">
       <div class="w-tx">
         <span class="w-ico ${income ? "in" : ""}">${icon}</span>
@@ -145,7 +145,7 @@
 
   const WD_STATUS = {
     processing: ["Sending", "warn"],
-    pending: ["Pending", "warn"],
+    pending: ["Processing", "warn"],
     unclaimed: ["Awaiting claim", "warn"],
     review: ["In review", "warn"],
     paid: ["Completed", "ok"],
@@ -161,8 +161,8 @@
     if (w.status === "unclaimed") return "PayPal emailed this address. Claim it within 30 days or it comes back to your wallet";
     if (w.status === "review") return "We’re checking this payout. No action needed";
     if (w.status === "processing") return "Sending to PayPal";
-    if (w.status === "pending") return w.method === "M-Pesa" ? "Arrives in 1–8 hours, depending on traffic" : "Waiting for payout review";
-    if (w.receipt) return `PayPal receipt ${w.receipt}`;
+    if (w.status === "pending") return w.method === "M-Pesa" ? "Waiting for approval · arrives in 1–8 hours" : "Waiting for payout review";
+    if (w.receipt) return `${w.method === "M-Pesa" ? "M-Pesa code" : "PayPal receipt"} ${w.receipt}`;
     return w.paid_at ? `Paid ${dateOf(w.paid_at)}` : "Paid";
   }
 
@@ -796,7 +796,7 @@
       savePrefs({ withdraw_method: method, withdraw_destination: dest });
       await load();
       wForm.amount.value = "";
-      const done = method === "M-Pesa" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to M-Pesa ${dest}. It arrives in 1–8 hours, depending on traffic, and shows as pending until then.` }
+      const done = method === "M-Pesa" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to M-Pesa ${dest}. It shows as Processing until we approve and send it, usually within 1–8 hours. You’ll get an email when it’s sent.` }
         : method !== "PayPal" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.` }
         : r.status === "paid" ? { title: "Sent to PayPal", text: `${Nsh.usd(amount)} is in the PayPal account for ${dest} now.` }
         : r.status === "unclaimed" ? { title: "Sent to PayPal", text: `PayPal emailed ${dest} to claim ${Nsh.usd(amount)}. If it isn’t claimed within 30 days, it comes back to your wallet.` }
