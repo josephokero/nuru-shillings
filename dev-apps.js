@@ -27,25 +27,24 @@
     return `${data.connect_base}?${p}`;
   };
 
-  /* A small live copy of the deposit window, so developers see their theme before saving. */
-  function preview(name, brand) {
-    const color = colorFor(brand);
-    const letter = esc(String(name || "Your app").trim().charAt(0).toUpperCase() || "A");
-    return `
-      <div class="da-pv ${brand.theme === "light" ? "light" : ""}" style="--pb:${esc(color)};--pi:${inkOf(color)}" aria-hidden="true">
-        <div class="da-pv-card">
-          <div class="da-pv-head">
-            <span class="da-pv-logo">${brand.logo ? `<img src="${esc(brand.logo)}" alt="" referrerpolicy="no-referrer">` : letter}</span>
-            <b>${esc(name || "Your app")}</b>
-          </div>
-          <p class="da-pv-ask">${esc(name || "Your app")} is asking you to add</p>
-          <p class="da-pv-amt">500 <small>NSH</small></p>
-          <div class="da-pv-rows"><span></span><span></span></div>
-          <div class="da-pv-btns"><i>Decline</i><i class="go">Confirm 500 NSH</i></div>
-        </div>
-        <p class="da-pv-foot"><i></i>Powered by Nuru Shillings</p>
-      </div>`;
-  }
+  /* The real deposit page, loaded from its own HTML with sample data, so the preview is exactly what users get. */
+  const PV_WIDTH = 440;
+  let depositHtml = null;
+  let pv = null;
+  const previewBox = () => `
+    <div class="da-pv-tabs" role="tablist" aria-label="Preview screen">
+      <button type="button" class="on" data-pv="confirm">Confirm</button>
+      <button type="button" data-pv="signin">Logged out</button>
+      <button type="button" data-pv="done">Complete</button>
+    </div>
+    <div class="da-pv-frame"><iframe title="Deposit window preview" tabindex="-1"></iframe></div>
+    <p class="da-pv-note">The real deposit window your users see. Amount and customer are samples.</p>`;
+
+  addEventListener("message", (e) => {
+    if (!pv || e.origin !== location.origin || e.source !== pv.frame.contentWindow) return;
+    if (e.data?.type === "nuru:preview-ready") { pv.ready = true; pv.paint(); }
+    if (e.data?.type === "nuru:preview-size") pv.fit(e.data.height);
+  });
 
   function form(a) {
     const brand = a?.brand || { color: null, theme: "dark", logo: null };
@@ -80,7 +79,7 @@
             </div>
             <label class="field"><span>Logo link (optional)</span><input class="input" name="logo_url" placeholder="https://acme.games/logo.png" value="${esc(brand.logo || "")}"></label>
           </div>
-          <div class="da-pv-wrap" id="da-pv">${preview(a?.name, brand)}</div>
+          <div class="da-pv-wrap" id="da-pv">${previewBox()}</div>
         </div>
         <div class="da-form-foot">
           <button class="btn" type="button" data-cancel>Cancel</button>
@@ -133,6 +132,7 @@ const { status } = await Nuru.deposit(deposit.url);
 <span class="c">// "succeeded" · "declined" · "closed". Confirm with the deposit.succeeded webhook.</span>`;
 
   function render() {
+    pv = null;
     root.innerHTML = `
       <div class="card-head">
         <div><h2>Apps</h2><p>Let people add funds to your app from their Nuru wallet. They confirm every amount in a Nuru window that matches your brand.</p></div>
@@ -161,7 +161,42 @@ const { status } = await Nuru.deposit(deposit.url);
       color: f.brand_color.value || null,
       logo: /^https:\/\/\S+$/.test(f.logo_url.value.trim()) ? f.logo_url.value.trim() : null,
     });
-    const paint = () => { f.querySelector("#da-pv").innerHTML = preview(f.name.value, brand()); };
+    const wrap = f.querySelector("#da-pv");
+    const box = wrap.querySelector(".da-pv-frame");
+    const frame = box.querySelector("iframe");
+    const sample = () => {
+      const website = f.website.value.trim();
+      let domain = null;
+      try { domain = new URL(website).hostname.replace(/^www\./, ""); } catch { /* not a full link yet */ }
+      return {
+        status: "pending", mode: Nsh.mode(), amount: 500, reference: "order_1042", description: null, origins: [], return_url: null,
+        app: { name: f.name.value.trim() || "Your app", website, domain, brand: brand() },
+        user: { name: "Amina Otieno", email: "amina@example.com", balance: 2400, connected: false },
+      };
+    };
+    pv = {
+      frame, ready: false, view: "confirm", height: 640,
+      paint() { if (this.ready) frame.contentWindow.postMessage({ type: "nuru:preview", view: this.view, info: sample() }, location.origin); },
+      fit(h) {
+        if (h) this.height = h;
+        const s = Math.min(1, box.clientWidth / PV_WIDTH);
+        frame.style.height = `${this.height}px`;
+        frame.style.transform = `scale(${s})`;
+        box.style.height = `${Math.ceil(this.height * s)}px`;
+      },
+    };
+    new ResizeObserver(() => pv?.frame === frame && pv.fit()).observe(box);
+    pv.fit();
+    depositHtml ||= fetch("/deposit").then((r) => r.text()).then((t) => t.replace('<body class="dp"', '<body class="dp" data-preview'));
+    depositHtml.then((html) => { frame.srcdoc = html; }).catch(() => { wrap.querySelector(".da-pv-note").textContent = "Preview couldn’t load. Refresh to try again."; });
+    wrap.addEventListener("click", (e) => {
+      const tab = e.target.closest("[data-pv]");
+      if (!tab) return;
+      pv.view = tab.dataset.pv;
+      wrap.querySelectorAll("[data-pv]").forEach((b) => b.classList.toggle("on", b === tab));
+      pv.paint();
+    });
+    const paint = () => pv.paint();
     const setColor = (c) => {
       f.brand_color.value = c;
       f.querySelectorAll(".da-sw").forEach((s) => s.classList.toggle("on", s.dataset.sw === c));
@@ -259,6 +294,7 @@ const { status } = await Nuru.deposit(deposit.url);
 
   document.addEventListener("click", (e) => {
     if (e.target.closest(".modes button") && data && editing === null) setTimeout(render, 30);
+    else if (e.target.closest(".modes button") && pv) setTimeout(() => pv.paint(), 30);
   });
 
   load();

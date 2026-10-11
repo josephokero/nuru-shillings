@@ -1,6 +1,6 @@
 (() => {
   const card = document.querySelector("#card");
-  const id = new URLSearchParams(location.search).get("id") || "";
+  const id = new URLSearchParams(location.search).get("id") || (document.body.hasAttribute("data-preview") ? "dep_7c1e4a9b2f6d8053e1a4" : "");
   const { esc, nsh, usd } = Nsh;
   const ico = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
   const ICONS = {
@@ -13,7 +13,9 @@
     clock: ico("M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"),
     plus: ico("M12 5v14M5 12h14"),
   };
-  const popup = Boolean(window.opener && !window.opener.closed);
+  // The Apps page renders this exact window with sample data; nothing in preview touches the API.
+  const PREVIEW = document.body.hasAttribute("data-preview");
+  const popup = PREVIEW || Boolean(window.opener && !window.opener.closed);
   let info = null;
   let ticker = 0;
 
@@ -33,7 +35,7 @@
   /* ---------- talking back to the app ---------- */
 
   function tell(status) {
-    if (!popup || !info) return;
+    if (PREVIEW || !popup || !info) return;
     const msg = { type: "nuru:deposit", id, status, reference: info.reference || null };
     for (const origin of info.origins) {
       try { window.opener.postMessage(msg, origin); } catch { /* opener navigated away */ }
@@ -48,6 +50,7 @@
   }
 
   function leave(status, delay) {
+    if (PREVIEW) return;
     const url = returnUrl(status);
     setTimeout(() => {
       if (popup) window.close();
@@ -227,6 +230,10 @@
   }, true);
 
   card.addEventListener("click", async (e) => {
+    if (PREVIEW) {
+      if (e.target.closest("a, button")) e.preventDefault();
+      return;
+    }
     const t = e.target;
     if (t.closest("[data-back]") && popup) {
       e.preventDefault();
@@ -282,7 +289,21 @@
     }
   });
 
-  if (!/^dep_[a-f0-9]{20}$/.test(id)) {
+  if (PREVIEW) {
+    const foot = document.querySelector(".dp-powered");
+    const size = () => parent.postMessage({ type: "nuru:preview-size", height: card.offsetHeight + foot.offsetHeight + 62 }, window.origin);
+    addEventListener("message", (e) => {
+      if (e.origin !== window.origin || e.data?.type !== "nuru:preview") return;
+      info = { ...e.data.info, expires: new Date(Date.now() + 15 * 60e3).toISOString() };
+      theme(info.app.brand);
+      if (e.data.view === "signin") showSignIn();
+      else if (e.data.view === "done") showDone({ amount: info.amount, balance: info.user.balance - info.amount });
+      else showConfirm();
+      requestAnimationFrame(size);
+    });
+    new ResizeObserver(size).observe(card);
+    parent.postMessage({ type: "nuru:preview-ready" }, window.origin);
+  } else if (!/^dep_[a-f0-9]{20}$/.test(id)) {
     showError("This link can’t be used", "The deposit link is incomplete. Go back to the app and try again.");
   } else {
     load();
