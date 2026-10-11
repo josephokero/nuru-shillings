@@ -23,6 +23,7 @@
           <span class="tag ${late ? "bad" : "warn"}">${w.status === "review" ? "PayPal review" : late ? "Over 8 hours" : "Waiting"}</span>
         </div>
         <dl class="ad-kv">
+          <div><dt>Send</dt><dd>${mpesa ? `KES ${nsh(w.kes)} from M-Pesa` : w.method === "PayPal" ? `${usd(w.amount)} USD from PayPal (Send money)` : `${usd(w.amount)} by ${esc(w.method)}`}</dd></div>
           <div><dt>Send to</dt><dd><b class="ad-dest">${esc(w.method)} ${esc(w.destination)}</b><button type="button" class="ad-copy" data-copy="${esc(w.destination)}">Copy</button></dd></div>
           <div><dt>Account</dt><dd>${esc(w.user.name || "—")}${w.user.verified ? ` <span class="tag ok">ID verified</span>` : ` <span class="tag bad">Not verified</span>`}</dd></div>
           <div><dt>Email</dt><dd>${esc(w.user.email)}</dd></div>
@@ -38,7 +39,7 @@
           <summary>Can’t send it? Return it to their wallet</summary>
           <form class="ad-return-form">
             <label class="field"><span>Reason the user will see</span>
-              <input class="input" name="reason" maxlength="200" placeholder="That number isn’t registered for M-Pesa."></label>
+              <input class="input" name="reason" maxlength="200" placeholder="${mpesa ? "That number isn’t registered for M-Pesa." : "That email doesn’t have a PayPal account."}"></label>
             <button class="btn ad-danger" type="submit">Return ${nsh(w.amount)} NSH to wallet</button>
           </form>
         </details>
@@ -61,7 +62,7 @@
       const d = await Nsh.api("admin/withdrawals");
       $("#ad-open").innerHTML = d.open.length
         ? d.open.map(card).join("")
-        : `<div class="ad-empty"><b>Nothing waiting</b><span>New M-Pesa withdrawals show up here, and you get an email for each one.</span></div>`;
+        : `<div class="ad-empty"><b>Nothing waiting</b><span>New PayPal and M-Pesa withdrawals show up here, and you get an email for each one.</span></div>`;
       $("#ad-recent").innerHTML = d.recent.length ? d.recent.map(recentRow).join("") : `<li class="ad-none">Nothing yet.</li>`;
       document.title = `${d.open.length ? `(${d.open.length}) ` : ""}Withdrawal approvals · Nora Shillings`;
     } catch (err) {

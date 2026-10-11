@@ -1,7 +1,7 @@
 import { db, send, fail, body, mailAdmin, mailWithdrawal, APP_URL } from "./_lib.js";
 import { usdToKes, failWithdrawal } from "./_pay.js";
 
-/* Withdrawals that need a person: M-Pesa payouts (sent by hand, then approved here) and PayPal payouts PayPal held for review. */
+/* Every live withdrawal needs a person: an admin sends it by hand from PayPal or M-Pesa, then marks it sent here. */
 
 const admins = () => String(process.env.NSH_ADMIN_EMAILS || "").toLowerCase().split(/[\s,;]+/).filter(Boolean);
 export const isAdmin = (user) => Boolean(user?.email) && admins().includes(String(user.email).toLowerCase());
@@ -22,12 +22,18 @@ const view = (w) => ({
 });
 
 export async function notifyWithdrawal(w) {
-  if (w.method !== "M-Pesa") return;
   const usd = (Number(w.amount) / 100).toFixed(2);
-  await mailAdmin(
-    `Approve M-Pesa withdrawal: KES ${usdToKes(Number(w.amount) / 100).toLocaleString("en-US")} to ${w.destination}`,
-    `A user asked to withdraw ${Number(w.amount).toLocaleString("en-US")} NSH ($${usd}) to M-Pesa ${w.destination}.\n\nSend it from M-Pesa, then open ${APP_URL}/admin and enter the M-Pesa code to mark it sent. If you can't send it, return it to their wallet from the same page.\n\nWithdrawal: ${w.id}`,
-  ).catch(() => {});
+  const nsh = `${Number(w.amount).toLocaleString("en-US")} NSH`;
+  const who = w.user ? `${w.user} asked` : "A user asked";
+  const after = `then open ${APP_URL}/admin and enter the ${w.method === "M-Pesa" ? "M-Pesa code" : "PayPal transaction ID"} to mark it sent. If you can't send it, return it to their wallet from the same page.\n\nWithdrawal: ${w.id}`;
+  const [subject, text] = w.method === "M-Pesa"
+    ? [`Approve M-Pesa withdrawal: KES ${usdToKes(Number(w.amount) / 100).toLocaleString("en-US")} to ${w.destination}`,
+      `${who} to withdraw ${nsh} ($${usd}) to M-Pesa ${w.destination}.\n\nSend KES ${usdToKes(Number(w.amount) / 100).toLocaleString("en-US")} from M-Pesa, ${after}`]
+    : w.method === "PayPal"
+      ? [`Approve PayPal withdrawal: $${usd} to ${w.destination}`,
+        `${who} to withdraw ${nsh} ($${usd}) to PayPal ${w.destination}.\n\nIn PayPal choose Send, enter ${w.destination} and $${usd} USD, ${after}`]
+      : [`Approve ${w.method} withdrawal: $${usd} to ${w.destination}`, `${who} to withdraw ${nsh} ($${usd}) to ${w.method} ${w.destination}.\n\nSend it, ${after}`];
+  await mailAdmin(subject, text).catch(() => {});
 }
 
 async function withUser(sql, id) {
@@ -54,9 +60,14 @@ export async function adminHandler(route, req, res, user) {
     const b = await body(req);
     const id = String(b.id || "");
     const receipt = String(b.receipt || "").replace(/\s/g, "").toUpperCase();
-    if (!/^[A-Z0-9]{8,20}$/.test(receipt)) fail(400, "Enter the M-Pesa confirmation code from the SMS, like SJK3H2ABCD.");
+    const [{ method } = {}] = await sql`SELECT method FROM withdrawals WHERE id = ${id}`;
+    if (!/^[A-Z0-9]{8,20}$/.test(receipt)) {
+      fail(400, method === "PayPal"
+        ? "Enter the PayPal transaction ID from the payment details, like 5TY05013RG002845M."
+        : "Enter the M-Pesa confirmation code from the SMS, like SJK3H2ABCD.");
+    }
     const [used] = await sql`SELECT id FROM withdrawals WHERE receipt = ${receipt} AND id <> ${id} LIMIT 1`;
-    if (used) fail(400, "That code is already on another withdrawal. Check the SMS and try again.");
+    if (used) fail(400, "That code is already on another withdrawal. Check it and try again.");
     const [w] = await sql`UPDATE withdrawals SET status = 'paid', receipt = ${receipt}, paid_at = now()
       WHERE id = ${id} AND mode = 'live' AND status IN ('pending', 'review') RETURNING id`;
     if (!w) fail(409, "Someone already handled this withdrawal. Refresh the list.");

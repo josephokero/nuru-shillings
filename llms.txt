@@ -6,7 +6,7 @@ Key facts:
 
 - Rate: 1 NSH = 1 US cent. 1,000 NSH = 10 USD. The same rate is used to buy, pay, refund, and withdraw.
 - Ways to add money: PayPal, card (on PayPal's secure card page), and M-Pesa (prompt on the phone).
-- Withdrawals: PayPal or M-Pesa. M-Pesa withdrawals are checked by the Nora team and usually arrive within 1 to 8 hours.
+- Withdrawals: PayPal or M-Pesa. Each withdrawal is checked and sent by the Nora team and usually arrives within 1 to 8 hours.
 - Pricing: businesses pay 1% of a paid payment. No monthly fee. Refusals are free and refunds return the fee. Wallets are free.
 - Accounts: sign up with an email link, no password. Two-step sign-in with passkeys or an authenticator app. Identity is verified once before live withdrawals.
 - Sandbox and Live: every account has free Sandbox test money and a Live balance with real money.
