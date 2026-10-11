@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Documentation · Nuru Shillings</title>
-  <meta name="description" content="The Nuru Shillings payments API: keys, Sandbox and Live, creating payments, checkout, refunds, webhooks, and errors. 100 Nuru Shillings equal 1 US dollar.">
+  <title>Documentation · Nora Shillings</title>
+  <meta name="description" content="The Nora Shillings payments API: keys, Sandbox and Live, creating payments, checkout, refunds, webhooks, and errors. 100 Nora Shillings equal 1 US dollar.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,12 +15,12 @@
   <div class="reference-site">
     <header class="ref-nav">
       <div class="ref-nav-left">
-        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <a class="ref-brand" href="/"><span>Nora</span></a>
         <nav aria-label="Main navigation">
           <a href="/product">Product</a>
           <a href="/developers">Developers</a>
           <a href="/business">Business</a>
-          <a href="/why-nuru">Why Nuru</a>
+          <a href="/why-nuru">Why Nora</a>
         </nav>
       </div>
       <div class="ref-actions">
@@ -44,19 +44,19 @@
                 <li>Create a payment with one request: an amount in NSH, your order reference, and the company name the buyer sees.</li>
                 <li>Use a <code>nsh_test_</code> key in Sandbox and a <code>nsh_live_</code> key in Live. The requests and responses are the same.</li>
                 <li>A live payment returns a <code>checkout_url</code>. Send the buyer there; the payment becomes <code>paid</code> when they pay.</li>
-                <li>Nuru sends <code>payment.paid</code> and <code>payment.refunded</code> to your https webhook. Confirm with <code>GET /v1/payments/:id</code> before you deliver.</li>
+                <li>Nora sends <code>payment.paid</code> and <code>payment.refunded</code> to your https webhook. Confirm with <code>GET /v1/payments/:id</code> before you deliver.</li>
                 <li>100 NSH = 1 USD. The company pays 1% of each paid payment. Everything else is free.</li>
               </ul>
             </div>
 
             <h2 id="intro"><span class="n">01</span>Introduction</h2>
-            <p>The Nuru Shillings API lets a website or app take payment in Nuru Shillings (NSH). Your server creates a payment, the buyer pays it from their Nuru wallet, and Nuru tells your server the result. The buyer sees your company name and the amount. Their own name is not shown to you or written to a public ledger.</p>
+            <p>The Nora Shillings API lets a website or app take payment in Nora Shillings (NSH). Your server creates a payment, the buyer pays it from their Nora wallet, and Nora tells your server the result. The buyer sees your company name and the amount. Their own name is not shown to you or written to a public ledger.</p>
             <p>A payment moves through these steps:</p>
             <ol>
               <li>Your server calls <code>POST /v1/payments</code> with the amount, your reference, and your company name.</li>
-              <li>Nuru returns a payment with an id. In Live the status is <code>pending</code> and the response includes a <code>checkout_url</code>.</li>
+              <li>Nora returns a payment with an id. In Live the status is <code>pending</code> and the response includes a <code>checkout_url</code>.</li>
               <li>You send the buyer to the <code>checkout_url</code>. They log in to their wallet and confirm the payment.</li>
-              <li>The status becomes <code>paid</code>, the amount less the 1% fee is added to your balance, and Nuru sends <code>payment.paid</code> to your webhook.</li>
+              <li>The status becomes <code>paid</code>, the amount less the 1% fee is added to your balance, and Nora sends <code>payment.paid</code> to your webhook.</li>
               <li>Your server confirms the payment and delivers the order.</li>
             </ol>
             <p>Everything in this document can be tried in Sandbox first, with practice money and no verification.</p>
@@ -65,7 +65,7 @@
             <h3>Open an account</h3>
             <p>Go to <a href="/signup">Start free</a> and enter your email. We send a sign-in link; opening it creates your account. There is no password and no cost. Every account starts with a wallet and 10,000 Sandbox NSH.</p>
             <h3>Open Business tools</h3>
-            <p>From your wallet, choose <strong>Business tools</strong>. This is where you create keys, save a webhook, create payments by hand, refund them, and see every event Nuru sent. The <strong>Sandbox / Live</strong> switch at the top decides which mode you are working in.</p>
+            <p>From your wallet, choose <strong>Business tools</strong>. This is where you create keys, save a webhook, create payments by hand, refund them, and see every event Nora sent. The <strong>Sandbox / Live</strong> switch at the top decides which mode you are working in.</p>
             <h3>Verify before Live</h3>
             <p>Sandbox works immediately. Before you can create a live key, you verify your identity once with a photo of your ID and a quick selfie. Verification is free. Until it is done, the account cannot create live payments or withdraw.</p>
 
@@ -102,7 +102,7 @@
 <b>const</b> payment = await res.json();</pre>
 
             <h2 id="amounts"><span class="n">04</span>Rate and amounts</h2>
-            <p>The rate is fixed: <strong>100 Nuru Shillings equal 1 US dollar</strong>. It is the same when a buyer adds money, pays, receives a refund, or withdraws. There is no spread and no second rate.</p>
+            <p>The rate is fixed: <strong>100 Nora Shillings equal 1 US dollar</strong>. It is the same when a buyer adds money, pays, receives a refund, or withdraws. There is no spread and no second rate.</p>
             <ul>
               <li>Amounts are whole numbers of NSH, sent as strings, for example <code>"1800"</code>. Strings avoid rounding errors in JSON.</li>
               <li>The smallest amount is <code>"1"</code> (0.01 USD). The largest single payment is <code>"100000000"</code> (1,000,000 USD).</li>
@@ -112,7 +112,7 @@
 
             <h2 id="fees"><span class="n">05</span>Fees</h2>
             <p>Opening an account, the wallet, Business tools, the API, Sandbox, adding money, and withdrawing are free. There is no monthly fee.</p>
-            <p>The company pays <strong>1%</strong> of each payment that reaches <code>paid</code>, rounded to the nearest whole NSH. The buyer pays the listed amount and no Nuru fee. A payment that is never paid costs nothing. A refund returns the fee to you.</p>
+            <p>The company pays <strong>1%</strong> of each payment that reaches <code>paid</code>, rounded to the nearest whole NSH. The buyer pays the listed amount and no Nora fee. A payment that is never paid costs nothing. A refund returns the fee to you.</p>
             <div class="legal-table">
               <table>
                 <tr><th>Amount</th><th>Fee</th><th>You receive</th></tr>
@@ -143,7 +143,7 @@
             <p>Send your secret key in the <code>Authorization</code> header of every request:</p>
             <pre class="doc-code"><b>Authorization:</b> Bearer nsh_live_••••••••••••••••4f2a</pre>
             <ul>
-              <li><strong>Shown once.</strong> Nuru stores only a one-way hash of the key and its last four characters. If you lose it, create a new one.</li>
+              <li><strong>Shown once.</strong> Nora stores only a one-way hash of the key and its last four characters. If you lose it, create a new one.</li>
               <li><strong>One key per mode.</strong> Creating a key with <strong>Replace key</strong> stops the previous key in that mode immediately. Update your server before you replace a key that is in use.</li>
               <li><strong>Server only.</strong> Never place a key in a web page, a mobile app, a public repository, or a log. Anyone with the key can create payments and refunds on your account.</li>
               <li><strong>Live keys need verification.</strong> A live key on an account that is not verified is refused with status 403.</li>
@@ -230,7 +230,7 @@
   "created": "2026-10-10T09:30:00.000Z",
   "checkout_url": "https://norashillings.benuru.com/pay?id=pay_8f2c41d09a7be3150c66"
 }</pre>
-            <p>With a test key the same request returns <code>"status": "paid"</code> and <code>"mode": "test"</code>, with no <code>checkout_url</code>, and Nuru sends <code>payment.paid</code> to your Sandbox webhook straight away.</p>
+            <p>With a test key the same request returns <code>"status": "paid"</code> and <code>"mode": "test"</code>, with no <code>checkout_url</code>, and Nora sends <code>payment.paid</code> to your Sandbox webhook straight away.</p>
             <p>Each call creates a new payment. Before you create a second payment for the same order, check whether you already stored a payment id for it.</p>
 
             <h2 id="retrieve"><span class="n">11</span>Retrieve a payment</h2>
@@ -238,7 +238,7 @@
             <p>Returns the payment object. You can only read payments that belong to your account and to the mode of the key you send. Use this call to confirm a payment before you deliver an order, and to check the status if a webhook did not arrive.</p>
 
             <h2 id="checkout"><span class="n">12</span>Checkout</h2>
-            <p>A live payment is paid on Nuru’s checkout page, at the <code>checkout_url</code> in the response. Redirect the buyer there, or show it as a link or button.</p>
+            <p>A live payment is paid on Nora’s checkout page, at the <code>checkout_url</code> in the response. Redirect the buyer there, or show it as a link or button.</p>
             <ul>
               <li>The page shows your company name and the amount.</li>
               <li>A buyer without an account can create one on the spot with their email. They return to the same checkout after opening the sign-in link.</li>
@@ -264,7 +264,7 @@
             </ul>
 
             <h2 id="webhooks"><span class="n">14</span>Webhooks</h2>
-            <p>A webhook is a URL on your server that Nuru calls when a payment changes. Sandbox and Live each have their own URL, set with the key of that mode or in Business tools.</p>
+            <p>A webhook is a URL on your server that Nora calls when a payment changes. Sandbox and Live each have their own URL, set with the key of that mode or in Business tools.</p>
             <h3>Save, read, or clear the URL</h3>
             <pre class="doc-code"><b>POST</b> /v1/webhooks
 
@@ -290,7 +290,7 @@
                 <tr><td><code>connection.revoked</code></td><td>Someone disconnects one of your apps.</td></tr>
               </table>
             </div>
-            <p>Nuru sends a <code>POST</code> request with a JSON body and these headers: <code>Content-Type: application/json</code>, <code>User-Agent: NuruShillings-Webhooks/1</code>, and <code>Nuru-Event-Id</code>.</p>
+            <p>Nora sends a <code>POST</code> request with a JSON body and these headers: <code>Content-Type: application/json</code>, <code>User-Agent: NuruShillings-Webhooks/1</code>, and <code>Nuru-Event-Id</code>.</p>
             <pre class="doc-code"><b>POST</b> https://your-platform.example/nuru
 
 {
@@ -310,7 +310,7 @@
             <p>A <code>webhook.test</code> event has <code>"data": {"test": true}</code> instead of a payment.</p>
             <h3>Delivery</h3>
             <ul>
-              <li>Nuru makes one attempt per event and waits up to 5 seconds for a reply. Redirects are not followed.</li>
+              <li>Nora makes one attempt per event and waits up to 5 seconds for a reply. Redirects are not followed.</li>
               <li>Reply with any 2xx status as soon as you receive the event, then do slow work afterwards.</li>
               <li>Every event and the status your server returned are listed under <strong>Webhook events</strong> in Business tools.</li>
               <li>If your server was down, nothing is lost: read the payment with <code>GET /v1/payments/:id</code>.</li>
@@ -339,7 +339,7 @@
 });</pre>
 
             <h2 id="apps"><span class="n">15</span>Deposits from apps</h2>
-            <p>Let people add funds to your app, game or platform straight from their Nuru wallet. It works like PayPal, but simpler: your server sets the amount, Nuru opens a window that matches your brand, and the person confirms or declines. Money only moves when they confirm.</p>
+            <p>Let people add funds to your app, game or platform straight from their Nora wallet. It works like PayPal, but simpler: your server sets the amount, Nora opens a window that matches your brand, and the person confirms or declines. Money only moves when they confirm.</p>
             <ul>
               <li><strong>Deposits only.</strong> Apps can ask people to add funds. Apps cannot take money on their own and cannot send withdrawals through the API.</li>
               <li><strong>Every amount is confirmed.</strong> The first time, confirming also connects your app to their wallet. After that they only confirm the amount.</li>
@@ -347,7 +347,7 @@
               <li><strong>Fees.</strong> Free for the person. You pay 1% of each deposit, taken before it reaches your balance.</li>
             </ul>
             <h3>1. Create an app</h3>
-            <p>In Business tools, open <strong>Apps</strong> and choose <strong>New app</strong>. Add the name people will see, your website and at least one return URL. Pick how the deposit window looks: <strong>Dark</strong> or <strong>Light</strong>, a button colour, and an optional logo link. The window always shows <em>Powered by Nuru Shillings</em>. You get an app id such as <code>app_5d1c…</code>. Choose <strong>Test the popup</strong> to try it with Sandbox money.</p>
+            <p>In Business tools, open <strong>Apps</strong> and choose <strong>New app</strong>. Add the name people will see, your website and at least one return URL. Pick how the deposit window looks: <strong>Dark</strong> or <strong>Light</strong>, a button colour, and an optional logo link. The window always shows <em>Powered by Nora Shillings</em>. You get an app id such as <code>app_5d1c…</code>. Choose <strong>Test the popup</strong> to try it with Sandbox money.</p>
             <h3>2. Create a deposit on your server</h3>
             <pre class="doc-code"><b>POST</b> /v1/deposits
 Authorization: Bearer nsh_test_…
@@ -389,7 +389,7 @@ Authorization: Bearer nsh_test_…
 }</pre>
             <p>A deposit stays open for 30 minutes. Cancel one that’s no longer needed with <code>POST /v1/deposits/:id/cancel</code>.</p>
             <h3>3. Open the deposit window</h3>
-            <p><strong>Inside your app (popup).</strong> Add the Nuru script and pass it the <code>url</code>. The person stays on your page. Nuru opens a small secure window and dims your page until they finish.</p>
+            <p><strong>Inside your app (popup).</strong> Add the Nora script and pass it the <code>url</code>. The person stays on your page. Nora opens a small secure window and dims your page until they finish.</p>
             <pre class="doc-code">&lt;script src="https://norashillings.benuru.com/nuru.js"&gt;&lt;/script&gt;
 
 button.onclick = async () => {
@@ -397,9 +397,9 @@ button.onclick = async () => {
   const { status } = await Nuru.deposit(deposit.url);
   if (status === "succeeded") showMessage("Coins added!");
 };</pre>
-            <p><code>status</code> is <code>succeeded</code>, <code>declined</code>, <code>cancelled</code>, <code>expired</code>, <code>closed</code> (the window was closed) or <code>blocked</code> (the browser blocked the popup; Nuru then opens the page in the same tab). You can also pass <code>onSuccess</code>, <code>onDecline</code> and <code>onClose</code> callbacks.</p>
+            <p><code>status</code> is <code>succeeded</code>, <code>declined</code>, <code>cancelled</code>, <code>expired</code>, <code>closed</code> (the window was closed) or <code>blocked</code> (the browser blocked the popup; Nora then opens the page in the same tab). You can also pass <code>onSuccess</code>, <code>onDecline</code> and <code>onClose</code> callbacks.</p>
             <p><strong>Outside your app (redirect).</strong> Send the person to <code>url</code>. If you set <code>return_url</code>, they come back to <code>return_url?deposit=dep_…&amp;status=succeeded&amp;reference=…</code> after they finish.</p>
-            <p>If they are not logged in to Nuru, the window asks them to log in or create a free wallet first, then returns to the deposit. Paying into an app needs no identity check; people only verify before their first withdrawal.</p>
+            <p>If they are not logged in to Nora, the window asks them to log in or create a free wallet first, then returns to the deposit. Paying into an app needs no identity check; people only verify before their first withdrawal.</p>
             <h3>4. Confirm on your server</h3>
             <p>The popup result and the return URL are for your interface only. Before you credit the person, check the deposit with your secret key, or wait for the <code>deposit.succeeded</code> webhook:</p>
             <pre class="doc-code"><b>GET</b> /v1/deposits/dep_41f0d2a7c9e15b3a8d60
@@ -449,7 +449,7 @@ button.onclick = async () => {
                 <tr><td>401</td><td>No valid key</td><td>Missing <code>Authorization</code> header; mistyped key; key was replaced</td></tr>
                 <tr><td>403</td><td>Not allowed yet</td><td>Live key used before the account is verified</td></tr>
                 <tr><td>404</td><td>Not found</td><td>Payment id does not exist, belongs to another account, or belongs to the other mode; unknown route</td></tr>
-                <tr><td>500</td><td>Problem on Nuru’s side</td><td>Try again. If it continues, write to support with the time and route</td></tr>
+                <tr><td>500</td><td>Problem on Nora’s side</td><td>Try again. If it continues, write to support with the time and route</td></tr>
               </table>
             </div>
             <p>Requests that fail with 4xx do not change anything. Fix the request before you retry it.</p>
@@ -469,7 +469,7 @@ button.onclick = async () => {
             <h2 id="support"><span class="n">18</span>Support and changes</h2>
             <p>Questions about the API or a live payment go to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Include the payment id and the time of the request. Never send your secret key.</p>
             <p>This document describes version 1. We may add new fields to responses and new event types without notice, so your code should ignore fields it does not recognise. If we need to remove or change an existing field, we will announce it by email and on this page before it takes effect.</p>
-            <p class="legal-end">Nuru Shillings · Documentation · Payments API version 1 · 10 October 2026</p>
+            <p class="legal-end">Nora Shillings · Documentation · Payments API version 1 · 10 October 2026</p>
           </article>
           <aside class="legal-toc">
             <nav class="legal-docs">
@@ -534,7 +534,7 @@ button.onclick = async () => {
     <footer class="ref-footer">
       <div class="foot-brand">
         <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
-        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+        <p class="foot-rate">100 Nora Shillings = 1 US dollar</p>
       </div>
       <div>
         <strong>Wallet</strong>
@@ -552,14 +552,14 @@ button.onclick = async () => {
       </div>
       <div>
         <strong>Company</strong>
-        <a href="/why-nuru">Why Nuru</a>
+        <a href="/why-nuru">Why Nora</a>
         <a href="/about">About</a>
         <a href="/help">Help centre</a>
         <a href="/community">Community</a>
         <a href="mailto:norashillings@benuru.com">Contact</a>
       </div>
       <div class="foot-base">
-        <span>© 2026 Nuru Shillings</span>
+        <span>© 2026 Nora Shillings</span>
         <nav>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
@@ -567,7 +567,7 @@ button.onclick = async () => {
           <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
         </nav>
       </div>
-      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nora Shillings</a></div>
     </footer>
   </div>
   <script src="legal.js?v=2"></script>

@@ -18,7 +18,7 @@
   };
 
   const what = (scope, app) => ({
-    deposits: ["Ask you to add funds", `${app} shows you the amount and you confirm it in a Nuru window. Nothing moves without your OK.`],
+    deposits: ["Ask you to add funds", `${app} shows you the amount and you confirm it in a Nora window. Nothing moves without your OK.`],
   }[scope]);
 
   function back(params) {
@@ -35,7 +35,7 @@
         <span class="cn-link"><i></i><i></i><i></i><b>${ICONS.shield}</b><i></i><i></i><i></i></span>
         <span class="cn-nuru"><span></span></span>
       </div>
-      <h1>Connect <b>${esc(info.app.name)}</b> to your Nuru wallet</h1>
+      <h1>Connect <b>${esc(info.app.name)}</b> to your Nora wallet</h1>
       <p class="cn-sub">${info.app.domain ? `<a href="${esc(info.app.website)}" target="_blank" rel="noopener noreferrer">${esc(info.app.domain)}</a>` : "This app"} wants to work with your wallet.${info.mode === "test" ? ` <span class="cn-mode">Sandbox</span>` : ""}</p>`;
   }
 
@@ -144,9 +144,9 @@
     } catch (err) {
       return showError(err.message);
     }
-    document.title = `Connect ${info.app.name} · Nuru Shillings`;
+    document.title = `Connect ${info.app.name} · Nora Shillings`;
     if (!info.user) return showSignIn(info);
-    if (info.mode === "live" && info.user.own) return showError("This is your own app. Log in with a different Nuru account to connect it.");
+    if (info.mode === "live" && info.user.own) return showError("This is your own app. Log in with a different Nora account to connect it.");
     showConsent(info);
   })();
 })();

@@ -189,7 +189,7 @@ async function connectApprove(req, res, { needUser }) {
   const b = await body(req);
   const app = await loadApp(b.app);
   const { redirect, mode } = checkRequest(app, b);
-  if (mode === "live" && user.id === app.owner_id) fail(400, "This is your own app. Connect a different Nuru account to it.");
+  if (mode === "live" && user.id === app.owner_id) fail(400, "This is your own app. Connect a different Nora account to it.");
   const c = await connect(app, user, mode);
   const code = secret(24);
   await db()`INSERT INTO connect_codes (code_hash, connection_id, expires_at) VALUES (${sha(code)}, ${c.id}, now() + interval '10 minutes')`;
@@ -217,8 +217,8 @@ function blockReason(d, user) {
   if (status === "expired") return "This deposit request expired. Go back to the app and start again.";
   if (status !== "pending") return null;
   if (d.connection_id && d.pinned_revoked) return "You disconnected this app. Go back to the app and connect again.";
-  if (user && d.pinned_user && d.pinned_user !== user.id) return "This deposit was started for a different Nuru account. Log in with that account, or start again in the app.";
-  if (user && d.mode === "live" && user.id === d.owner_id) return "This is your own app. Use a different Nuru account to add money to it.";
+  if (user && d.pinned_user && d.pinned_user !== user.id) return "This deposit was started for a different Nora account. Log in with that account, or start again in the app.";
+  if (user && d.mode === "live" && user.id === d.owner_id) return "This is your own app. Use a different Nora account to add money to it.";
   return null;
 }
 
@@ -315,7 +315,7 @@ async function depositConfirm(req, res, { needUser }) {
 async function depositDecline(req, res, { needUser }) {
   const user = await needUser(req);
   const d = await loadDeposit((await body(req)).id);
-  if (d.pinned_user && d.pinned_user !== user.id) fail(403, "This deposit was started for a different Nuru account.");
+  if (d.pinned_user && d.pinned_user !== user.id) fail(403, "This deposit was started for a different Nora account.");
   const [row] = await db()`UPDATE deposits SET status = 'declined', user_id = ${user.id}, completed_at = now()
     WHERE id = ${d.id} AND status = 'pending' RETURNING *`;
   if (row) {

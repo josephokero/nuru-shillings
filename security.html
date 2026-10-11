@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Security · Nuru Shillings</title>
-  <meta name="description" content="How Nuru Shillings protects accounts, API keys, webhooks, and payments, what you are responsible for, and how to report a vulnerability.">
+  <title>Security · Nora Shillings</title>
+  <meta name="description" content="How Nora Shillings protects accounts, API keys, webhooks, and payments, what you are responsible for, and how to report a vulnerability.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,12 +15,12 @@
   <div class="reference-site">
     <header class="ref-nav">
       <div class="ref-nav-left">
-        <a class="ref-brand" href="/"><span>Nuru</span></a>
+        <a class="ref-brand" href="/"><span>Nora</span></a>
         <nav aria-label="Main navigation">
           <a href="/product">Product</a>
           <a href="/developers">Developers</a>
           <a href="/business">Business</a>
-          <a href="/why-nuru">Why Nuru</a>
+          <a href="/why-nuru">Why Nora</a>
         </nav>
       </div>
       <div class="ref-actions">
@@ -51,14 +51,14 @@
             </div>
 
             <h2 id="purpose"><span class="n">01</span>What this page is</h2>
-            <p>This page describes how Nuru Shillings protects accounts, keys, and payments, what each side is responsible for, and how to report a problem. It applies to wallet holders, companies, and developers.</p>
-            <p>It is a description of the product’s controls. It is not a certificate from an auditor, it does not claim a banking licence, and it does not make Nuru a bank. The <a href="/terms">Terms of Service</a> and the <a href="/privacy">Privacy Notice</a> also apply.</p>
+            <p>This page describes how Nora Shillings protects accounts, keys, and payments, what each side is responsible for, and how to report a problem. It applies to wallet holders, companies, and developers.</p>
+            <p>It is a description of the product’s controls. It is not a certificate from an auditor, it does not claim a banking licence, and it does not make Nora a bank. The <a href="/terms">Terms of Service</a> and the <a href="/privacy">Privacy Notice</a> also apply.</p>
 
             <h2 id="shared"><span class="n">02</span>Who is responsible for what</h2>
-            <p>Security is shared. Nuru protects the Service; you protect your sign-in, your keys, and your own platform.</p>
+            <p>Security is shared. Nora protects the Service; you protect your sign-in, your keys, and your own platform.</p>
             <div class="legal-table">
               <table>
-                <tr><th>Area</th><th>Nuru does</th><th>You do</th></tr>
+                <tr><th>Area</th><th>Nora does</th><th>You do</th></tr>
                 <tr><td>Sign-in</td><td>Sends one-time links that expire in 20 minutes; stores only hashes; offers no third-party login</td><td>Keep your email account secure; log out on shared devices</td></tr>
                 <tr><td>Verification</td><td>Locks withdrawals and live keys until an ID and live-selfie check is approved</td><td>Use your own valid ID</td></tr>
                 <tr><td>API keys</td><td>Separates test and live keys; creates a live key only after verification; stores keys as hashes</td><td>Keep keys on your server; report a leak at once</td></tr>
@@ -69,18 +69,18 @@
             </div>
 
             <h2 id="chain"><span class="n">03</span>Private settlement</h2>
-            <p>A paid payment is marked <code>chain: "private"</code>. It is not written to a public ledger, so no one can read a public chain to trace who paid whom. The company, the buyer, and Nuru can still match the payment id to the reference the company stored, which is what refunds and support need.</p>
+            <p>A paid payment is marked <code>chain: "private"</code>. It is not written to a public ledger, so no one can read a public chain to trace who paid whom. The company, the buyer, and Nora can still match the payment id to the reference the company stored, which is what refunds and support need.</p>
 
             <h2 id="checkout"><span class="n">04</span>What checkout shows</h2>
             <p>Checkout shows the company name and the amount. It does not show the name of the person who paid. The payment fields are limited to amount, unit, reference, and company. A platform should keep it that way: do not place a buyer’s name, email, or phone number inside the reference.</p>
 
             <h2 id="earnings"><span class="n">05</span>Earnings</h2>
-            <p>Nuru does not hold a company’s earnings on a card network that can freeze the payout. A company receives the amount of each paid payment less the 1% fee. Refunds are made by payment id and return both the amount and the fee. A buyer can sell back and withdraw to PayPal, a card, or M-Pesa at 100 Nuru Shillings to 1 US dollar.</p>
+            <p>Nora does not hold a company’s earnings on a card network that can freeze the payout. A company receives the amount of each paid payment less the 1% fee. Refunds are made by payment id and return both the amount and the fee. A buyer can sell back and withdraw to PayPal, a card, or M-Pesa at 100 Nora Shillings to 1 US dollar.</p>
 
             <h2 id="accounts"><span class="n">06</span>Account protection</h2>
             <h3>Email sign-in links</h3>
             <p>There are no passwords, so there is no password to guess, reuse, or leak. To sign in, you enter your email and we send a link. The link works once and expires after 20 minutes. We store only a one-way SHA-256 hash of it.</p>
-            <p>The secret part of the link sits after the <code>#</code> in the address. Browsers do not send that part to servers, so email security scanners that open links cannot use it up. The page sends it to Nuru only when you open it yourself.</p>
+            <p>The secret part of the link sits after the <code>#</code> in the address. Browsers do not send that part to servers, so email security scanners that open links cannot use it up. The page sends it to Nora only when you open it yourself.</p>
             <p>Anyone who can read your email can sign in, so protect your email account with a strong password and two-step verification. There is no sign-in through Google or any other company.</p>
             <h3>Limits</h3>
             <p>We limit how many links can be requested for one email address and from one IP address in a short time. A hidden form field also catches automated form-fillers. Together they stop simple scripts from opening accounts in bulk or flooding an inbox.</p>
@@ -88,7 +88,7 @@
             <p>A session is kept in an HttpOnly, Secure cookie that page scripts cannot read. You stay signed in on that device, even after closing the browser, until you log out. A session that is not used for 365 days ends on its own. Logging out ends the session on our servers at once. Always log out on a shared or public computer.</p>
 
             <h2 id="verify"><span class="n">07</span>The verification gate</h2>
-            <p>A new wallet can add money, send, and pay at once. Money can only leave Nuru after you verify your identity with a photo of your ID and a live selfie, which our identity partner matches to the document. Your browser never decides the result: the server confirms it directly with the identity partner. Until then, a wallet cannot withdraw, and Business tools cannot create a live key or a live payment. Withdrawals go only to a PayPal account, card, or M-Pesa number in your verified name, within daily limits. Sandbox and the test key never move a live balance. Verification is free and done once.</p>
+            <p>A new wallet can add money, send, and pay at once. Money can only leave Nora after you verify your identity with a photo of your ID and a live selfie, which our identity partner matches to the document. Your browser never decides the result: the server confirms it directly with the identity partner. Until then, a wallet cannot withdraw, and Business tools cannot create a live key or a live payment. Withdrawals go only to a PayPal account, card, or M-Pesa number in your verified name, within daily limits. Sandbox and the test key never move a live balance. Verification is free and done once.</p>
 
             <h2 id="keys"><span class="n">08</span>API keys</h2>
             <div class="legal-table">
@@ -99,7 +99,7 @@
               </table>
             </div>
             <ul>
-              <li>A key is shown in full once, when you create it. Nuru keeps only a one-way hash and the last four characters, so we cannot show it to you again. Copy it straight into your server’s settings.</li>
+              <li>A key is shown in full once, when you create it. Nora keeps only a one-way hash and the last four characters, so we cannot show it to you again. Copy it straight into your server’s settings.</li>
               <li>Keep secret keys in server-side environment variables or a secrets manager.</li>
               <li>Never place a key in a web page, a mobile app bundle, a browser extension, a public repository, a screenshot, or an email.</li>
               <li>Give access to the live key only to the people who need it.</li>
@@ -111,13 +111,13 @@
             <ul>
               <li>Call <code>https://norashillings.benuru.com/v1</code> from your server only, over https.</li>
               <li>Send the key in the header: <code>Authorization: Bearer nsh_live_…</code>.</li>
-              <li>Send amounts as strings of Nuru Shillings, for example <code>"1800"</code>, to avoid rounding errors.</li>
+              <li>Send amounts as strings of Nora Shillings, for example <code>"1800"</code>, to avoid rounding errors.</li>
               <li>Use your own unique <code>reference</code> per order, and check it before creating a second payment for the same order.</li>
               <li>Treat any status other than <code>paid</code> as not paid.</li>
             </ul>
 
             <h2 id="webhooks"><span class="n">10</span>Webhooks</h2>
-            <p>Nuru sends <code>payment.paid</code> and <code>payment.refunded</code> to the endpoint you save with <code>POST /v1/webhooks</code>. The endpoint must use https and a public host name; addresses on private networks are refused. Nuru waits up to 5 seconds for a reply and records whether delivery succeeded. Each event carries the event id, the type, the payment id, the reference, and the status.</p>
+            <p>Nora sends <code>payment.paid</code> and <code>payment.refunded</code> to the endpoint you save with <code>POST /v1/webhooks</code>. The endpoint must use https and a public host name; addresses on private networks are refused. Nora waits up to 5 seconds for a reply and records whether delivery succeeded. Each event carries the event id, the type, the payment id, the reference, and the status.</p>
             <ol>
               <li>Fulfil an order from the webhook, never from a browser redirect, which a user can fake.</li>
               <li>Before you deliver, confirm the payment with <code>GET /v1/payments/:id</code> using your secret key.</li>
@@ -143,14 +143,14 @@
             <p>We may refuse a payment, limit requests, or suspend an account to stop fraud, stolen payment methods, scripted sign-ups, or any use the <a href="/terms#use">Terms</a> prohibit. A refused payment does not move a balance and is free. If you believe a payment was refused by mistake, write to us with the payment id and a person will review it.</p>
 
             <h2 id="phishing"><span class="n">13</span>Phishing and impersonation</h2>
-            <p>Nuru will <strong>never</strong> ask you to forward a sign-in link, or for your secret API key, your M-Pesa PIN, your card security code, or a one-time code from your bank. We will not ask you to move your balance to “protect” it.</p>
-            <p>Real sign-in links always open <code>norashillings.benuru.com</code>. Before you open one, check the address it points to, and never open a sign-in email you did not ask for. If you receive a message that claims to be from Nuru and asks for any of these, do not reply. Forward it to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>.</p>
+            <p>Nora will <strong>never</strong> ask you to forward a sign-in link, or for your secret API key, your M-Pesa PIN, your card security code, or a one-time code from your bank. We will not ask you to move your balance to “protect” it.</p>
+            <p>Real sign-in links always open <code>norashillings.benuru.com</code>. Before you open one, check the address it points to, and never open a sign-in email you did not ask for. If you receive a message that claims to be from Nora and asks for any of these, do not reply. Forward it to <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>.</p>
 
             <h2 id="incidents"><span class="n">14</span>If there is an incident</h2>
             <p>If we find a security incident, we act to contain it, investigate what was affected, and fix the cause. If it affects your account or personal information, we will tell you without undue delay, explain what happened and what you should do, and notify the relevant authority where the law requires.</p>
 
             <h2 id="disclosure"><span class="n">15</span>Reporting a vulnerability</h2>
-            <p>If you believe you have found a security weakness in Nuru, email <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a> with the subject line “Security report”. Please include:</p>
+            <p>If you believe you have found a security weakness in Nora, email <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a> with the subject line “Security report”. Please include:</p>
             <ul>
               <li>a description of the issue and its possible impact;</li>
               <li>the steps to reproduce it, and the page or API route involved;</li>
@@ -171,11 +171,11 @@
             </ul>
 
             <h2 id="limits"><span class="n">16</span>Limits of this page</h2>
-            <p>This page states the product rules and the controls Nuru is built around. It does not claim a banking licence, deposit insurance, or a completed third-party audit. The commitments you can rely on are the ones written here and in the Terms: the rate is fixed at 100 NSH = 1 USD, settlement is private, checkout shows the company name, withdrawals wait for verification, and a refund uses the original payment id.</p>
+            <p>This page states the product rules and the controls Nora is built around. It does not claim a banking licence, deposit insurance, or a completed third-party audit. The commitments you can rely on are the ones written here and in the Terms: the rate is fixed at 100 NSH = 1 USD, settlement is private, checkout shows the company name, withdrawals wait for verification, and a refund uses the original payment id.</p>
 
             <h2 id="contact"><span class="n">17</span>Contact</h2>
             <p>Security reports and account help: <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>. Include the payment id if it is about a payment. Never send a sign-in link or a secret key.</p>
-            <p class="legal-end">Nuru Shillings · Security · Version 10 October 2026</p>
+            <p class="legal-end">Nora Shillings · Security · Version 10 October 2026</p>
           </article>
           <aside class="legal-toc">
             <nav class="legal-docs">
@@ -240,7 +240,7 @@
     <footer class="ref-footer">
       <div class="foot-brand">
         <p>Private payment infrastructure. Checkout shows the company. The person behind the payment stays off the public record.</p>
-        <p class="foot-rate">100 Nuru Shillings = 1 US dollar</p>
+        <p class="foot-rate">100 Nora Shillings = 1 US dollar</p>
       </div>
       <div>
         <strong>Wallet</strong>
@@ -258,14 +258,14 @@
       </div>
       <div>
         <strong>Company</strong>
-        <a href="/why-nuru">Why Nuru</a>
+        <a href="/why-nuru">Why Nora</a>
         <a href="/about">About</a>
         <a href="/help">Help centre</a>
         <a href="/community">Community</a>
         <a href="mailto:norashillings@benuru.com">Contact</a>
       </div>
       <div class="foot-base">
-        <span>© 2026 Nuru Shillings</span>
+        <span>© 2026 Nora Shillings</span>
         <nav>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
@@ -273,7 +273,7 @@
           <a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a>
         </nav>
       </div>
-      <div class="foot-mark"><a class="foot-name" href="/">Nuru Shillings</a></div>
+      <div class="foot-mark"><a class="foot-name" href="/">Nora Shillings</a></div>
     </footer>
   </div>
   <script src="legal.js?v=2"></script>

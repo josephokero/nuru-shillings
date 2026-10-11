@@ -1,4 +1,4 @@
-/*! Nuru Shillings checkout · https://norashillings.benuru.com/docs#apps
+/*! Nora Shillings checkout · https://norashillings.benuru.com/docs#apps
  *
  *   <script src="https://norashillings.benuru.com/nuru.js"></script>
  *   const result = await Nuru.deposit(deposit.url);   // { status: "succeeded" | "declined" | "cancelled" | "expired" | "closed", id }
@@ -31,7 +31,7 @@
     el.className = "nuru-veil";
     el.setAttribute("role", "dialog");
     el.setAttribute("aria-modal", "true");
-    el.innerHTML = `<div><i></i><b>Finish in the Nuru Shillings window</b><p>Don’t see it? Bring it back to confirm securely.</p><button type="button">Show window</button><button type="button">Cancel</button></div>`;
+    el.innerHTML = `<div><i></i><b>Finish in the Nora Shillings window</b><p>Don’t see it? Bring it back to confirm securely.</p><button type="button">Show window</button><button type="button">Cancel</button></div>`;
     const [show, cancel] = el.querySelectorAll("button");
     show.addEventListener("click", onFocus);
     cancel.addEventListener("click", onCancel);

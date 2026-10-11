@@ -265,12 +265,12 @@ async function sendMoney(req, res) {
   const mode = isMode(b.mode) ? b.mode : fail(400, "Choose Sandbox or Live.");
   const to = String(b.to || "").trim().toLowerCase();
   const amount = amountOf(b.amount);
-  if (!isEmail(to)) fail(400, "Enter the email of a Nuru account.");
+  if (!isEmail(to)) fail(400, "Enter the email of a Nora account.");
   if (to === user.email) fail(400, "You cannot send to yourself.");
   if (!amount) fail(400, "Enter an amount in NSH.");
   const sql = db();
   const [target] = await sql`SELECT id FROM users WHERE email = ${to}`;
-  if (!target) fail(404, "No Nuru account uses that email. Ask them to sign up first.");
+  if (!target) fail(404, "No Nora account uses that email. Ask them to sign up first.");
   const [done] = await sql`WITH debit AS (
       UPDATE balances SET amount = amount - ${amount}
       WHERE user_id = ${user.id} AND mode = ${mode} AND amount >= ${amount} RETURNING user_id

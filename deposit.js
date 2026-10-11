@@ -130,7 +130,7 @@
       <div class="dp-body">
         ${amount()}
         <div class="dp-actions one">
-          <a class="dp-btn go" href="/signin?next=${next}">Log in to Nuru to continue</a>
+          <a class="dp-btn go" href="/signin?next=${next}">Log in to Nora to continue</a>
           <a class="dp-btn" href="/signup?next=${next}">Create a free wallet</a>
         </div>
         <p class="dp-small"><span>${ICONS.lock}You’ll come straight back here</span></p>

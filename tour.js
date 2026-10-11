@@ -6,20 +6,20 @@
 
   const STEPS = [
     {
-      title: "Welcome to Nuru Shillings",
-      text: "I’m Nuru, your guide. Let me show you where everything lives. It takes less than a minute.",
+      title: "Welcome to Nora Shillings",
+      text: "I’m Nora, your guide. Let me show you where everything lives. It takes less than a minute.",
       next: "Show me around",
       back: "Skip",
     },
     {
       target: [".w-balance", ".w-hero", ".balance"],
       title: "This is your balance",
-      text: "Everything you hold, in Nuru Shillings. The dollar value sits right under it. 100 NSH is always $1.",
+      text: "Everything you hold, in Nora Shillings. The dollar value sits right under it. 100 NSH is always $1.",
     },
     {
       target: [".w-actions", ".app-actions", ".balance .actions"],
       title: "Add, send and withdraw",
-      text: "Add money with PayPal, card or M-Pesa. Send to anyone with a Nuru account in seconds. Withdraw whenever you like. All free.",
+      text: "Add money with PayPal, card or M-Pesa. Send to anyone with a Nora account in seconds. Withdraw whenever you like. All free.",
     },
     {
       target: [".w-account-mini", ".w-account", "#verify-note", '.side-nav a[href="#account"]'],
@@ -107,7 +107,7 @@
       <div class="tour-card">
         <div class="tour-head">
           ${globe()}
-          <div class="tour-who"><b>Nuru</b><span id="tour-count"></span></div>
+          <div class="tour-who"><b>Nora</b><span id="tour-count"></span></div>
           <button class="tour-skip" type="button" data-skip>Skip tour</button>
         </div>
         <h2 id="tour-title"></h2>

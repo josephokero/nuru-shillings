@@ -126,7 +126,7 @@
   const SNIPPET = (sdk) => `<span class="c">// 1. Your server asks for a deposit (secret key stays on the server)</span>
 POST /v1/deposits  { "app": "app_…", "amount": "500", "reference": "order_1042" }
 
-<span class="c">// 2. Your page opens the Nuru window with the url you got back</span>
+<span class="c">// 2. Your page opens the Nora window with the url you got back</span>
 &lt;script src="${esc(sdk)}"&gt;&lt;/script&gt;
 const { status } = await Nuru.deposit(deposit.url);
 <span class="c">// "succeeded" · "declined" · "closed". Confirm with the deposit.succeeded webhook.</span>`;
@@ -135,7 +135,7 @@ const { status } = await Nuru.deposit(deposit.url);
     pv = null;
     root.innerHTML = `
       <div class="card-head">
-        <div><h2>Apps</h2><p>Let people add funds to your app from their Nuru wallet. They confirm every amount in a Nuru window that matches your brand.</p></div>
+        <div><h2>Apps</h2><p>Let people add funds to your app from their Nora wallet. They confirm every amount in a Nora window that matches your brand.</p></div>
         ${editing === null && data.apps.length ? `<button class="btn sm primary" type="button" data-new>New app</button>` : ""}
       </div>
       <div class="card-body">

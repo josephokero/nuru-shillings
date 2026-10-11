@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     return send(res, 400, { error: "Remove the secret key from your message. We never need it." });
   }
 
-  const from = process.env.NURU_MAIL_FROM || `Nuru Shillings <${SUPPORT_EMAIL}>`;
+  const from = process.env.NURU_MAIL_FROM || `Nora Shillings <${SUPPORT_EMAIL}>`;
   const to = process.env.NURU_SUPPORT_TO || SUPPORT_EMAIL;
   const label = TOPICS[kind];
   const title = subject || label;
@@ -74,14 +74,14 @@ export default async function handler(req, res) {
     to: [email],
     reply_to: to,
     subject: `We received your message: ${title}`,
-    text: `Hi ${name || "there"},\n\nWe received your message and will reply to this address.\n\nYour message:\n${message}\n\nNuru Shillings will never ask you for a sign-in link, a secret key, an M-Pesa PIN, or a card security code.\n\nNuru Shillings · ${SUPPORT_EMAIL}`,
+    text: `Hi ${name || "there"},\n\nWe received your message and will reply to this address.\n\nYour message:\n${message}\n\nNora Shillings will never ask you for a sign-in link, a secret key, an M-Pesa PIN, or a card security code.\n\nNora Shillings · ${SUPPORT_EMAIL}`,
     html: `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#111">
       <p>Hi ${esc(name || "there")},</p>
       <p>We received your message and will reply to this address.</p>
       <p style="color:#555">Your message:</p>
       <blockquote style="margin:0;padding:12px 16px;border-left:3px solid #ddd;color:#333;white-space:pre-wrap">${esc(message)}</blockquote>
-      <p style="color:#777;font-size:13px">Nuru Shillings will never ask you for a sign-in link, a secret key, an M-Pesa PIN, or a card security code.</p>
-      <p style="color:#777;font-size:13px">Nuru Shillings · ${SUPPORT_EMAIL}</p></div>`,
+      <p style="color:#777;font-size:13px">Nora Shillings will never ask you for a sign-in link, a secret key, an M-Pesa PIN, or a card security code.</p>
+      <p style="color:#777;font-size:13px">Nora Shillings · ${SUPPORT_EMAIL}</p></div>`,
   });
 
   return send(res, 200, { ok: true });

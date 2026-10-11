@@ -81,4 +81,4 @@ createServer(async (req, res) => {
     res.statusCode = 404;
     res.end("Not found");
   }
-}).listen(port, () => console.log(`Nuru Shillings on http://localhost:${port}`));
+}).listen(port, () => console.log(`Nora Shillings on http://localhost:${port}`));

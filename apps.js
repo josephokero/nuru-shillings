@@ -28,9 +28,9 @@
           <span class="ap-hub"><span></span></span>
         </div>
         <h2>No apps connected yet</h2>
-        <p>When a website or app lets you add funds with Nuru, it opens a secure Nuru window. You see the exact amount and decide. Apps you’ve used show up here.</p>
+        <p>When a website or app lets you add funds with Nora, it opens a secure Nora window. You see the exact amount and decide. Apps you’ve used show up here.</p>
         <ol class="ap-how">
-          <li><b>1</b><span><strong>The app asks</strong>You tap “Add funds with Nuru” inside the app.</span></li>
+          <li><b>1</b><span><strong>The app asks</strong>You tap “Add funds with Nora” inside the app.</span></li>
           <li><b>2</b><span><strong>You confirm</strong>Check the amount, then Confirm or Decline.</span></li>
           <li><b>3</b><span><strong>Done</strong>Money moves instantly and you both get an email receipt.</span></li>
         </ol>
@@ -62,7 +62,7 @@
           <div><dt>Last used</dt><dd class="ap-when">${a.last_used ? Nsh.when(a.last_used) : "Not yet"}</dd></div>
         </dl>
 
-        <p class="ap-rule">${ICONS.deposits}<span>Can ask you to add funds. <b>You confirm every amount</b> in a Nuru window first.</span></p>
+        <p class="ap-rule">${ICONS.deposits}<span>Can ask you to add funds. <b>You confirm every amount</b> in a Nora window first.</span></p>
 
         ${a.recent.length ? `
         <details class="ap-recent">

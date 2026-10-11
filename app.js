@@ -36,7 +36,7 @@
     home: ["Home", null],
     activity: ["Activity", "Every payment in and out of your wallet"],
     add: ["Add money", "Top up your balance at 100 NSH = $1"],
-    send: ["Send money", "Free and instant to any Nuru account"],
+    send: ["Send money", "Free and instant to any Nora account"],
     withdraw: ["Withdraw", "Cash out to PayPal, M-Pesa, or card"],
     account: ["Account", "Your profile and verification"],
     apps: ["Apps", "Apps connected to your wallet"],
@@ -65,7 +65,7 @@
     const [icon, label] = LABELS[a.kind] || [ICONS.list, a.kind];
     const sub = a.kind === "add" ? [a.method, a.counterparty].filter(Boolean).join(" · ")
       : a.kind === "withdraw" ? a.counterparty || ""
-      : a.kind === "send" || a.kind === "receive" ? (a.method || "Nuru transfer") : a.counterparty || "";
+      : a.kind === "send" || a.kind === "receive" ? (a.method || "Nora transfer") : a.counterparty || "";
     const title = ["send", "receive", "withdraw"].includes(a.kind) ? `${label} ${a.kind === "withdraw" ? a.method : a.counterparty}` : label;
     return { icon, title, meta: [sub, a.ref].filter(Boolean).join(" · ") };
   }
@@ -224,7 +224,7 @@
     const csv = lines.map((l) => l.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    link.download = "nuru-activity.csv";
+    link.download = "nora-activity.csv";
     link.click();
     URL.revokeObjectURL(link.href);
   }
@@ -249,7 +249,7 @@
     $("#top-actions").hidden = view !== "home";
     stopPoll();
     $$(".co-done").forEach((d) => { d.hidden = true; d.previousElementSibling.hidden = false; });
-    document.title = `${title} · Nuru Shillings`;
+    document.title = `${title} · Nora Shillings`;
     scrollTo({ top: 0, behavior: "instant" });
     const field = $(`.view[data-view="${view}"] form .input`);
     if (field && matchMedia("(min-width: 721px)").matches) field.focus({ preventScroll: true });
@@ -453,7 +453,7 @@
     $("#add-trust").hidden = false;
     $("#add-trust").innerHTML = addM === "M-Pesa"
       ? `${LOCK}M-Pesa payments run through PayHero. You approve with your own PIN.`
-      : `${LOCK}Secured by PayPal. Nuru never sees your card number or PayPal password.`;
+      : `${LOCK}Secured by PayPal. Nora never sees your card number or PayPal password.`;
     addForm.querySelectorAll("#chips button").forEach((c) => c.classList.toggle("on", Number(c.dataset.usd) === usd));
     fit(addForm.usd);
 

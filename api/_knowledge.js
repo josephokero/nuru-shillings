@@ -2,14 +2,14 @@ export const SUPPORT_EMAIL = "supportnorashillings@benuru.com";
 export const COMPANY_EMAIL = "norashillings@benuru.com";
 
 export const FACTS = `
-Nuru Shillings (NSH) is private payment infrastructure, founded in June 2026. Joseph Nyarandi is the founder. Emmanuel is director.
+Nora Shillings (NSH) is private payment infrastructure, founded in June 2026. Joseph Nyarandi is the founder. Emmanuel is director.
 
 Rate
-- 100 Nuru Shillings = 1 US dollar. The same rate is used to buy, pay, value the fee, refund, and sell back. No spread, no second rate.
+- 100 Nora Shillings = 1 US dollar. The same rate is used to buy, pay, value the fee, refund, and sell back. No spread, no second rate.
 - Examples: 10 USD = 1,000 NSH. 18 USD = 1,800 NSH.
 
 Accounts
-- Open an account with just an email address. Nuru emails a sign-in link; opening it creates the account and signs in. There is no password.
+- Open an account with just an email address. Nora emails a sign-in link; opening it creates the account and signs in. There is no password.
 - A sign-in link works once and expires after 20 minutes. If it does not arrive, check spam and use Resend. You stay signed in on that device, even after closing the browser, until you log out.
 - There is no sign-in with Google or any other company.
 - Everyone lands in the wallet after signing in. Business tools (the developer dashboard with keys, webhooks, and payments) is one click away from the wallet.
@@ -18,26 +18,26 @@ Accounts
 - A new wallet can add money, send, and pay right away without verifying. Before the first withdrawal, the user verifies once on the Account page: a photo of a national ID, passport, or driving licence plus a short live selfie, checked by our identity partner Didit. It takes about two minutes and is free. The verified name and country come from the ID. If a check is declined, the user can try again with clearer photos; if it is in review, withdrawals unlock as soon as it is approved. Businesses also verify before creating a live key or live payments.
 
 Business name
-- A business does not have to be a registered company to use Nuru. The user gives the business a name, Nuru records that name on its own servers, and that is the only name a checkout shows. The personal name of the owner is not shown to buyers.
+- A business does not have to be a registered company to use Nora. The user gives the business a name, Nora records that name on its own servers, and that is the only name a checkout shows. The personal name of the owner is not shown to buyers.
 
 Adding money, paying, withdrawing
 - Add money with PayPal, a supported card, or M-Pesa. Money added is available in the wallet immediately.
-- Pay any platform that connects the Nuru API, without leaving that platform's page.
+- Pay any platform that connects the Nora API, without leaving that platform's page.
 - Sell back at 100 NSH = 1 USD and withdraw to PayPal, a supported card, or M-Pesa in the verified name. Withdrawing is free. PayPal withdrawals are sent instantly to the PayPal email entered (smallest 100 NSH, up to 1,000 USD a day); if that email has no PayPal account yet, PayPal asks the person to claim it, and unclaimed money comes back after 30 days. M-Pesa withdrawals arrive in 1 to 8 hours, depending on traffic. Card withdrawals are paid out after a short review. Money added by card or PayPal can be withdrawn 24 hours after it arrives. If the method rejects a withdrawal, the amount returns to the wallet.
 
 Fees
 - Opening an account, the wallet, the API, the sandbox, adding money, and withdrawing are free. No monthly fee.
-- A company pays 1% of each payment that is paid. The buyer pays no Nuru fee. A refused payment is free. A refund returns the payment and the fee. Example: on 1,800 NSH the fee is 18 NSH and the company receives 1,782 NSH.
+- A company pays 1% of each payment that is paid. The buyer pays no Nora fee. A refused payment is free. A refund returns the payment and the fee. Example: on 1,800 NSH the fee is 18 NSH and the company receives 1,782 NSH.
 - PayPal, a card issuer, or a mobile-money provider may charge their own fees.
 
 Privacy and security
-- Checkout shows the company name only. The buyer's name is not shown to other customers and the payment is not written to a public ledger. Records are marked chain "private" and kept on Nuru's private chain.
-- Nuru does not sell personal information and runs no advertising trackers.
-- Nuru will never ask anyone to forward a sign-in link, or for a secret API key, an M-Pesa PIN, or a card security code.
-- Privacy does not mean Nuru helps anyone break the law.
+- Checkout shows the company name only. The buyer's name is not shown to other customers and the payment is not written to a public ledger. Records are marked chain "private" and kept on Nora's private chain.
+- Nora does not sell personal information and runs no advertising trackers.
+- Nora will never ask anyone to forward a sign-in link, or for a secret API key, an M-Pesa PIN, or a card security code.
+- Privacy does not mean Nora helps anyone break the law.
 
 Who can take payments
-- Shops, services, subscriptions, marketplaces, apps, digital products, and adult sites can take payment on their own page. Card processors often refuse whole categories like adult sites; Nuru does not refuse a site for that reason.
+- Shops, services, subscriptions, marketplaces, apps, digital products, and adult sites can take payment on their own page. Card processors often refuse whole categories like adult sites; Nora does not refuse a site for that reason.
 - Not allowed: fraud, money laundering, terrorist financing, sanctions evasion, anything illegal where the buyer or the company is located, weapons, illegal drugs, stolen data, material that exploits children, unlicensed gambling, pyramid or Ponzi schemes, testing stolen cards.
 
 Refunds
@@ -51,20 +51,20 @@ Developers
 - Docs: /docs on this site.
 
 Pages on this site
-- Help centre: /help. Community help: /community. Docs: /docs. Terms: /terms. Privacy: /privacy. Security: /security. About: /about. Product overview: /product. Developers overview: /developers. Business overview: /business. Why Nuru: /why-nuru. Wallet: /dashboard. Business tools: /developer. Sign up: /signup. Log in: /signin.
+- Help centre: /help. Community help: /community. Docs: /docs. Terms: /terms. Privacy: /privacy. Security: /security. About: /about. Product overview: /product. Developers overview: /developers. Business overview: /business. Why Nora: /why-nuru. Wallet: /dashboard. Business tools: /developer. Sign up: /signup. Log in: /signin.
 
 Contact
 - Account and payment support: ${SUPPORT_EMAIL}
 - Company, partnerships, and privacy questions: ${COMPANY_EMAIL}
 `.trim();
 
-export const SYSTEM_PROMPT = `You are the Nuru Shillings assistant on the Nuru Shillings website. You help people use the wallet, pay, withdraw, take payments as a business, and use the API.
+export const SYSTEM_PROMPT = `You are the Nora Shillings assistant on the Nora Shillings website. You help people use the wallet, pay, withdraw, take payments as a business, and use the API.
 
 Rules:
 - Answer only from the facts below. If you do not know, say so and point them to ${SUPPORT_EMAIL}.
 - Be short, clear, and professional. Plain sentences. Use a short list only when steps help.
 - Never ask for a sign-in link, secret API key, M-Pesa PIN, or card security code. If a user shares a key, tell them to replace it in Business tools.
-- Do not help with anything listed as not allowed. Privacy on Nuru does not mean helping anyone break the law.
+- Do not help with anything listed as not allowed. Privacy on Nora does not mean helping anyone break the law.
 - Do not invent balances, payment statuses, or account details. You cannot see the user's account.
 - Reply in the language the user writes in.
 

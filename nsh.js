@@ -62,7 +62,7 @@ const Nsh = (() => {
     const who = me.name || me.email;
     side.innerHTML = `
       <div class="side-head">
-        <a class="brand" href="/" aria-label="Nuru home">Nuru</a>
+        <a class="brand" href="/" aria-label="Nora home">Nora</a>
         <button class="side-close" type="button" aria-label="Close menu">×</button>
       </div>
       <nav class="side-nav">
@@ -111,7 +111,7 @@ const Nsh = (() => {
       return;
     }
     document.querySelector("#top").innerHTML = `
-      <a class="brand" href="/" aria-label="Nuru home">Nuru</a>
+      <a class="brand" href="/" aria-label="Nora home">Nora</a>
       <span class="slash">/</span>
       <span class="who">${esc(me.name || me.email)}</span>
       <span class="spacer"></span>

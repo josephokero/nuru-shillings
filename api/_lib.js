@@ -12,7 +12,7 @@ export function db() {
 
 export const APP_URL = (process.env.APP_URL || "https://norashillings.benuru.com").replace(/\/$/, "");
 export const SUPPORT = process.env.NURU_SUPPORT_TO || "supportnorashillings@benuru.com";
-export const FROM = process.env.NURU_MAIL_FROM || `Nuru Shillings <${SUPPORT}>`;
+export const FROM = process.env.NURU_MAIL_FROM || `Nora Shillings <${SUPPORT}>`;
 export const SESSION_COOKIE = "nsh_session";
 export const SESSION_DAYS = 365;
 export const SANDBOX_START = 10000;
@@ -155,7 +155,7 @@ function emailLayout({ preheader, title, lead, body = "", action, link, note = "
       <tr><td style="padding:0 4px 28px">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
           <td width="20" height="20" bgcolor="#ffffff" style="width:20px;height:20px;border-radius:50%;background:#fff;font-size:0;line-height:0">&nbsp;</td>
-          <td style="padding-left:10px;font-family:${FONT};font-size:16px;font-weight:600;letter-spacing:-.02em;color:#fff">Nuru Shillings</td>
+          <td style="padding-left:10px;font-family:${FONT};font-size:16px;font-weight:600;letter-spacing:-.02em;color:#fff">Nora Shillings</td>
         </tr></table>
       </td></tr>
       <tr><td bgcolor="#0a0a0a" style="background:#0a0a0a;border:1px solid #262626;border-radius:12px;padding:36px 32px">
@@ -166,7 +166,7 @@ function emailLayout({ preheader, title, lead, body = "", action, link, note = "
       <tr><td style="padding:28px 4px 0;font-family:${FONT};font-size:12px;line-height:1.7;color:#6e6e6e">
         Sent to ${esc(to)}. ${esc(reason)}<br>
         <a href="${APP_URL}/help" style="color:#a1a1a1;text-decoration:none">Help</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="${APP_URL}/privacy" style="color:#a1a1a1;text-decoration:none">Privacy</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="${APP_URL}/terms" style="color:#a1a1a1;text-decoration:none">Terms</a>
-        <div style="margin-top:14px;color:#4d4d4d">© 2026 Nuru Shillings</div>
+        <div style="margin-top:14px;color:#4d4d4d">© 2026 Nora Shillings</div>
       </td></tr>
     </table>
   </td></tr>
@@ -187,11 +187,11 @@ async function resendMail(payload) {
 }
 
 export async function mailAdmin(subject, text) {
-  return resendMail({ to: [SUPPORT], subject: `[Nuru ops] ${subject}`, text: `${text}\n\n—\nNuru Shillings · ${APP_URL}` });
+  return resendMail({ to: [SUPPORT], subject: `[Nora ops] ${subject}`, text: `${text}\n\n—\nNora Shillings · ${APP_URL}` });
 }
 
 export async function mailLink(to, link, isNew) {
-  const title = isNew ? "Create your Nuru Shillings account" : "Log in to Nuru Shillings";
+  const title = isNew ? "Create your Nora Shillings account" : "Log in to Nora Shillings";
   const action = isNew ? "Create account" : "Log in";
   const lead = isNew
     ? "Click below to create your account. Your wallet opens straight away."
@@ -201,14 +201,14 @@ export async function mailLink(to, link, isNew) {
   return resendMail({
     to: [to],
     subject: title,
-    text: `${title}\n\n${lead}\n\n${action}: ${link}\n\n${note}\n\n—\nSent to ${to}. ${reason}\nNuru Shillings · ${APP_URL}`,
+    text: `${title}\n\n${lead}\n\n${action}: ${link}\n\n${note}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
     html: emailLayout({ preheader: "This link expires in 20 minutes.", title, lead, action, link, note, to, reason }),
   });
 }
 
 export async function mailWelcome(to) {
   const title = "Your account is ready";
-  const lead = "Welcome to Nuru Shillings. Your wallet is open. Here is how to get started.";
+  const lead = "Welcome to Nora Shillings. Your wallet is open. Here is how to get started.";
   const steps = [
     ["Add money", "Use PayPal, a card, or M-Pesa. 100 NSH is always 1 USD, and you can send and pay right away."],
     ["Verify once to withdraw", "Before your first withdrawal, take a photo of your ID and a quick selfie. It is free and done once."],
@@ -225,11 +225,11 @@ export async function mailWelcome(to) {
           </tr>`).join("")}
         </table>`;
   const link = `${APP_URL}/dashboard`;
-  const reason = "You're receiving this because you created a Nuru Shillings account.";
+  const reason = "You're receiving this because you created a Nora Shillings account.";
   return resendMail({
     to: [to],
-    subject: "Welcome to Nuru Shillings",
-    text: `${title}\n\n${lead}\n\n${steps.map(([h, p], i) => `${i + 1}. ${h}: ${p}`).join("\n")}\n\nOpen your wallet: ${link}\n\n—\nSent to ${to}. ${reason}\nNuru Shillings · ${APP_URL}`,
+    subject: "Welcome to Nora Shillings",
+    text: `${title}\n\n${lead}\n\n${steps.map(([h, p], i) => `${i + 1}. ${h}: ${p}`).join("\n")}\n\nOpen your wallet: ${link}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
     html: emailLayout({ preheader: "Your wallet is open. Here is how to get started.", title, lead, body, action: "Open my wallet", link, to, reason }),
   });
 }
@@ -259,11 +259,11 @@ export async function mailReceipt(to, t) {
         </table>`;
   const title = `${nsh} added to your wallet`;
   const lead = `Your payment of ${t.method === "mpesa" && t.kes ? `KES ${Number(t.kes).toLocaleString("en-US")}` : usd} was successful. Here is your receipt.`;
-  const reason = "You're receiving this because you added money to your Nuru Shillings wallet.";
+  const reason = "You're receiving this because you added money to your Nora Shillings wallet.";
   return resendMail({
     to: [to],
     subject: `Receipt ${t.id} · ${nsh} added`,
-    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\nOpen your wallet: ${APP_URL}/dashboard\n\n—\nSent to ${to}. ${reason}\nNuru Shillings · ${APP_URL}`,
+    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\nOpen your wallet: ${APP_URL}/dashboard\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
     html: emailLayout({ preheader: `Payment received. ${nsh} added.`, title, lead, body, action: "Open my wallet", link: `${APP_URL}/dashboard#activity`, to, reason }),
   });
 }
@@ -301,17 +301,17 @@ export async function mailDeposit(to, d, role) {
         </table>`;
   const title = payer ? `You added ${nsh(d.amount)} to ${d.app}` : `${nsh(d.amount - d.fee)} received from ${d.user}`;
   const lead = payer
-    ? `You confirmed this deposit${sandbox}. The money moved from your Nuru wallet to ${d.app}.`
-    : `${d.user} confirmed a deposit to ${d.app}${sandbox}. It is already in your Nuru balance.`;
+    ? `You confirmed this deposit${sandbox}. The money moved from your Nora wallet to ${d.app}.`
+    : `${d.user} confirmed a deposit to ${d.app}${sandbox}. It is already in your Nora balance.`;
   const reason = payer
-    ? "You're receiving this because you confirmed a deposit from your Nuru Shillings wallet."
-    : "You're receiving this because your app received a deposit through Nuru Shillings.";
+    ? "You're receiving this because you confirmed a deposit from your Nora Shillings wallet."
+    : "You're receiving this because your app received a deposit through Nora Shillings.";
   const link = payer ? `${APP_URL}/dashboard#activity` : `${APP_URL}/developer`;
   const action = payer ? "View in my wallet" : "Open Business tools";
   return resendMail({
     to: [to],
     subject: payer ? `Receipt ${d.id} · ${nsh(d.amount)} to ${d.app}` : `Deposit ${d.id} · ${nsh(d.amount)} from ${d.user}`,
-    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\n${action}: ${link}\n\n—\nSent to ${to}. ${reason}\nNuru Shillings · ${APP_URL}`,
+    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}\n\n${action}: ${link}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
     html: emailLayout({ preheader: lead, title, lead, body, action, link, to, reason }),
   });
 }
@@ -329,18 +329,18 @@ export async function mailKyc(to, outcome, u) {
         </table>` : "";
   const title = approved ? "You’re verified" : "We couldn’t verify you";
   const lead = approved
-    ? "Your identity check is approved. Withdrawals are now unlocked on your Nuru Shillings wallet."
+    ? "Your identity check is approved. Withdrawals are now unlocked on your Nora Shillings wallet."
     : "Your identity check wasn’t approved this time. You can try again from your wallet whenever you’re ready.";
   const note = approved
     ? "Your name and country now come from your ID. If anything looks wrong, reply to this email."
     : "Use a valid ID that hasn’t expired, take the photos in good light, and keep your face fully visible.";
   const action = approved ? "Open my wallet" : "Try again";
   const link = `${APP_URL}/dashboard#account`;
-  const reason = "You're receiving this because you started an identity check on Nuru Shillings.";
+  const reason = "You're receiving this because you started an identity check on Nora Shillings.";
   return resendMail({
     to: [to],
     subject: approved ? "You’re verified · withdrawals unlocked" : "Your identity check wasn’t approved",
-    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}${rows.length ? "\n\n" : ""}${note}\n\n${action}: ${link}\n\n—\nSent to ${to}. ${reason}\nNuru Shillings · ${APP_URL}`,
+    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}${rows.length ? "\n\n" : ""}${note}\n\n${action}: ${link}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
     html: emailLayout({ preheader: lead, title, lead, body, action, link, note, to, reason }),
   });
 }

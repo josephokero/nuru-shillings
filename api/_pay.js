@@ -54,7 +54,7 @@ async function pp(path, init = {}) {
 export async function paypalCreateOrder(t) {
   const card = t.method === "card";
   const experience = {
-    brand_name: "Nuru Shillings",
+    brand_name: "Nora Shillings",
     landing_page: card ? "GUEST_CHECKOUT" : "LOGIN",
     user_action: "PAY_NOW",
     shipping_preference: "NO_SHIPPING",
@@ -71,8 +71,8 @@ export async function paypalCreateOrder(t) {
         reference_id: t.id,
         custom_id: t.id,
         invoice_id: t.id,
-        description: `Nuru Shillings wallet top-up (${Number(t.nsh).toLocaleString("en-US")} NSH)`,
-        soft_descriptor: "NURU SHILLINGS",
+        description: `Nora Shillings wallet top-up (${Number(t.nsh).toLocaleString("en-US")} NSH)`,
+        soft_descriptor: "NORA SHILLINGS",
         amount: { currency_code: "USD", value: Number(t.usd).toFixed(2) },
       }],
       payment_source: { paypal: { experience_context: experience } },
@@ -163,14 +163,14 @@ export async function paypalPayout(w) {
     body: JSON.stringify({
       sender_batch_header: {
         sender_batch_id: w.id,
-        email_subject: "You have money from Nuru Shillings",
-        email_message: "Your Nuru Shillings withdrawal has arrived.",
+        email_subject: "You have money from Nora Shillings",
+        email_message: "Your Nora Shillings withdrawal has arrived.",
       },
       items: [{
         recipient_type: "EMAIL",
         receiver: w.destination,
         amount: { value: (Number(w.amount) / 100).toFixed(2), currency: "USD" },
-        note: "Nuru Shillings withdrawal",
+        note: "Nora Shillings withdrawal",
         sender_item_id: w.id,
       }],
     }),
@@ -208,7 +208,7 @@ export async function payheroStk(t) {
     channel_id: Number(env("PAYHERO_CHANNEL_ID")) || env("PAYHERO_CHANNEL_ID"),
     provider: "m-pesa",
     external_reference: t.id,
-    customer_name: "Nuru Shillings",
+    customer_name: "Nora Shillings",
     callback_url: env("NSH_PAYHERO_CALLBACK_URL") || `${publicBase()}/api/webhooks/payhero`,
   };
   const r = await fetch("https://backend.payhero.co.ke/api/v2/payments", {
