@@ -154,6 +154,7 @@
   const wdDone = (w) => w.status === "paid" || w.status === "failed";
   let wdFilter = "all";
   let wdTimer;
+  let wdChecked = null;
 
   function wdNote(w) {
     if (w.status === "failed") return w.failure || "Returned to your wallet";
@@ -483,7 +484,7 @@
     $("#wd-s-after").textContent = wOver ? "—" : after(-wAmt);
     $("#wd-warn").hidden = !wOver;
     const unverified = me && !me.verified;
-    $("#wd-btn").textContent = unverified ? "Verify to withdraw" : wAmt ? `Withdraw ${Nsh.usd(wAmt)}` : "Enter an amount";
+    $("#wd-btn").textContent = unverified ? "Verify to withdraw" : !wAmt ? "Enter an amount" : wdChecked ? `Yes, send ${Nsh.usd(wAmt)}` : `Withdraw ${Nsh.usd(wAmt)}`;
     $("#wd-btn").disabled = unverified || !wAmt || wOver;
     $("#dest-label").textContent = m === "PayPal" ? "PayPal email" : m === "M-Pesa" ? "M-Pesa phone number" : "Card’s last 4 digits";
     wForm.destination.placeholder = m === "PayPal" ? "you@example.com" : m === "M-Pesa" ? "+254 7XX XXX XXX" : "4242";
@@ -688,12 +689,109 @@
     }).then(refreshCheckout);
   });
 
+  const MAIL_HOSTS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "live.com", "ymail.com", "protonmail.com", "aol.com"];
+  const editDistance = (a, b) => {
+    const d = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      let prev = d[0];
+      d[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const cur = d[j];
+        d[j] = Math.min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+        prev = cur;
+      }
+    }
+    return d[b.length];
+  };
+
+  /** Returns {error} or {dest, shown, hint} where hint is a likely intended address. */
+  function checkDest(method, raw) {
+    const v = raw.trim();
+    if (method === "PayPal") {
+      const email = v.toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(email)) return { error: "Enter a full PayPal email, like you@gmail.com." };
+      const [user, host] = email.split("@");
+      let hint = "";
+      const near = MAIL_HOSTS.find((h) => h !== host && editDistance(h, host) <= 2);
+      if (!MAIL_HOSTS.includes(host) && near) hint = `${user}@${near}`;
+      const own = String(me?.email || "").toLowerCase();
+      if (!hint && own && own !== email) {
+        const [ou, oh] = own.split("@");
+        if (editDistance(ou, user) <= 2 && editDistance(oh, host) <= 2) hint = own;
+      }
+      return { dest: email, shown: email, hint };
+    }
+    if (method === "M-Pesa") {
+      const d = v.replace(/[\s()-]/g, "").replace(/^\+/, "");
+      const local = /^0[17]\d{8}$/.test(d) ? d.slice(1) : /^254[17]\d{8}$/.test(d) ? d.slice(3) : /^[17]\d{8}$/.test(d) ? d : "";
+      if (!local) return { error: "Enter a Kenyan M-Pesa number, like 0712 345 678." };
+      return { dest: `+254${local}`, shown: `+254 ${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6)}` };
+    }
+    const last4 = v.replace(/\D/g, "");
+    if (last4.length !== 4) return { error: "Enter the last 4 digits of your card." };
+    return { dest: last4, shown: `Card ending ${last4}` };
+  }
+
+  const wdCheck = document.createElement("div");
+  wdCheck.className = "wd-check";
+  wdCheck.hidden = true;
+  $("#wd-btn").before(wdCheck);
+  function closeCheck() {
+    wdChecked = null;
+    wdCheck.hidden = true;
+    refreshCheckout();
+  }
+
+  function openCheck(method, amount, c) {
+    wdChecked = c;
+    const what = method === "PayPal" ? "PayPal email" : method === "M-Pesa" ? "M-Pesa number" : "Card";
+    const eta = method === "PayPal" ? "arrives instantly" : method === "M-Pesa" ? "arrives in 1–8 hours" : "after payout review";
+    wdCheck.innerHTML = `
+      <div class="wd-check-head"><b>Is this correct?</b><button type="button" class="wd-check-edit" data-wd-edit>Edit</button></div>
+      <span class="wd-check-label">${what}</span>
+      <p class="wd-check-dest">${Nsh.esc(c.shown)}</p>
+      <p class="wd-check-meta">${Nsh.usd(amount)} · ${eta}</p>
+      ${c.hint ? `<p class="wd-check-hint">Did you mean <b>${Nsh.esc(c.hint)}</b>? <button type="button" data-wd-fix="${Nsh.esc(c.hint)}">Use this</button></p>` : ""}
+      <p class="wd-check-warn">Check every letter. Money sent to the wrong ${method === "M-Pesa" ? "number" : "address"} can’t be pulled back.</p>`;
+    wdCheck.hidden = false;
+    $("#wd-btn").textContent = `Yes, send ${Nsh.usd(amount)}`;
+    wdCheck.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  wdCheck.addEventListener("click", (e) => {
+    const fix = e.target.closest("[data-wd-fix]");
+    if (fix) {
+      wForm.destination.value = fix.dataset.wdFix;
+      const amount = amountOf(wForm.amount.value);
+      openCheck(wForm.method.value, amount, checkDest(wForm.method.value, fix.dataset.wdFix));
+      return;
+    }
+    if (e.target.closest("[data-wd-edit]")) {
+      closeCheck();
+      wForm.destination.focus();
+      wForm.destination.select();
+    }
+  });
+  ["input", "change"].forEach((ev) => wForm.addEventListener(ev, (e) => { if (wdChecked && !wdCheck.contains(e.target)) closeCheck(); }));
+
   wForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const amount = amountOf(wForm.amount.value);
     const method = wForm.method.value;
-    Nsh.submit(wForm, $("#msg-withdraw"), async () => {
-      const dest = wForm.destination.value.trim();
+    const msg = $("#msg-withdraw");
+    if (!wdChecked) {
+      const c = checkDest(method, wForm.destination.value);
+      msg.className = c.error ? "msg err" : "msg";
+      msg.textContent = c.error || "";
+      if (c.error) { wForm.destination.focus(); return; }
+      openCheck(method, amount, c);
+      return;
+    }
+    const checked = wdChecked;
+    Nsh.submit(wForm, msg, async () => {
+      const dest = checked.dest;
+      wdChecked = null;
+      wdCheck.hidden = true;
       const r = await Nsh.api("wallet/withdraw", { body: { mode: MODE, amount, method, destination: dest } });
       savePrefs({ withdraw_method: method, withdraw_destination: dest });
       await load();

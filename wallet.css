@@ -605,6 +605,16 @@ body.is-scrolled .app-top { border-bottom-color: #161616; background: rgba(0,0,0
 .co-note { margin: 20px 0 0; color: var(--dim); font-size: 12.5px; text-align: center; }
 .co-warn { margin: 18px 0 0; padding: 10px 14px; border-radius: 10px; background: rgba(248,113,113,.08); color: var(--bad); font-size: 13px; }
 .co-pay { height: 50px !important; margin-top: 22px; font-size: 15px !important; }
+.wd-check { margin-top: 20px; padding: 16px 18px; display: grid; border: 1px solid #3a3a3a; border-radius: 14px; background: #070707; animation: w-in .25s ease both; }
+.wd-check-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; }
+.wd-check-edit, .wd-check-hint button { padding: 0; border: 0; background: none; color: var(--text); font-size: 13px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.wd-check-label { margin-top: 12px; color: var(--dim); font-size: 12px; }
+.wd-check-dest { margin: 2px 0 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; word-break: break-all; }
+.wd-check-meta { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.wd-check-hint { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: rgba(251,191,36,.08); color: var(--warn); font-size: 13px; }
+.wd-check-hint b { word-break: break-all; }
+.wd-check-hint button { margin-left: 4px; color: var(--warn); }
+.wd-check-warn { margin: 12px 0 0; color: var(--dim); font-size: 12.5px; }
 .co-body .msg { text-align: center; }
 
 .co-side { position: sticky; top: 96px; display: grid; gap: 16px; }
