@@ -1,0 +1,40 @@
+# Nora Shillings
+
+> Nora Shillings (NSH) is a wallet and payments API. 100 Nora Shillings always equal 1 US dollar. People add money with PayPal, a card, or M-Pesa, hold Nora Shillings, send them, pay businesses, and withdraw. Businesses and apps take payment with one API call and pay 1% only on paid payments. Founded in June 2026. Works worldwide.
+
+Key facts:
+
+- Rate: 1 NSH = 1 US cent. 1,000 NSH = 10 USD. The same rate is used to buy, pay, refund, and withdraw.
+- Ways to add money: PayPal, card (on PayPal's secure card page), and M-Pesa (prompt on the phone).
+- Withdrawals: PayPal or M-Pesa. M-Pesa withdrawals are checked by the Nora team and usually arrive within 1 to 8 hours.
+- Pricing: businesses pay 1% of a paid payment. No monthly fee. Refusals are free and refunds return the fee. Wallets are free.
+- Accounts: sign up with an email link, no password. Two-step sign-in with passkeys or an authenticator app. Identity is verified once before live withdrawals.
+- Sandbox and Live: every account has free Sandbox test money and a Live balance with real money.
+- Support: supportnorashillings@benuru.com
+
+## Product
+
+- [Home](https://norashillings.benuru.com/): what Nora Shillings is and how it works
+- [Product](https://norashillings.benuru.com/product): the wallet, adding money, sending, paying, withdrawing
+- [Business](https://norashillings.benuru.com/business): accepting Nora Shillings in a shop, app, or marketplace
+- [Why Nora](https://norashillings.benuru.com/why-nuru): how Nora compares with usual payment processors
+- [Sign up](https://norashillings.benuru.com/signup): open a free wallet
+
+## Developers
+
+- [Developers](https://norashillings.benuru.com/developers): overview of the payments API
+- [API documentation](https://norashillings.benuru.com/docs): keys, Sandbox and Live, payments, checkout, refunds, webhooks, app deposits, errors
+- Base URL: https://norashillings.benuru.com/v1
+- Authentication: `Authorization: Bearer nsh_test_...` (Sandbox) or `nsh_live_...` (Live)
+- Endpoints: `POST /v1/payments`, `GET /v1/payments/{id}`, `POST /v1/refunds`, `POST /v1/webhooks`, `POST /v1/deposits`, `GET /v1/deposits/{id}`, `POST /v1/connections/exchange`
+- Amounts are whole numbers of NSH sent as strings, for example `"1800"` for 18 USD.
+- Webhooks are signed with the `Nuru-Signature` header.
+
+## Help and policies
+
+- [Help centre](https://norashillings.benuru.com/help): answers about adding money, paying, withdrawing, fees, and the API
+- [Community](https://norashillings.benuru.com/community): questions answered by the Nora team
+- [Security](https://norashillings.benuru.com/security): how accounts, keys, webhooks, and payments are protected
+- [About](https://norashillings.benuru.com/about): company, founder, and mission
+- [Privacy Notice](https://norashillings.benuru.com/privacy)
+- [Terms of Service](https://norashillings.benuru.com/terms)
