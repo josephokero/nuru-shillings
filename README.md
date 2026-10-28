@@ -6,7 +6,11 @@
 
 <p align="center">
   <strong>Private payment infrastructure for every platform.</strong><br>
-  A digital wallet and business toolkit — 100 NSH = 1 USD.
+  One wallet. One rate. Every kind of business.
+</p>
+
+<p align="center">
+  <em>100 NSH = 1 USD</em> — buy, pay, refund, and sell at the same fixed rate.
 </p>
 
 <p align="center">
@@ -22,6 +26,7 @@
   <a href="https://norashillings.benuru.com">Open the wallet</a> ·
   <a href="https://norashillings.benuru.com/docs">API docs</a> ·
   <a href="https://norashillings.benuru.com/product">Product</a> ·
+  <a href="https://norashillings.benuru.com/developers">Developers</a> ·
   <a href="https://norashillings.benuru.com/about">About</a>
 </p>
 
@@ -31,54 +36,131 @@
   <img src="docs/architecture.jpg" alt="Nora Shillings architecture: customers, business tools, and platform rails" width="920">
 </p>
 
-## What it is
+## Who it is for
 
-Nora Shillings is a live payments product:
+Nora Shillings is built for two sides of the same payment:
 
-- **Wallet** — add money, send, pay, and withdraw
-- **Business tools** — API keys, hosted checkout, deposits, apps, and webhooks
-- **Identity** — one free ID + selfie check (Didit) before withdrawals and live keys
-- **Rails** — PayPal, card, and M-Pesa where configured
+| You are… | What you get |
+| --- | --- |
+| **A person** | A free wallet: add money, send to friends, pay companies, withdraw when you verify |
+| **A business** | Business tools: accept Nora on your site, API keys, checkout, deposits, webhooks |
 
-The buyer’s personal identity stays private. The company name is what checkout shows.
+You do **not** need to be a registered company. You give the company a name. That name is what checkout shows — not your personal name.
+
+### Every kind of business is welcome
+
+Card networks often block whole categories of commerce. Nora does **not** refuse a site because of its category.
+
+A shop, a service, a marketplace, an app, a creator platform, or an adult site can take payment on its own page. Privacy is the point of the product: the buyer’s identity is not published, and settlement is not written to a public ledger where anyone can follow the amount, the time, and the path.
+
+Nora is payment infrastructure. It is **not** a bank, an investment, or a savings product. Balances do not earn interest. The value stays fixed at the published rate.
+
+## How it works
+
+### 1. Open a wallet (free, no password)
+
+Enter your email. Nora sends a one-time sign-in link. Opening it creates the account and signs you in. You can **add, send, and pay immediately**. Verification is only needed to **withdraw** or to take **live** business payments.
+
+### 2. Hold Nora Shillings (NSH)
+
+- **100 NSH = 1 US dollar**, always — to buy, to pay, to refund, and to sell
+- One balance you can spend on any platform that connects the Nora payments API
+- The same wallet works wherever Nora is accepted
+
+### 3. Add money
+
+Choose PayPal, card, or M-Pesa. Each method opens its own checkout. Successful payments credit the wallet once and send a receipt on screen and by email.
+
+### 4. Move money
+
+- **Send** — to another Nora account by email (free, instant)
+- **Pay a company** — confirm at Nora checkout; the company name and amount are shown; if balance covers it, status becomes `paid`
+- **Withdraw** — after a free ID + selfie check, sell NSH back to USD and cash out to PayPal, card, or M-Pesa in your verified name (withdrawing is free)
+
+### 5. Take payments as a business
+
+In **Business tools** you get:
+
+- Sandbox keys to practice without real money
+- Live keys after identity verification
+- Hosted checkout and deposit flows
+- Signed webhooks (`payment.paid`, `payment.refunded`, and related events)
+- Connected apps for platforms that embed Nora
+
+The buyer pays exactly the amount shown. Nora does not add a fee on top for the buyer. The company pays **1% only when a payment is paid**. There is no monthly fee.
+
+### What you can do before and after verifying
+
+| Action | Before verifying | After verifying |
+| --- | --- | --- |
+| Add money | Yes | Yes |
+| Send to another wallet | Yes | Yes |
+| Pay a company | Yes | Yes |
+| Withdraw | No | Yes, to accounts in your name |
+| Take live payments as a company | No | Yes |
+
+Verification is a short Didit check: photo of a national ID, passport, or driving licence, plus a live selfie. Free, about two minutes, once.
+
+## Fees at a glance
+
+| Item | Price |
+| --- | --- |
+| Opening an account | Free |
+| Adding money | Free from Nora |
+| Sending to another wallet | Free |
+| Paying a company | Free for the buyer |
+| Withdrawing | Free |
+| Monthly fee | None |
+| Company fee on a paid payment | 1% |
+
+PayPal, your card issuer, or M-Pesa may charge their own fees under their own terms — those are not Nora fees.
 
 ## Architecture
 
 ```mermaid
 flowchart TB
-  subgraph customers [Customers]
+  subgraph people [People]
     W[Wallet]
     W --> Add[Add money]
     W --> Send[Send]
-    W --> Pay[Pay]
+    W --> Pay[Pay companies]
     W --> Out[Withdraw]
   end
 
-  subgraph business [Business tools]
+  subgraph biz [Any kind of business]
+    Shop[Shop / service]
+    Market[Marketplace]
+    App[App / platform]
+    Other[Creator / adult / other]
+  end
+
+  subgraph tools [Business tools]
     K[API keys]
-    C[Checkout / deposits]
-    H[Webhooks]
-    A[Connected apps]
+    C[Checkout and deposits]
+    H[Signed webhooks]
   end
 
-  subgraph platform [Platform]
+  subgraph rails [Platform rails]
     ID[Didit identity]
-    PP[PayPal]
+    PP[PayPal and card]
     MP[M-Pesa]
-    DB[(Neon Postgres)]
+    DB[(Neon Postgres ledger)]
   end
 
-  customers --> platform
-  business --> platform
-  platform --> DB
+  people --> Pay
+  Pay --> tools
+  biz --> tools
+  tools --> rails
+  people --> rails
+  rails --> DB
 ```
 
 | Layer | Role |
 | --- | --- |
-| Wallet | Personal balances in Sandbox and Live |
+| Wallet | Personal Live balance at 100 NSH = 1 USD |
 | Business tools | Accept NSH, issue keys, deliver signed webhooks |
-| Identity | Didit session → verified name & country on the account |
-| Ledger | Append-only money movement in Postgres |
+| Identity | Didit session → verified name and country on the account |
+| Ledger | Money movement recorded in Postgres under Nora’s controls |
 
 ## Stack
 
@@ -86,7 +168,7 @@ flowchart TB
 - **Data** — Neon Postgres
 - **Auth** — email magic links, optional TOTP / passkeys
 - **KYC** — Didit hosted verification
-- **Payouts / top-ups** — PayPal and PayHero (M-Pesa) when env is set
+- **Top-ups / payouts** — PayPal and PayHero (M-Pesa) when configured
 
 ## Quick start
 
@@ -100,7 +182,7 @@ node server.mjs        # http://localhost:8765
 ```
 
 Required locally: `DATABASE_URL`, `NSH_ENC_KEY`, `APP_URL`.  
-Optional: Didit, PayPal, PayHero, Resend, Bunny storage — see `.env.example`.
+Optional: Didit, PayPal, PayHero, Resend, Bunny storage — see [`.env.example`](.env.example).
 
 > **Security:** this repo ships with no API keys, database URLs, or webhook secrets. Keep production values in your host’s env store only.
 
@@ -111,6 +193,7 @@ api/           Serverless handlers (wallet, KYC, pay, apps, security, admin)
 scripts/       DB migrations and integration tests
 *.html / *.js  Marketing site, wallet UI, business tools UI
 docs/          Architecture art and brand assets for GitHub
+img/           Founder and team photos
 ```
 
 ## Founder
