@@ -36,7 +36,7 @@
         <span class="cn-nuru"><span></span></span>
       </div>
       <h1>Connect <b>${esc(info.app.name)}</b> to your Nora wallet</h1>
-      <p class="cn-sub">${info.app.domain ? `<a href="${esc(info.app.website)}" target="_blank" rel="noopener noreferrer">${esc(info.app.domain)}</a>` : "This app"} wants to work with your wallet.${info.mode === "test" ? ` <span class="cn-mode">Sandbox</span>` : ""}</p>`;
+      <p class="cn-sub">${info.app.domain && /^https?:\/\//i.test(info.app.website || "") ? `<a href="${esc(info.app.website)}" target="_blank" rel="noopener noreferrer">${esc(info.app.domain)}</a>` : "This app"} wants to work with your wallet.${info.mode === "test" ? ` <span class="cn-mode">Sandbox</span>` : ""}</p>`;
   }
 
   function perms(info) {
@@ -71,6 +71,20 @@
         <a class="btn block" href="/signup?next=${next()}">Create a free wallet</a>
       </div>
       <p class="cn-small">You’ll come straight back here after you log in.</p>`;
+  }
+
+  function showOwn(info) {
+    card.innerHTML = `
+      ${header(info)}
+      <div class="cn-note">${ICONS.alert}<span>You’re logged in as <b>${esc(info.user.email)}</b>, the developer of ${esc(info.app.name)}. Customers connect their own Nora wallet, never yours.</span></div>
+      <div class="cn-actions">
+        <button class="btn primary block" type="button" data-switch="signin">Log in with another wallet</button>
+        <button class="btn block" type="button" data-switch="signup">Create a free wallet</button>
+      </div>`;
+    card.querySelectorAll("[data-switch]").forEach((b) => b.addEventListener("click", async () => {
+      await Nsh.api("auth/logout", { body: {}, redirect: false }).catch(() => {});
+      location.href = `/${b.dataset.switch}?next=${next()}`;
+    }));
   }
 
   function showConsent(info) {
@@ -146,7 +160,7 @@
     }
     document.title = `Connect ${info.app.name} · Nora Shillings`;
     if (!info.user) return showSignIn(info);
-    if (info.mode === "live" && info.user.own) return showError("This is your own app. Log in with a different Nora account to connect it.");
+    if (info.mode === "live" && info.user.own) return showOwn(info);
     showConsent(info);
   })();
 })();

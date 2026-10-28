@@ -1,5 +1,5 @@
 import {
-  db, send, fail, body, isMode, amountOf, safeWebhook, sha, secret, newId, fee, mailDeposit, HttpError, APP_URL,
+  db, send, fail, body, isMode, amountOf, sha, secret, newId, fee, mailDeposit, HttpError, APP_URL, postWebhook, bunnyDelete,
 } from "./_lib.js";
 
 export const SCOPES = ["deposits"];
@@ -52,9 +52,11 @@ const colorOf = (v) => {
   return /^#[0-9a-f]{6}$/i.test(s) ? s.toLowerCase() : fail(400, "Brand colour must be a hex colour like #4f46e5.");
 };
 const themeOf = (v) => (v === "light" ? "light" : "dark");
+const OWN_LOGO = /^\/api\/app-logo\?k=([A-Za-z0-9_-]{20,40}\.(?:jpg|png|webp))$/;
 const logoOf = (v) => {
   const s = String(v || "").trim();
-  if (!s) return null;
+  if (!s) return fail(400, "Upload your app logo. People see it in the deposit window, so they know it’s really you.");
+  if (OWN_LOGO.test(s)) return s;
   try {
     const u = new URL(s);
     if (u.protocol === "https:" && s.length <= 300) return s;
@@ -68,21 +70,7 @@ async function emit(ownerId, mode, type, data) {
   const event = { id: newId("evt"), type, created: new Date().toISOString(), data };
   const [owner] = await sql`SELECT webhook_test, webhook_live FROM users WHERE id = ${ownerId}`;
   const url = mode === "live" ? owner?.webhook_live : owner?.webhook_test;
-  let status = null;
-  if (url && safeWebhook(url)) {
-    try {
-      const r = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "User-Agent": "NuruShillings-Webhooks/1", "Nuru-Event-Id": event.id },
-        body: JSON.stringify(event),
-        redirect: "manual",
-        signal: AbortSignal.timeout(5000),
-      });
-      status = r.status;
-    } catch {
-      status = 0;
-    }
-  }
+  const status = await postWebhook(ownerId, mode, url, event);
   await sql`INSERT INTO events (id, user_id, mode, type, payment_id, payload, delivery_status)
     VALUES (${event.id}, ${ownerId}, ${mode}, ${type}, ${null}, ${JSON.stringify(event)}, ${status})`;
 }
@@ -218,7 +206,7 @@ function blockReason(d, user) {
   if (status !== "pending") return null;
   if (d.connection_id && d.pinned_revoked) return "You disconnected this app. Go back to the app and connect again.";
   if (user && d.pinned_user && d.pinned_user !== user.id) return "This deposit was started for a different Nora account. Log in with that account, or start again in the app.";
-  if (user && d.mode === "live" && user.id === d.owner_id) return "This is your own app. Use a different Nora account to add money to it.";
+  if (user && d.mode === "live" && user.id === d.owner_id) return "This is your own app. Your developer wallet can’t pay into it. Log in with the customer’s own Nora wallet.";
   return null;
 }
 
@@ -237,6 +225,7 @@ async function depositInfo(req, res, { sessionUser }) {
       verified: Boolean(user.verified_at),
       balance: Number(bal?.amount || 0),
       connected: Boolean(connected),
+      own: user.id === d.owner_id,
     };
   }
   send(res, 200, {
@@ -255,11 +244,12 @@ async function depositInfo(req, res, { sessionUser }) {
   });
 }
 
-async function depositConfirm(req, res, { needUser }) {
+async function depositConfirm(req, res, { needUser, moneyOut }) {
   const user = await needUser(req);
   const d = await loadDeposit((await body(req)).id);
   const blocked = blockReason(d, user);
   if (blocked) fail(400, blocked);
+  moneyOut(user, d.mode);
   if (statusOf(d) !== "pending") fail(409, `This deposit is already ${statusOf(d)}.`);
   const amount = Number(d.amount);
   const net = amount - Number(d.fee);
@@ -279,7 +269,8 @@ async function depositConfirm(req, res, { needUser }) {
         UPDATE deposits SET status = 'succeeded', user_id = ${user.id}, connection_id = ${c.id}, completed_at = now()
         WHERE id = ${d.id} AND EXISTS (SELECT 1 FROM debit) RETURNING id
       ), credit AS (
-        INSERT INTO balances (user_id, mode, amount) SELECT ${d.owner_id}, ${d.mode}, ${net} FROM dep
+        INSERT INTO balances (user_id, mode, amount)
+        SELECT ${d.owner_id}, ${d.mode}, ${net} FROM dep WHERE ${user.id} <> ${d.owner_id}
         ON CONFLICT (user_id, mode) DO UPDATE SET amount = balances.amount + EXCLUDED.amount
       ), mv AS (
         INSERT INTO app_moves (id, connection_id, kind, amount, fee, reference, description)
@@ -289,7 +280,7 @@ async function depositConfirm(req, res, { needUser }) {
         SELECT ${user.id}, ${d.mode}, 'app_deposit', ${-amount}, ${d.app_name}, ${d.id} FROM dep
       ), l2 AS (
         INSERT INTO ledger (user_id, mode, kind, amount, counterparty, ref)
-        SELECT ${d.owner_id}, ${d.mode}, 'app_deposit_in', ${net}, ${user.email}, ${d.id} FROM dep
+        SELECT ${d.owner_id}, ${d.mode}, 'app_deposit_in', ${net}, ${user.email}, ${d.id} FROM dep WHERE ${user.id} <> ${d.owner_id}
       ), touch AS (
         UPDATE connections SET last_used_at = now() WHERE id = ${c.id} AND EXISTS (SELECT 1 FROM dep)
       ) SELECT (SELECT count(*) FROM dep)::int AS n, (SELECT amount FROM debit) AS balance`,
@@ -310,6 +301,16 @@ async function depositConfirm(req, res, { needUser }) {
   ]).then((all) => all.forEach((x) => x.status === "rejected" && console.error("[apps] after deposit", x.reason)));
 
   send(res, 200, { status: "succeeded", id: d.id, amount, balance: Number(r.balance), app: d.app_name, return_url: backTo(d, "succeeded") });
+}
+
+async function depositConnect(req, res, { needUser }) {
+  const user = await needUser(req);
+  const d = await loadDeposit((await body(req)).id);
+  const blocked = blockReason(d, user);
+  if (blocked) fail(400, blocked);
+  if (statusOf(d) !== "pending") fail(409, `This deposit is already ${statusOf(d)}.`);
+  await connect({ id: d.app_id, owner_id: d.owner_id }, user, d.mode);
+  send(res, 200, { connected: true });
 }
 
 async function depositDecline(req, res, { needUser }) {
@@ -410,10 +411,13 @@ async function devAppSave(req, res, { needUser }) {
   const logo = logoOf(b.logo_url);
   const sql = db();
   if (b.id) {
-    const [a] = await sql`UPDATE apps SET name = ${name}, website = ${website}, redirect_uris = ${uris},
+    const [a] = await sql`UPDATE apps n SET name = ${name}, website = ${website}, redirect_uris = ${uris},
         brand_color = ${color}, theme = ${theme}, logo_url = ${logo}
-      WHERE id = ${String(b.id)} AND owner_id = ${user.id} AND deleted_at IS NULL RETURNING id`;
+      FROM apps o WHERE n.id = o.id AND n.id = ${String(b.id)} AND n.owner_id = ${user.id} AND n.deleted_at IS NULL
+      RETURNING n.id, o.logo_url AS old_logo`;
     if (!a) fail(404, "No app with that id.");
+    const old = OWN_LOGO.exec(a.old_logo || "");
+    if (old && a.old_logo !== logo) await bunnyDelete(`nuru-shillings/app-logos/${old[1]}`);
     return send(res, 200, { id: a.id });
   }
   const [count] = await sql`SELECT count(*)::int AS n FROM apps WHERE owner_id = ${user.id} AND deleted_at IS NULL`;
@@ -534,6 +538,7 @@ const ROUTES = {
   "GET connect/info": connectInfo,
   "POST connect/approve": connectApprove,
   "GET deposit/info": depositInfo,
+  "POST deposit/connect": depositConnect,
   "POST deposit/confirm": depositConfirm,
   "POST deposit/decline": depositDecline,
   "GET apps/connected": connectedApps,

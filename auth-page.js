@@ -9,9 +9,10 @@
   if (nextPath) localStorage.setItem("nsh-next", nextPath);
   else localStorage.removeItem("nsh-next");
 
-  fetch("/api/me", { credentials: "same-origin" }).then((r) => {
-    if (r.ok) location.replace(localStorage.getItem("nsh-next") || "/dashboard");
-  }).catch(() => {});
+  const signedIn = () => fetch("/api/session", { credentials: "same-origin" }).then((r) => r.json()).then((s) => s.signed_in).catch(() => false);
+  signedIn().then((yes) => {
+    if (yes) location.replace(localStorage.getItem("nsh-next") || "/dashboard");
+  });
 
   // The email link usually opens in another tab; once it signs in, carry on here too.
   let watching = 0;
@@ -19,8 +20,7 @@
     clearInterval(watching);
     watching = setInterval(async () => {
       if (sent.hidden) return clearInterval(watching);
-      const r = await fetch("/api/me", { credentials: "same-origin" }).catch(() => null);
-      if (r?.ok) {
+      if (await signedIn()) {
         clearInterval(watching);
         location.replace(nextPath || "/dashboard");
       }
@@ -66,6 +66,30 @@
     btn.textContent = "Resend link";
     setTimeout(() => { btn.disabled = false; }, 30000);
   });
+
+  const pkBox = document.querySelector("#pk-box");
+  if (pkBox && Nsh.passkey.supported()) {
+    pkBox.hidden = false;
+    const pkBtn = document.querySelector("#pk-login");
+    const pkMsg = document.querySelector("#msg-pk");
+    pkBtn.addEventListener("click", async () => {
+      pkBtn.disabled = true;
+      pkBtn.classList.add("busy");
+      pkMsg.className = "msg";
+      pkMsg.textContent = "";
+      try {
+        const { ticket, options } = await Nsh.api("auth/passkey/options", { body: {}, redirect: false });
+        const response = await Nsh.passkey.get(options);
+        await Nsh.api("auth/passkey/verify", { body: { ticket, response }, redirect: false });
+        location.replace(nextPath || "/dashboard");
+      } catch (err) {
+        pkMsg.className = "msg err";
+        pkMsg.textContent = err.message;
+      }
+      pkBtn.disabled = false;
+      pkBtn.classList.remove("busy");
+    });
+  }
 
   document.querySelector("#back").addEventListener("click", () => {
     sent.hidden = true;

@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="wallet.css?v=11">
   <link rel="stylesheet" href="tour.css?v=1">
   <link rel="stylesheet" href="apps.css?v=3">
+  <link rel="stylesheet" href="mfa.css?v=1">
 </head>
 <body class="wallet-page">
   <aside class="side" id="side" aria-label="Menu">
@@ -275,7 +276,7 @@
                 <div><dt>Rate</dt><dd>100 NSH = $1.00</dd></div>
                 <div><dt>Fee</dt><dd class="free">Free</dd></div>
                 <div><dt>To</dt><dd id="wd-s-to">PayPal</dd></div>
-                <div><dt>Arrives</dt><dd id="wd-s-eta">Instantly</dd></div>
+                <div><dt>Arrives</dt><dd id="wd-s-eta">In 1–8 hours</dd></div>
               </dl>
               <div class="co-total"><span>You receive</span><b id="wd-s-total">$0.00</b></div>
               <div class="co-after"><span>Balance after</span><span id="wd-s-after">—</span></div>
@@ -325,7 +326,7 @@
               <dl class="w-kv">
                 <div><dt>Name</dt><dd id="acc-name">—</dd></div>
                 <div><dt>Country</dt><dd id="acc-country">—</dd></div>
-                <div><dt>Sign-in</dt><dd>Email link</dd></div>
+                <div><dt>Sign-in</dt><dd id="acc-signin">Email link</dd></div>
                 <div><dt>Member since</dt><dd id="acc-since">—</dd></div>
               </dl>
             </section>
@@ -335,7 +336,7 @@
               <p class="note">Once, free, about 2 minutes. You can add, send, and pay without it. It’s needed to withdraw.</p>
               <ol class="kyc-how">
                 <li><b>Photo of your ID</b><span>National ID, passport, or driving licence</span></li>
-                <li><b>Quick selfie</b><span>A short live check that it’s really you</span></li>
+                <li><b>Quick selfie</b><span>A short live check on your phone or computer</span></li>
                 <li><b>Withdrawals unlocked</b><span>Your name and country come from the ID</span></li>
               </ol>
               <p class="kyc-state" id="kyc-state" hidden></p>
@@ -343,6 +344,8 @@
               <p class="msg" id="msg-verify"></p>
               <p class="kyc-fine">Checks are done by Didit, our identity partner. We keep the result, your name, and your country. Your ID photos stay with Didit. <a href="/privacy">Privacy</a></p>
             </form>
+
+            <section class="w-card v-form sec-card" id="security-root" aria-live="polite"></section>
           </div>
           <aside class="v-side">
             <div class="w-card v-info">
@@ -416,9 +419,10 @@
     </footer>
   </div>
 
-  <script src="nsh.js?v=6"></script>
-  <script src="app.js?v=25"></script>
+  <script src="nsh.js?v=8"></script>
+  <script src="app.js?v=26"></script>
   <script src="tour.js?v=2"></script>
   <script src="apps.js?v=3"></script>
+  <script src="security.js?v=1"></script>
 </body>
 </html>

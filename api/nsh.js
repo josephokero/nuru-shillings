@@ -7,16 +7,18 @@ import {
 
 import {
   paypalReady, payheroReady, kesPerUsd, usdToKes, normalizePhone, paypalCreateOrder, paypalVerifyWebhook,
-  payheroStk, mpesaReason, publicTopup, completeTopup, failTopup, settlePaypal, settleMpesa,
-  paypalWithdraw, settleWithdrawal,
+  payheroStk, publicTopup, completeTopup, failTopup, settlePaypal, settleMpesa, reverseTopup,
+  requestWithdrawal, settleWithdrawal,
 } from "./_pay.js";
 import { appsHandler, v1Connections, v1Deposits } from "./_apps.js";
-import { adminHandler, isAdmin, notifyWithdrawal } from "./_admin.js";
+import { adminHandler, adminPage, isAdmin, notifyWithdrawal } from "./_admin.js";
 import { kycReady, startKyc, syncKyc, kycWebhook, KYC_DONE } from "./_kyc.js";
+import { securityHandler, finishLogin, guardMoneyOut, requireStepUp, requireMfaSetup, hasMfa } from "./_security.js";
 
 const AVATAR_DIR = "nuru-shillings/avatars";
 const AVATAR_NAME = /^[A-Za-z0-9_-]{20,40}\.(jpg|png|webp)$/;
 const avatarUrl = (key) => (key ? `/api/avatar?k=${encodeURIComponent(key.split("/").pop())}` : null);
+const LOGO_DIR = "nuru-shillings/app-logos";
 
 function routeOf(req) {
   const url = new URL(req.url, "http://local");
@@ -29,7 +31,9 @@ async function sessionUser(req) {
   const token = cookie(req, SESSION_COOKIE);
   if (!token) return null;
   const sql = db();
-  const [user] = await sql`SELECT u.*, s.expires_at AS session_expires FROM sessions s JOIN users u ON u.id = s.user_id
+  const [user] = await sql`SELECT u.*, s.expires_at AS session_expires, s.mfa_at AS session_mfa_at, s.admin_at AS session_admin_at,
+      EXISTS (SELECT 1 FROM passkeys p WHERE p.user_id = u.id) AS has_passkey
+    FROM sessions s JOIN users u ON u.id = s.user_id
     WHERE s.token_hash = ${sha(token)} AND s.expires_at > now()`;
   if (user) user.session_token = token;
   return user || null;
@@ -103,10 +107,7 @@ async function authVerify(req, res) {
     ]);
     await mailWelcome(used[0].email).catch((err) => console.error("[auth] welcome", err));
   }
-  const session = secret(32);
-  await sql`INSERT INTO sessions (token_hash, user_id, expires_at)
-    VALUES (${sha(session)}, ${user.id}, now() + make_interval(days => ${SESSION_DAYS}))`;
-  send(res, 200, { ok: true, created: user.created }, { "Set-Cookie": sessionCookie(session, SESSION_DAYS * 86400) });
+  await finishLogin(req, res, user.id, { created: user.created });
 }
 
 async function authLogout(req, res) {
@@ -118,7 +119,7 @@ async function authLogout(req, res) {
 /* ---------- wallet ---------- */
 
 async function me(req, res, mode) {
-  const user = await needUser(req);
+  let user = await needUser(req);
   const sql = db();
   const open = await sql`SELECT * FROM withdrawals WHERE user_id = ${user.id} AND status IN ('processing', 'unclaimed')
     ORDER BY created_at LIMIT 3`;
@@ -139,6 +140,10 @@ async function me(req, res, mode) {
   for (const b of balances) bal[b.mode] = Number(b.amount);
   const keyMap = { test: null, live: null };
   for (const k of keys) keyMap[k.mode] = { last4: k.last4, created: k.created_at };
+  /* Pull the latest Didit result so Account does not show a stale "not started" after a session expires or is approved. */
+  if (!user.verified_at && user.kyc_session && !KYC_DONE.has(user.kyc_status)) {
+    user = await syncKyc(user);
+  }
   send(res, 200, {
     email: user.email,
     name: user.name,
@@ -146,6 +151,8 @@ async function me(req, res, mode) {
     verified: Boolean(user.verified_at),
     kyc: user.verified_at ? "approved" : user.kyc_session ? user.kyc_status || "not_started" : "none",
     kyc_ready: kycReady(),
+    mfa: hasMfa(user),
+    frozen: Boolean(user.frozen_at),
     avatar: avatarUrl(user.avatar_key),
     prefs: user.prefs || {},
     member_since: user.created_at,
@@ -166,7 +173,8 @@ function imageBytes(dataUrl) {
   const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ""));
   if (!m) fail(400, "Choose a JPG, PNG, or WebP picture.");
   const bytes = Buffer.from(m[2], "base64");
-  if (bytes.length < 100 || bytes.length > 400000) fail(400, "That picture is too large. Use one under 400 KB.");
+  if (bytes.length < 100) fail(400, "That file is not a valid picture.");
+  if (bytes.length > 400000) fail(400, "That picture is too large. Use one under 400 KB.");
   const sig = bytes.subarray(0, 12);
   const ok = m[1] === "jpeg" ? sig[0] === 0xff && sig[1] === 0xd8
     : m[1] === "png" ? sig.toString("hex", 0, 4) === "89504e47"
@@ -192,10 +200,18 @@ async function removeAvatar(req, res) {
   send(res, 200, { avatar: null });
 }
 
-async function getAvatar(req, res) {
+async function setAppLogo(req, res) {
+  await needUser(req);
+  const { bytes, ext, type } = imageBytes((await body(req, 600000)).image);
+  const name = `${secret(18)}.${ext}`;
+  await bunnyPut(`${LOGO_DIR}/${name}`, bytes, type);
+  send(res, 200, { logo: `/api/app-logo?k=${name}` });
+}
+
+async function getAvatar(req, res, dir = AVATAR_DIR) {
   const name = new URL(req.url, "http://local").searchParams.get("k") || "";
   if (!AVATAR_NAME.test(name)) fail(404, "Not found.");
-  const bytes = await bunnyGet(`${AVATAR_DIR}/${name}`);
+  const bytes = await bunnyGet(`${dir}/${name}`);
   if (!bytes) fail(404, "Not found.");
   const ext = name.split(".").pop();
   res.statusCode = 200;
@@ -270,6 +286,7 @@ async function sendMoney(req, res) {
   if (!isEmail(to)) fail(400, "Enter the email of a Nora account.");
   if (to === user.email) fail(400, "You cannot send to yourself.");
   if (!amount) fail(400, "Enter an amount in NSH.");
+  guardMoneyOut(user, mode);
   const sql = db();
   const [target] = await sql`SELECT id FROM users WHERE email = ${to}`;
   if (!target) fail(404, "No Nora account uses that email. Ask them to sign up first.");
@@ -298,22 +315,26 @@ async function withdraw(req, res) {
   if (!amount) fail(400, "Enter an amount in NSH.");
   if (destination.length < 4) fail(400, `Enter your ${method === "M-Pesa" ? "M-Pesa phone number" : method === "PayPal" ? "PayPal email" : "card's last 4 digits"}.`);
   if (mode === "live" && !user.verified_at) fail(403, "Verify your identity before withdrawing. It’s free and done once.");
-  if (mode === "live" && method === "PayPal") return send(res, 200, { ok: true, ...(await paypalWithdraw(user, amount, destination)) });
-  const status = mode === "live" ? "pending" : "done";
+  if (mode === "live") requireMfaSetup(user, "withdrawing");
+  guardMoneyOut(user, mode);
+  if (mode === "live") {
+    const w = await requestWithdrawal(user, method, amount, destination);
+    await notifyWithdrawal({ ...w, user: user.name || user.email });
+    return send(res, 200, { ok: true, status: "pending", withdrawal: w });
+  }
   const id = newId("wd");
   const [done] = await db()`WITH debit AS (
       UPDATE balances SET amount = amount - ${amount}
-      WHERE user_id = ${user.id} AND mode = ${mode} AND amount >= ${amount} RETURNING user_id
+      WHERE user_id = ${user.id} AND mode = 'test' AND amount >= ${amount} RETURNING user_id
     ), w AS (
       INSERT INTO withdrawals (id, user_id, mode, method, amount, destination, status, paid_at)
-      SELECT ${id}, user_id, ${mode}, ${method}, ${amount}, ${destination}, ${mode === "live" ? "pending" : "paid"}, CASE WHEN ${mode} = 'live' THEN NULL ELSE now() END FROM debit
+      SELECT ${id}, user_id, 'test', ${method}, ${amount}, ${destination}, 'paid', now() FROM debit
     ), row AS (
       INSERT INTO ledger (user_id, mode, kind, amount, counterparty, method, status, ref)
-      SELECT ${user.id}, ${mode}, 'withdraw', ${-amount}, ${destination}, ${method}, ${status}, ${id} FROM debit
+      SELECT ${user.id}, 'test', 'withdraw', ${-amount}, ${destination}, ${method}, 'done', ${id} FROM debit
     ) SELECT count(*)::int AS n FROM debit`;
   if (!done.n) fail(400, "Your balance is too low for that amount.");
-  if (mode === "live") await notifyWithdrawal({ id, method, amount, destination });
-  send(res, 200, { ok: true, status });
+  send(res, 200, { ok: true, status: "done" });
 }
 
 /* ---------- real top-ups: PayPal, card (PayPal guest checkout), M-Pesa (PayHero STK) ---------- */
@@ -369,8 +390,10 @@ async function ownTopup(req) {
 
 async function topupStatus(req, res) {
   let t = await ownTopup(req);
-  if (t.status === "pending" && t.provider_ref) {
-    const age = Date.now() - new Date(t.created_at).getTime();
+  const age = Date.now() - new Date(t.created_at).getTime();
+  // A late confirmation from the provider still credits a payment we had given up on.
+  const recheck = t.status === "failed" && age < 86400000;
+  if ((t.status === "pending" || recheck) && t.provider_ref) {
     if (t.method === "mpesa" && age > 4000) t = await settleMpesa(t);
     else if (t.method !== "mpesa") t = await settlePaypal(t);
     if (t.status === "pending" && t.method === "mpesa" && age > 5 * 60000) {
@@ -411,7 +434,7 @@ async function paypalCancel(req, res) {
 async function paypalWebhook(req, res) {
   const event = await body(req, 200000);
   const verified = await paypalVerifyWebhook(req, event).catch(() => false);
-  if (verified === false) return send(res, 400, { error: "Signature check failed." });
+  if (verified !== true) return send(res, 400, { error: "Signature check failed." });
   const r = event.resource || {};
   const sql = db();
   if (String(event.event_type || "").startsWith("PAYMENT.PAYOUTS")) {
@@ -427,9 +450,8 @@ async function paypalWebhook(req, res) {
   if (t) {
     if (["CHECKOUT.ORDER.APPROVED", "PAYMENT.CAPTURE.COMPLETED", "PAYMENT.CAPTURE.DENIED", "PAYMENT.CAPTURE.DECLINED"].includes(event.event_type)) {
       await settlePaypal(t);
-    } else if (["PAYMENT.CAPTURE.REFUNDED", "PAYMENT.CAPTURE.REVERSED"].includes(event.event_type)) {
-      await sql`UPDATE topups SET meta = meta || ${JSON.stringify({ reversed: event.event_type, reversed_at: event.create_time })}::jsonb WHERE id = ${t.id}`;
-      console.warn("[paypal] capture reversed", t.id, event.event_type);
+    } else if (["PAYMENT.CAPTURE.REFUNDED", "PAYMENT.CAPTURE.REVERSED"].includes(event.event_type) && t.status === "paid") {
+      await reverseTopup(t, event);
     }
   }
   send(res, 200, { ok: true });
@@ -442,14 +464,12 @@ async function payheroWebhook(req, res) {
   const [t] = ref ? await db()`SELECT * FROM topups WHERE id = ${ref} AND method = 'mpesa'` : [];
   if (!t || t.status === "paid") return send(res, 200, { ok: true });
 
-  const code = Number(p.ResultCode ?? p.result_code ?? -1);
   let settled = t;
-  for (let i = 0; i < 3 && settled.status !== "paid" && settled.status !== "cancelled"; i++) {
+  for (let i = 0; i < 3 && settled.status === "pending"; i++) {
     if (i) await new Promise((r) => setTimeout(r, 2000));
     settled = await settleMpesa(settled);
   }
-  // A callback alone never credits money: only PayHero's own status record can. A failure code may close it.
-  if (settled.status === "pending" && code > 0) await failTopup(t.id, mpesaReason(code, p.ResultDesc));
+  // The callback is unsigned, so it is only a nudge: PayHero's own status record decides success and failure.
   send(res, 200, { ok: true });
 }
 
@@ -458,11 +478,29 @@ async function payheroWebhook(req, res) {
 async function devOverview(req, res, mode) {
   const user = await needUser(req);
   const sql = db();
-  const [payments, events] = await Promise.all([
+  const [payments, events, [pay], [dep], [hooks]] = await Promise.all([
     sql`SELECT * FROM payments WHERE merchant_id = ${user.id} AND mode = ${mode} ORDER BY created_at DESC LIMIT 20`,
     sql`SELECT id, type, payment_id, delivery_status, created_at FROM events WHERE user_id = ${user.id} AND mode = ${mode} ORDER BY created_at DESC LIMIT 20`,
+    sql`SELECT count(*) FILTER (WHERE status = 'paid')::int AS paid,
+        count(*) FILTER (WHERE status = 'pending')::int AS pending,
+        count(*) FILTER (WHERE status = 'refunded')::int AS refunded,
+        COALESCE(sum(amount - fee) FILTER (WHERE status = 'paid'), 0)::bigint AS net,
+        COALESCE(sum(fee) FILTER (WHERE status = 'paid'), 0)::bigint AS fees
+      FROM payments WHERE merchant_id = ${user.id} AND mode = ${mode}`,
+    sql`SELECT count(*)::int AS n, COALESCE(sum(amount - fee), 0)::bigint AS net, COALESCE(sum(fee), 0)::bigint AS fees
+      FROM deposits WHERE owner_id = ${user.id} AND mode = ${mode} AND status = 'succeeded'`,
+    sql`SELECT count(*)::int AS sent, count(*) FILTER (WHERE delivery_status BETWEEN 200 AND 299)::int AS ok
+      FROM events WHERE user_id = ${user.id} AND mode = ${mode} AND created_at > now() - interval '30 days'`,
   ]);
-  send(res, 200, { payments: payments.map(publicPayment), events });
+  send(res, 200, {
+    payments: payments.map(publicPayment),
+    events,
+    totals: {
+      payments: { paid: pay.paid, pending: pay.pending, refunded: pay.refunded, net: Number(pay.net), fees: Number(pay.fees) },
+      deposits: { count: dep.n, net: Number(dep.net), fees: Number(dep.fees) },
+      webhooks: { sent: hooks.sent, ok: hooks.ok },
+    },
+  });
 }
 
 async function rollKey(req, res) {
@@ -470,6 +508,7 @@ async function rollKey(req, res) {
   const b = await body(req);
   const mode = isMode(b.mode) ? b.mode : fail(400, "Choose Sandbox or Live.");
   if (mode === "live" && !user.verified_at) fail(403, "Verify your identity to get a live key.");
+  if (mode === "live") requireStepUp(user);
   const key = `nsh_${mode}_${secret(24)}`;
   const sql = db();
   await sql.transaction([
@@ -492,6 +531,7 @@ async function devWebhook(req, res) {
   const user = await needUser(req);
   const b = await body(req);
   const mode = isMode(b.mode) ? b.mode : fail(400, "Choose Sandbox or Live.");
+  if (mode === "live") requireStepUp(user);
   send(res, 200, { url: await setWebhook(user, mode, b.url) });
 }
 
@@ -591,6 +631,7 @@ async function checkoutPay(req, res) {
   if (!p) fail(404, "This payment does not exist.");
   if (p.status !== "pending") fail(400, `This payment is already ${p.status}.`);
   if (p.merchant_id === user.id) fail(400, "You cannot pay your own payment.");
+  guardMoneyOut(user, "live");
   const amount = Number(p.amount);
   const net = amount - Number(p.fee);
   const [done] = await sql`WITH debit AS (
@@ -649,6 +690,17 @@ async function v1(req, res, parts) {
 
 /* ---------- router ---------- */
 
+const OWN_ORIGINS = new Set([new URL(APP_URL).origin, "https://norashillings.benuru.com", "https://nuru-shillings.vercel.app"]);
+
+/** Browser calls that change anything must come from our own pages, as JSON. Blocks cross-site request forgery. */
+function fromOwnSite(req) {
+  const origin = req.headers.origin;
+  if (origin && !OWN_ORIGINS.has(origin)) return false;
+  const site = req.headers["sec-fetch-site"];
+  if (site && site !== "same-origin" && site !== "none") return false;
+  return String(req.headers["content-type"] || "").toLowerCase().startsWith("application/json");
+}
+
 export default async function handler(req, res) {
   const route = routeOf(req);
   const url = new URL(req.url, "http://local");
@@ -656,10 +708,13 @@ export default async function handler(req, res) {
   const post = req.method === "POST";
   try {
     if (route.startsWith("v1/")) return await v1(req, res, route.slice(3).split("/").filter(Boolean));
+    if (route === "admin-console" || route.startsWith("admin-console/")) return await adminPage(route, req, res, await sessionUser(req));
+    if (post && !route.startsWith("webhooks/") && !fromOwnSite(req)) fail(403, "This request must come from the Nora Shillings website.");
     if (route === "auth/start" && post) return await authStart(req, res);
     if (route === "auth/verify" && post) return await authVerify(req, res);
     if (route === "auth/logout" && post) return await authLogout(req, res);
     if (route === "me" && req.method === "GET") return await me(req, res, mode);
+    if (route === "session" && req.method === "GET") return send(res, 200, { signed_in: Boolean(await sessionUser(req)) });
     if (route === "wallet/verify/start" && post) return await verifyStart(req, res);
     if (route === "wallet/verify/status" && req.method === "GET") return await verifyStatus(req, res);
     if (route === "webhooks/didit" && post) return await diditWebhook(req, res);
@@ -667,6 +722,8 @@ export default async function handler(req, res) {
     if (route === "profile/avatar/remove" && post) return await removeAvatar(req, res);
     if (route === "profile/prefs" && post) return await savePrefs(req, res);
     if (route === "avatar" && req.method === "GET") return await getAvatar(req, res);
+    if (route === "dev/apps/logo" && post) return await setAppLogo(req, res);
+    if (route === "app-logo" && req.method === "GET") return await getAvatar(req, res, LOGO_DIR);
     if (route === "topup/start" && post) return await topupStart(req, res);
     if (route === "topup/status" && req.method === "GET") return await topupStatus(req, res);
     if (route === "topup/paypal/return" && req.method === "GET") return await paypalReturn(req, res);
@@ -676,7 +733,7 @@ export default async function handler(req, res) {
     if (route === "wallet/add" && post) return await addMoney(req, res);
     if (route === "wallet/send" && post) return await sendMoney(req, res);
     if (route === "wallet/withdraw" && post) return await withdraw(req, res);
-    if (route.startsWith("admin/")) return await adminHandler(route, req, res, await needUser(req));
+    if (route.startsWith("admin/")) return await adminHandler(route, req, res, await sessionUser(req));
     if (route === "dev/overview" && req.method === "GET") return await devOverview(req, res, mode);
     if (route === "dev/keys" && post) return await rollKey(req, res);
     if (route === "dev/webhook" && post) return await devWebhook(req, res);
@@ -685,11 +742,13 @@ export default async function handler(req, res) {
     if (route === "dev/refund" && post) return await devRefund(req, res);
     if (route === "checkout" && req.method === "GET") return await checkoutGet(req, res);
     if (route === "checkout/pay" && post) return await checkoutPay(req, res);
+    const secRoute = securityHandler(req.method, route);
+    if (secRoute) return await secRoute(req, res, { needUser });
     const appRoute = appsHandler(req.method, route);
-    if (appRoute) return await appRoute(req, res, { needUser, sessionUser });
+    if (appRoute) return await appRoute(req, res, { needUser, sessionUser, moneyOut: guardMoneyOut });
     send(res, 404, { error: "Not found." });
   } catch (err) {
-    if (err instanceof HttpError) return send(res, err.status, { error: err.message });
+    if (err instanceof HttpError) return send(res, err.status, { error: err.message, ...(err.extra || {}) });
     console.error("[nsh]", route, err);
     send(res, 500, { error: "Something went wrong. Try again." });
   }

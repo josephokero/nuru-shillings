@@ -83,7 +83,7 @@ try {
   ok("forged M-Pesa success callback does not credit", r.status === 200 && m.status === "pending", m.status);
   r = await post("webhooks/payhero", { status: false, response: { ExternalReference: mp, ResultCode: 1032, ResultDesc: "Request cancelled by user" } });
   [m] = await sql`SELECT status, failure FROM topups WHERE id = ${mp}`;
-  ok("M-Pesa decline callback marks it failed", m.status === "failed", m.failure);
+  ok("forged M-Pesa decline callback cannot fail a payment (only PayHero's record can)", m.status === "pending", m.status);
 
   const { completeTopup } = await import("../api/_pay.js");
   const paid = `top_test_${crypto.randomBytes(6).toString("hex")}`;
@@ -97,9 +97,13 @@ try {
   ok("confirmed payment credits wallet once", s.json.status === "paid" && s.json.balance === 200 && led.n === 1, `balance ${s.json.balance}, ledger rows ${led.n}`);
   ok("receipt email sent", Boolean(mail.emailed_at), EMAIL);
 } finally {
-  await sql`DELETE FROM ledger WHERE user_id = ${user.id}`;
-  await sql`DELETE FROM balances WHERE user_id = ${user.id}`;
-  await sql`DELETE FROM topups WHERE user_id = ${user.id}`;
-  await sql`DELETE FROM sessions WHERE user_id = ${user.id}`;
-  await sql`DELETE FROM users WHERE id = ${user.id}`;
+  await sql.transaction([
+    sql`SELECT set_config('nsh.purge', 'on', true)`,
+    sql`DELETE FROM ledger WHERE user_id = ${user.id}`,
+    sql`DELETE FROM balances WHERE user_id = ${user.id}`,
+    sql`DELETE FROM topups WHERE user_id = ${user.id}`,
+    sql`DELETE FROM security_events WHERE user_id = ${user.id}`,
+    sql`DELETE FROM sessions WHERE user_id = ${user.id}`,
+    sql`DELETE FROM users WHERE id = ${user.id}`,
+  ]);
 }

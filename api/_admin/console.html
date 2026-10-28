@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="referrer" content="no-referrer">
+  <title>Admin console · Nora Shillings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+  <link rel="stylesheet" href="/app.css?v=5">
+  <link rel="stylesheet" href="/wallet.css?v=11">
+  <link rel="stylesheet" href="/developer.css?v=1">
+  <link rel="stylesheet" href="/mfa.css?v=1">
+  <link rel="stylesheet" href="/admin/console.css">
+</head>
+<body class="wallet-page dev-page ac-page">
+  <aside class="side" id="side" aria-label="Menu" hidden></aside>
+  <div class="side-scrim" id="side-scrim"></div>
+
+  <!-- Face lock -->
+  <main class="ac-gate" id="gate" hidden>
+    <div class="ac-gate-box">
+      <a class="brand" href="/">Nora</a>
+      <span class="ac-face" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.5v1M15 9.5v1M12 9.5v3.5h-1M9.5 16a3.5 3.5 0 0 0 5 0"/></svg>
+      </span>
+      <h1 id="gate-title">Admin console</h1>
+      <p class="ac-gate-lead" id="gate-lead">Checking…</p>
+      <ol class="ac-steps" id="gate-steps" hidden></ol>
+      <button class="btn primary block" type="button" id="gate-btn" hidden></button>
+      <p class="msg" id="gate-msg" role="status"></p>
+      <p class="ac-gate-foot" id="gate-foot"></p>
+      <a class="ac-gate-back" href="/dashboard">Back to my wallet</a>
+    </div>
+  </main>
+
+  <div class="app-main" id="app" hidden>
+    <header class="app-top">
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-controls="side" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="app-title">
+        <h1 id="view-title">Overview</h1>
+        <p id="view-sub">Everything on Nora Shillings</p>
+      </div>
+      <div class="app-actions">
+        <span class="ac-unlocked" id="unlocked" title="Face lock"><i aria-hidden="true"></i><span id="unlocked-text">Unlocked</span></span>
+        <button class="btn sm" type="button" id="lock-now">Lock</button>
+      </div>
+    </header>
+
+    <div class="wallet">
+      <!-- Overview -->
+      <section class="view" data-view="overview">
+        <div class="w-stats ac-stats">
+          <div class="w-stat"><span class="w-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM20 20v-1.5a3.5 3.5 0 0 0-2.5-3.4M15.5 4.1a3.5 3.5 0 0 1 0 6.8"/></svg></span>
+            <div><small>Users</small><b id="t-users">0</b><span id="t-users-sub"></span></div></div>
+          <div class="w-stat"><span class="w-stat-ico in"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18M12 3l9 5H3z"/></svg></span>
+            <div><small>Money in live wallets</small><b id="t-held">$0.00</b><span id="t-held-sub"></span></div></div>
+          <div class="w-stat"><span class="w-stat-ico warn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2"/></svg></span>
+            <div><small>Withdrawals waiting</small><b id="t-wd">0</b><span id="t-wd-sub"></span></div></div>
+          <div class="w-stat"><span class="w-stat-ico in"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7 7 17M16 17H7V8"/></svg></span>
+            <div><small>Top-ups (live)</small><b id="t-top">$0.00</b><span id="t-top-sub"></span></div></div>
+          <div class="w-stat"><span class="w-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1-5H5L4 9zM5 9v11h14V9M9 20v-6h6v6"/></svg></span>
+            <div><small>Payments and deposits (live)</small><b id="t-pay">$0.00</b><span id="t-pay-sub"></span></div></div>
+          <div class="w-stat"><span class="w-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M17 7.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2.2 2.6 5 3.2 5 1.3 5 3.3-2.2 3.2-5 3.2-5-1.2-5-3.2"/></svg></span>
+            <div><small>Fees earned (live)</small><b id="t-fees">$0.00</b><span id="t-fees-sub"></span></div></div>
+        </div>
+
+        <div class="w-two ac-two">
+          <div class="w-card w-activity">
+            <div class="w-card-head"><h2>Withdrawals to send</h2><a class="w-more" href="#withdrawals">Open all <i aria-hidden="true"></i></a></div>
+            <ul class="w-list" id="ov-open"></ul>
+          </div>
+          <div class="w-card w-activity">
+            <div class="w-card-head"><h2>New users</h2><a class="w-more" href="#users">All users <i aria-hidden="true"></i></a></div>
+            <ul class="w-list ac-mini" id="ov-signups"></ul>
+          </div>
+        </div>
+
+        <div class="w-card w-activity dv-gap">
+          <div class="w-card-head"><h2>Latest security events</h2><a class="w-more" href="#security">Full log <i aria-hidden="true"></i></a></div>
+          <ul class="w-list ac-mini" id="ov-events"></ul>
+        </div>
+      </section>
+
+      <!-- Withdrawals -->
+      <section class="view" data-view="withdrawals" hidden>
+        <div class="ac-open" id="wd-open"></div>
+        <div class="w-card w-activity dv-gap">
+          <div class="w-card-head"><h2>Handled</h2><span class="w-count">Sent and returned, newest first</span></div>
+          <ul class="w-list" id="wd-recent"></ul>
+        </div>
+      </section>
+
+      <!-- Users -->
+      <section class="view" data-view="users" hidden>
+        <div class="w-card w-activity">
+          <div class="w-card-head w-tools">
+            <input class="input ac-search" id="user-q" type="search" placeholder="Search email, name or user id" autocomplete="off" aria-label="Search users">
+            <div class="w-filter" role="tablist" aria-label="Filter users">
+              <button type="button" class="on" data-uf="all">All</button>
+              <button type="button" data-uf="verified">Verified</button>
+              <button type="button" data-uf="unverified">Not verified</button>
+              <button type="button" data-uf="money">Has money</button>
+              <button type="button" data-uf="frozen">On hold</button>
+            </div>
+          </div>
+          <div class="w-thead ac-thead" aria-hidden="true"><span>User</span><span>Joined</span><span>Status</span><span>Live balance</span></div>
+          <ul class="w-list" id="users"></ul>
+        </div>
+      </section>
+
+      <!-- One user -->
+      <section class="view" data-view="user" hidden>
+        <div id="user-detail"></div>
+      </section>
+
+      <!-- Top-ups -->
+      <section class="view" data-view="topups" hidden>
+        <div class="w-card w-activity">
+          <div class="w-card-head w-tools">
+            <h2>Top-ups</h2>
+            <div class="w-filter" role="tablist" aria-label="Mode"><button type="button" class="on" data-tm="live">Live</button><button type="button" data-tm="test">Sandbox</button></div>
+          </div>
+          <div class="w-thead ac-thead" aria-hidden="true"><span>Top-up</span><span>Date</span><span>Status</span><span>Amount</span></div>
+          <ul class="w-list" id="topups"></ul>
+        </div>
+      </section>
+
+      <!-- Payments -->
+      <section class="view" data-view="payments" hidden>
+        <div class="w-card w-activity">
+          <div class="w-card-head w-tools">
+            <h2>Business payments</h2>
+            <div class="w-filter" role="tablist" aria-label="Mode"><button type="button" class="on" data-pm="live">Live</button><button type="button" data-pm="test">Sandbox</button></div>
+          </div>
+          <div class="w-thead ac-thead" aria-hidden="true"><span>Payment</span><span>Date</span><span>Status</span><span>Amount</span></div>
+          <ul class="w-list" id="payments"></ul>
+        </div>
+      </section>
+
+      <!-- Apps -->
+      <section class="view" data-view="apps" hidden>
+        <div class="w-card w-activity">
+          <div class="w-card-head"><h2>Apps</h2><span class="w-count">Every app developers have made</span></div>
+          <div class="w-thead ac-thead" aria-hidden="true"><span>App</span><span>Created</span><span>Status</span><span>Live deposits</span></div>
+          <ul class="w-list" id="apps"></ul>
+        </div>
+        <div class="w-card w-activity dv-gap">
+          <div class="w-card-head"><h2>Deposits into apps</h2><span class="w-count">Live and Sandbox</span></div>
+          <div class="w-thead ac-thead" aria-hidden="true"><span>Deposit</span><span>Date</span><span>Status</span><span>Amount</span></div>
+          <ul class="w-list" id="deposits"></ul>
+        </div>
+      </section>
+
+      <!-- Security -->
+      <section class="view" data-view="security" hidden>
+        <div class="w-card w-activity">
+          <div class="w-card-head w-tools">
+            <h2>Security log</h2>
+            <div class="w-filter" role="tablist" aria-label="Filter events">
+              <button type="button" class="on" data-sf="">All</button>
+              <button type="button" data-sf="login">Sign-ins</button>
+              <button type="button" data-sf="mfa_failed">Wrong codes</button>
+              <button type="button" data-sf="admin_action">Admin actions</button>
+              <button type="button" data-sf="admin_unlock">Console opened</button>
+              <button type="button" data-sf="admin_face_failed">Failed face scans</button>
+            </div>
+          </div>
+          <ul class="w-list ac-mini" id="events"></ul>
+        </div>
+      </section>
+    </div>
+
+    <footer class="app-foot">
+      <span>© 2026 Nora Shillings · Admin</span>
+      <nav><a href="/dashboard">My wallet</a><a href="/developer">Business tools</a><a href="/docs">Docs</a></nav>
+    </footer>
+  </div>
+
+  <script src="/nsh.js?v=8"></script>
+  <script src="/admin/console.js"></script>
+</body>
+</html>

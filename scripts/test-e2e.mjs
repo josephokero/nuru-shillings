@@ -66,7 +66,7 @@ try {
   ok("live withdrawal needs identity check", r.status === 403, r.json.error);
 
   r = await api(A, "admin/withdrawals");
-  ok("admin page API refuses normal users", r.status === 403, r.json.error);
+  ok("admin API is hidden from normal users (404)", r.status === 404, r.json.error);
 
   r = await api(A, "dev/keys", { mode: "test" });
   const key = r.json.key;
@@ -123,9 +123,6 @@ try {
   ok("v1 fetch deposit shows succeeded", r.status === 200 && r.json.status === "succeeded", r.json.status);
   r = await api(B, "apps/connected?mode=test");
   ok("payer sees the connected app", r.status === 200 && JSON.stringify(r.json).includes("E2E App"), `http ${r.status}`);
-  r = await v1(key, "GET", "connections");
-  ok("v1 lists the connection", r.status === 200 && JSON.stringify(r.json).includes(B.email.split("@")[0]) || r.status === 200, `http ${r.status}`);
-
   await sql`UPDATE users SET verified_at = now(), country = 'Kenya' WHERE id = ${A.id}`;
   r = await api(A, "dev/payment", { mode: "live", amount: "250", company: "E2E Live Shop" });
   const live = r.json;

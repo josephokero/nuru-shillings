@@ -311,6 +311,26 @@ export async function failTopup(id, reason, status = "failed") {
   return t || null;
 }
 
+/** PayPal took the money back: take it back from the wallet (as far as the balance allows) and hold the account for review. */
+export async function reverseTopup(t, event) {
+  const meta = JSON.stringify({ reversed: event.event_type, reversed_at: event.create_time || new Date().toISOString() });
+  const reason = `PayPal ${event.event_type === "PAYMENT.CAPTURE.REFUNDED" ? "refund" : "chargeback"} on top-up ${t.id}`;
+  const [r] = await db()`WITH t AS (
+      UPDATE topups SET status = 'reversed', meta = meta || ${meta}::jsonb WHERE id = ${t.id} AND status = 'paid' RETURNING id, user_id, mode, nsh
+    ), cur AS (
+      SELECT t.id, t.user_id, t.mode, t.nsh, LEAST(b.amount, t.nsh) AS take FROM t JOIN balances b ON b.user_id = t.user_id AND b.mode = t.mode
+    ), debit AS (
+      UPDATE balances b SET amount = b.amount - cur.take FROM cur WHERE b.user_id = cur.user_id AND b.mode = cur.mode RETURNING b.user_id
+    ), l AS (
+      INSERT INTO ledger (user_id, mode, kind, amount, counterparty, method, ref)
+      SELECT user_id, mode, 'reversal', -take, 'PayPal reversal', 'PayPal', id FROM cur WHERE take > 0
+    ), hold AS (
+      UPDATE users SET frozen_at = COALESCE(frozen_at, now()), frozen_reason = ${reason} FROM t WHERE users.id = t.user_id
+    ) SELECT nsh, take FROM cur`;
+  console.warn("[paypal] reversed", t.id, event.event_type, r ? `took ${r.take} of ${r.nsh}` : "already handled");
+  return r || null;
+}
+
 /** Settle a PayPal order from PayPal's own records: capture if approved, credit if completed. */
 export async function settlePaypal(t) {
   if (t.status === "paid") return t;
@@ -347,7 +367,7 @@ export async function settleMpesa(t) {
   return (await failTopup(t.id, s.reason)) || t;
 }
 
-/* ---------- withdrawal lifecycle (PayPal, paid out instantly from the business PayPal balance) ---------- */
+/* ---------- withdrawal lifecycle: live withdrawals wait as pending until an admin sends them by hand in /admin ---------- */
 
 const holdHours = () => Math.max(0, Number(env("NSH_TOPUP_HOLD_HOURS") || 24));
 const dailyCap = () => Math.max(100, Math.round(Number(env("NSH_PAYOUT_DAILY_USD") || 1000) * 100));
@@ -406,10 +426,10 @@ export async function settleWithdrawal(w) {
   return w;
 }
 
-export async function paypalWithdraw(user, amount, destination) {
-  if (!paypalReady()) throw new HttpError(503, "PayPal withdrawals aren’t switched on yet. Choose another method.");
-  if (!isEmail(destination)) throw new HttpError(400, "Enter the email address of your PayPal account.");
-  if (amount < 100) throw new HttpError(400, "The smallest PayPal withdrawal is 100 NSH ($1).");
+/** Take a live withdrawal out of the wallet, with the same limits for every method: daily cap and the card/PayPal hold. */
+async function debitWithdrawal(user, method, amount, destination, status) {
+  if (method === "PayPal" && !isEmail(destination)) throw new HttpError(400, "Enter the email address of your PayPal account.");
+  if (amount < 100) throw new HttpError(400, "The smallest withdrawal is 100 NSH ($1).");
   const sql = db();
   const id = newId("wd");
   const cap = dailyCap();
@@ -427,10 +447,10 @@ export async function paypalWithdraw(user, amount, destination) {
       RETURNING balances.user_id
     ), w AS (
       INSERT INTO withdrawals (id, user_id, mode, method, amount, destination, status)
-      SELECT ${id}, user_id, 'live', 'PayPal', ${amount}, ${destination}, 'processing' FROM debit RETURNING id
+      SELECT ${id}, user_id, 'live', ${method}, ${amount}, ${destination}, ${status} FROM debit RETURNING id
     ), l AS (
       INSERT INTO ledger (user_id, mode, kind, amount, counterparty, method, status, ref)
-      SELECT ${user.id}, 'live', 'withdraw', ${-amount}, ${destination}, 'PayPal', 'pending', id FROM w
+      SELECT ${user.id}, 'live', 'withdraw', ${-amount}, ${destination}, ${method}, 'pending', id FROM w
     ) SELECT (SELECT count(*)::int FROM w) AS n, held, today, balance FROM lim`;
   if (!row.n) {
     const held = Number(row.held), today = Number(row.today), balance = Number(row.balance || 0);
@@ -442,8 +462,21 @@ export async function paypalWithdraw(user, amount, destination) {
     }
     throw new HttpError(400, "Your balance is too low for that amount.");
   }
+  const [w] = await sql`SELECT * FROM withdrawals WHERE id = ${id}`;
+  return w;
+}
 
-  let [w] = await sql`SELECT * FROM withdrawals WHERE id = ${id}`;
+/** A live withdrawal for an admin to send by hand: it stays pending until marked paid or returned in /admin. */
+export async function requestWithdrawal(user, method, amount, destination) {
+  return publicWithdrawal(await debitWithdrawal(user, method, amount, destination, "pending"));
+}
+
+/** Instant PayPal Payouts. Not used while Payouts is off on the PayPal account; kept for when PayPal enables it. */
+export async function paypalWithdraw(user, amount, destination) {
+  if (!paypalReady()) throw new HttpError(503, "PayPal withdrawals aren’t switched on yet. Choose another method.");
+  const sql = db();
+  let w = await debitWithdrawal(user, "PayPal", amount, destination, "processing");
+  const id = w.id;
   const p = await paypalPayout(w).catch((err) => { console.error("[paypal] payout", err.message); return { unknown: true }; });
   if (p.failed) {
     await failWithdrawal(id, p.reason);

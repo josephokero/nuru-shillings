@@ -63,8 +63,12 @@ try {
     });
     console.log(`cleanup: Didit test session ${d.ok ? "deleted" : `not deleted (${d.status})`}`);
   }
-  await sql`DELETE FROM sessions WHERE user_id = ${user.id}`;
-  await sql`DELETE FROM ledger WHERE user_id = ${user.id}`;
-  await sql`DELETE FROM balances WHERE user_id = ${user.id}`;
-  await sql`DELETE FROM users WHERE id = ${user.id}`;
+  await sql.transaction([
+    sql`SELECT set_config('nsh.purge', 'on', true)`,
+    sql`DELETE FROM sessions WHERE user_id = ${user.id}`,
+    sql`DELETE FROM ledger WHERE user_id = ${user.id}`,
+    sql`DELETE FROM balances WHERE user_id = ${user.id}`,
+    sql`DELETE FROM security_events WHERE user_id = ${user.id}`,
+    sql`DELETE FROM users WHERE id = ${user.id}`,
+  ]);
 }

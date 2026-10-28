@@ -161,8 +161,8 @@
     if (w.status === "unclaimed") return "PayPal emailed this address. Claim it within 30 days or it comes back to your wallet";
     if (w.status === "review") return "We’re checking this payout. No action needed";
     if (w.status === "processing") return "Sending to PayPal";
-    if (w.status === "pending") return w.method === "M-Pesa" ? "Waiting for approval · arrives in 1–8 hours" : "Waiting for payout review";
-    if (w.receipt) return `${w.method === "M-Pesa" ? "M-Pesa code" : "PayPal receipt"} ${w.receipt}`;
+    if (w.status === "pending") return w.method === "Card" ? "Waiting for payout review" : "Waiting for approval · arrives in 1–8 hours";
+    if (w.receipt) return `${w.method === "M-Pesa" ? "M-Pesa code" : "PayPal transaction"} ${w.receipt}`;
     return w.paid_at ? `Paid ${dateOf(w.paid_at)}` : "Paid";
   }
 
@@ -233,7 +233,7 @@
   function route() {
     let view = location.hash.replace(/^#\/?/, "") || "home";
     if (view === "verify") view = "account";
-    if (!VIEWS[view]) view = "home";
+    if (!Object.hasOwn(VIEWS, view)) view = "home";
     current = view;
     if (me) $("#verify-note").hidden = me.verified || view !== "withdraw";
     $$(".view").forEach((s) => { s.hidden = s.dataset.view !== view; });
@@ -479,7 +479,7 @@
     $("#wd-preview").textContent = Nsh.usd(wAmt);
     $("#wd-s-amount").textContent = `${Nsh.nsh(wAmt)} NSH`;
     $("#wd-s-to").textContent = dest ? `${m} · ${dest}` : m;
-    $("#wd-s-eta").textContent = m === "PayPal" ? "Instantly" : m === "M-Pesa" ? "In 1–8 hours" : "After payout review";
+    $("#wd-s-eta").textContent = m === "Card" ? "After payout review" : "In 1–8 hours";
     $("#wd-s-total").textContent = Nsh.usd(wAmt);
     $("#wd-s-after").textContent = wOver ? "—" : after(-wAmt);
     $("#wd-warn").hidden = !wOver;
@@ -745,7 +745,7 @@
   function openCheck(method, amount, c) {
     wdChecked = c;
     const what = method === "PayPal" ? "PayPal email" : method === "M-Pesa" ? "M-Pesa number" : "Card";
-    const eta = method === "PayPal" ? "arrives instantly" : method === "M-Pesa" ? "arrives in 1–8 hours" : "after payout review";
+    const eta = method === "Card" ? "after payout review" : "arrives in 1–8 hours";
     wdCheck.innerHTML = `
       <div class="wd-check-head"><b>Is this correct?</b><button type="button" class="wd-check-edit" data-wd-edit>Edit</button></div>
       <span class="wd-check-label">${what}</span>
@@ -792,15 +792,12 @@
       const dest = checked.dest;
       wdChecked = null;
       wdCheck.hidden = true;
-      const r = await Nsh.api("wallet/withdraw", { body: { mode: MODE, amount, method, destination: dest } });
+      await Nsh.api("wallet/withdraw", { body: { mode: MODE, amount, method, destination: dest } });
       savePrefs({ withdraw_method: method, withdraw_destination: dest });
       await load();
       wForm.amount.value = "";
-      const done = method === "M-Pesa" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to M-Pesa ${dest}. It shows as Processing until we approve and send it, usually within 1–8 hours. You’ll get an email when it’s sent.` }
-        : method !== "PayPal" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.` }
-        : r.status === "paid" ? { title: "Sent to PayPal", text: `${Nsh.usd(amount)} is in the PayPal account for ${dest} now.` }
-        : r.status === "unclaimed" ? { title: "Sent to PayPal", text: `PayPal emailed ${dest} to claim ${Nsh.usd(amount)}. If it isn’t claimed within 30 days, it comes back to your wallet.` }
-        : { title: "Sending to PayPal", text: `${Nsh.usd(amount)} to ${dest}. It usually lands within a minute. Withdrawal history shows when it’s paid.` };
+      const done = method === "Card" ? { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method}. It shows as pending until it is paid out.` }
+        : { title: "Withdrawal requested", text: `${Nsh.usd(amount)} to ${method} ${dest}. It shows as Processing until we approve and send it, usually within 1–8 hours. You’ll get an email when it’s sent.` };
       finish(wForm, { ...done, again: "Withdraw more" });
     }).then(refreshCheckout);
   });
@@ -882,14 +879,15 @@
     const msg = $("#msg-verify");
     msg.className = "msg";
     msg.textContent = CHECKING;
-    watchKyc(0, 8);
+    watchKyc(0, 12);
   }
 
   (async () => {
     try {
       const params = new URLSearchParams(location.search);
       const returned = params.get("topup");
-      const fromKyc = params.has("kyc");
+      /* Didit redirects to our callback with ?kyc=1 and may also append verificationSessionId + status. */
+      const fromKyc = params.has("kyc") || params.has("verificationSessionId");
       if (returned) history.replaceState(null, "", "/dashboard#add");
       else if (fromKyc) history.replaceState(null, "", "/dashboard#account");
       await load();

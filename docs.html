@@ -9,6 +9,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="canonical" href="https://norashillings.benuru.com/docs">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nora Shillings">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:url" content="https://norashillings.benuru.com/docs">
+  <meta property="og:title" content="Documentation · Nora Shillings">
+  <meta property="og:description" content="The Nora Shillings payments API: keys, Sandbox and Live, creating payments, checkout, refunds, webhooks, and errors. 100 Nora Shillings equal 1 US dollar.">
+  <meta property="og:image" content="https://norashillings.benuru.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Nora Shillings: payment infrastructure for every platform. 100 NSH = 1 USD.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Documentation · Nora Shillings">
+  <meta name="twitter:description" content="The Nora Shillings payments API: keys, Sandbox and Live, creating payments, checkout, refunds, webhooks, and errors. 100 Nora Shillings equal 1 US dollar.">
+  <meta name="twitter:image" content="https://norashillings.benuru.com/og.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebAPI","name":"Nora Shillings Payments API","url":"https://norashillings.benuru.com/docs","documentation":"https://norashillings.benuru.com/docs","provider":{"@type":"Organization","name":"Nora Shillings","url":"https://norashillings.benuru.com/"},"description":"Take payment in Nora Shillings with one API call: payments, hosted checkout, refunds, webhooks, and app deposits. Sandbox and Live keys."}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nora Shillings","item":"https://norashillings.benuru.com/"},{"@type":"ListItem","position":2,"name":"Documentation","item":"https://norashillings.benuru.com/docs"}]}</script>
   <link rel="stylesheet" href="reference.css?v=83">
 </head>
 <body class="home subpage">
@@ -274,7 +294,7 @@
             <p>Returns <code>{"url": "…", "mode": "live"}</code>. Send an empty <code>url</code> to stop webhooks for that mode. <code>GET /v1/webhooks</code> returns the saved URL. The URL must:</p>
             <ul>
               <li>use https;</li>
-              <li>use a public host name, not an IP address, <code>localhost</code>, or a <code>.local</code> or <code>.internal</code> name;</li>
+              <li>use a public host name, not an IP address, <code>localhost</code>, or a <code>.local</code> or <code>.internal</code> name, that resolves to a public address;</li>
               <li>be at most 500 characters.</li>
             </ul>
             <h3>Events</h3>
@@ -290,7 +310,7 @@
                 <tr><td><code>connection.revoked</code></td><td>Someone disconnects one of your apps.</td></tr>
               </table>
             </div>
-            <p>Nora sends a <code>POST</code> request with a JSON body and these headers: <code>Content-Type: application/json</code>, <code>User-Agent: NuruShillings-Webhooks/1</code>, and <code>Nuru-Event-Id</code>.</p>
+            <p>Nora sends a <code>POST</code> request with a JSON body and these headers: <code>Content-Type: application/json</code>, <code>User-Agent: NuruShillings-Webhooks/1</code>, <code>Nuru-Event-Id</code>, and <code>Nuru-Signature</code>.</p>
             <pre class="doc-code"><b>POST</b> https://your-platform.example/nuru
 
 {
@@ -308,6 +328,17 @@
   }
 }</pre>
             <p>A <code>webhook.test</code> event has <code>"data": {"test": true}</code> instead of a payment.</p>
+            <h3>Verify the signature</h3>
+            <p>Every event carries a <code>Nuru-Signature</code> header like <code>t=1791612345,v1=5f2b…</code>. <code>v1</code> is an HMAC-SHA256, in hex, of <code>t</code>, a dot, and the raw request body, keyed with your signing secret. Find the secret under <strong>Webhook → Signing secret</strong> in Business tools. Sandbox and Live have different secrets. Reject the event if the signature does not match or if <code>t</code> is more than 5 minutes old.</p>
+            <pre class="doc-code"><b>import</b> crypto <b>from</b> "node:crypto";
+
+<b>function</b> verifyNuru(rawBody, header, secret) {
+  <b>const</b> parts = Object.fromEntries(header.split(",").map((p) =&gt; p.split("=")));
+  <b>const</b> expected = crypto.createHmac("sha256", secret).update(`${parts.t}.${rawBody}`).digest("hex");
+  <b>const</b> fresh = Math.abs(Date.now() / 1000 - Number(parts.t)) &lt; 300;
+  <b>return</b> fresh &amp;&amp; parts.v1?.length === expected.length &amp;&amp;
+    crypto.timingSafeEqual(Buffer.from(parts.v1), Buffer.from(expected));
+}</pre>
             <h3>Delivery</h3>
             <ul>
               <li>Nora makes one attempt per event and waits up to 5 seconds for a reply. Redirects are not followed.</li>

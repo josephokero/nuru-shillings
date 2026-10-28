@@ -1,8 +1,18 @@
-﻿.env
+﻿# Secrets and local env
+.env
 .env.*
 .env*
+!.env.example
+
+# Dependencies and platform
 node_modules/
-.vercel
+.vercel/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# Local scratch, screenshots, and one-off probes
 *-v*.png
 preview*.png
 stage-*.png
@@ -10,3 +20,10 @@ _*.png
 _*.html
 _*.mjs
 _*.json
+.deploy-kyc/
+.deploy-*
+
+# Editor
+.idea/
+.vscode/
+*.swp

@@ -4,7 +4,6 @@ Disallow: /api/
 Disallow: /v1/
 Disallow: /dashboard
 Disallow: /developer
-Disallow: /admin
 Disallow: /auth
 Disallow: /connect
 Disallow: /deposit

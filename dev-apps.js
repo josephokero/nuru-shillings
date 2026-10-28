@@ -18,7 +18,7 @@
   function tile(a) {
     const letter = esc(String(a.name || "A").trim().charAt(0).toUpperCase());
     if (a.brand?.logo) return `<span class="da-tile da-img"><img src="${esc(a.brand.logo)}" alt="" referrerpolicy="no-referrer"></span>`;
-    if (a.brand?.color) return `<span class="da-tile" style="background:${esc(a.brand.color)};color:${inkOf(a.brand.color)}">${letter}</span>`;
+    if (/^#[0-9a-f]{6}$/i.test(a.brand?.color || "")) return `<span class="da-tile" style="background:${esc(a.brand.color)};color:${inkOf(a.brand.color)}">${letter}</span>`;
     return `<span class="da-tile" style="--h:${hue(a.name)}">${letter}</span>`;
   }
 
@@ -33,7 +33,8 @@
   let pv = null;
   const previewBox = () => `
     <div class="da-pv-tabs" role="tablist" aria-label="Preview screen">
-      <button type="button" class="on" data-pv="confirm">Confirm</button>
+      <button type="button" class="on" data-pv="connect">First time</button>
+      <button type="button" data-pv="confirm">Confirm</button>
       <button type="button" data-pv="signin">Logged out</button>
       <button type="button" data-pv="done">Complete</button>
     </div>
@@ -52,6 +53,18 @@
       <form class="da-form" id="da-form">
         <div class="da-form-grid">
           <div>
+            <div class="field">
+              <span>App logo <em class="da-req">Required</em></span>
+              <div class="da-logo-up">
+                <span class="da-logo-pv">${brand.logo ? `<img src="${esc(brand.logo)}" alt="">` : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>`}</span>
+                <div>
+                  <button type="button" class="btn sm" data-logo-pick>${brand.logo ? "Change logo" : "Upload logo"}</button>
+                  <small data-logo-msg>Square PNG, JPG or WebP. People see it when they connect and confirm a deposit.</small>
+                </div>
+                <input type="file" accept="image/png,image/jpeg,image/webp" hidden data-logo-file>
+                <input type="hidden" name="logo_url" value="${esc(brand.logo || "")}">
+              </div>
+            </div>
             <div class="row">
               <label class="field"><span>App name people see</span><input class="input" name="name" required maxlength="60" placeholder="Acme Games" value="${esc(a?.name || "")}"></label>
               <label class="field"><span>Website</span><input class="input" name="website" placeholder="https://acme.games" value="${esc(a?.website || "")}"></label>
@@ -77,7 +90,6 @@
                 </div>
               </div>
             </div>
-            <label class="field"><span>Logo link (optional)</span><input class="input" name="logo_url" placeholder="https://acme.games/logo.png" value="${esc(brand.logo || "")}"></label>
           </div>
           <div class="da-pv-wrap" id="da-pv">${previewBox()}</div>
         </div>
@@ -114,6 +126,7 @@
           <div><dt>Connect only</dt><dd class="da-link"><code>${esc(connectLink(a))}</code>
             <span><button type="button" class="da-copy" data-copy="${esc(connectLink(a))}">Copy</button><small>Optional. Links a wallet to your user account before any deposit.</small></span></dd></div>
         </dl>
+        ${a.brand.logo ? "" : `<p class="da-warn">Add your app logo. It’s required, and people see it before they connect or pay. <button type="button" class="da-copy" data-edit>Add logo</button></p>`}
         <p class="da-test-msg" role="status"></p>
         <div class="da-confirm" hidden>
           <span>Delete <b>${esc(a.name)}</b>? Everyone connected to it is disconnected and open deposit requests are cancelled.</span>
@@ -134,11 +147,11 @@ const { status } = await Nuru.deposit(deposit.url);
   function render() {
     pv = null;
     root.innerHTML = `
-      <div class="card-head">
-        <div><h2>Apps</h2><p>Let people add funds to your app from their Nora wallet. They confirm every amount in a Nora window that matches your brand.</p></div>
+      <div class="card-head w-card-head">
+        <div><h2>Apps</h2><p>Let people add funds to your app from their Nora wallet. They confirm every amount in a Nora window that matches your brand. Connected apps show in each user’s wallet under Apps.</p></div>
         ${editing === null && data.apps.length ? `<button class="btn sm primary" type="button" data-new>New app</button>` : ""}
       </div>
-      <div class="card-body">
+      <div class="card-body dv-body">
         ${editing === "new" || (!data.apps.length && editing === null) ? form(null) : ""}
         ${data.apps.length ? `<ul class="da-list">${data.apps.map((a) => (editing === a.id ? `<li class="da-app">${form(a)}</li>` : appRow(a))).join("")}</ul>` : ""}
         <div class="da-flow">
@@ -155,11 +168,26 @@ const { status } = await Nuru.deposit(deposit.url);
     bindForm(f);
   }
 
+  /* Fit the logo inside a 256px square, keeping transparency. */
+  async function squareLogo(file, size = 256) {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(size / bitmap.width, size / bitmap.height);
+    const w = Math.round(bitmap.width * scale);
+    const h = Math.round(bitmap.height * scale);
+    const canvas = Object.assign(document.createElement("canvas"), { width: size, height: size });
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(bitmap, (size - w) / 2, (size - h) / 2, w, h);
+    bitmap.close?.();
+    const png = canvas.toDataURL("image/png");
+    return png.length < 500000 ? png : canvas.toDataURL("image/webp", 0.9);
+  }
+
   function bindForm(f) {
     const brand = () => ({
       theme: f.querySelector("input[name=theme]:checked")?.value || "dark",
       color: f.brand_color.value || null,
-      logo: /^https:\/\/\S+$/.test(f.logo_url.value.trim()) ? f.logo_url.value.trim() : null,
+      logo: f.logo_url.value.trim() || null,
     });
     const wrap = f.querySelector("#da-pv");
     const box = wrap.querySelector(".da-pv-frame");
@@ -175,7 +203,7 @@ const { status } = await Nuru.deposit(deposit.url);
       };
     };
     pv = {
-      frame, ready: false, view: "confirm", height: 640,
+      frame, ready: false, view: "connect", height: 640,
       paint() { if (this.ready) frame.contentWindow.postMessage({ type: "nuru:preview", view: this.view, info: sample() }, location.origin); },
       fit(h) {
         if (h) this.height = h;
@@ -212,9 +240,45 @@ const { status } = await Nuru.deposit(deposit.url);
       const sw = e.target.closest("[data-sw]");
       if (sw) setColor(f.brand_color.value === sw.dataset.sw ? "" : sw.dataset.sw);
     });
+    const logoFile = f.querySelector("[data-logo-file]");
+    const logoMsg = f.querySelector("[data-logo-msg]");
+    const logoBtn = f.querySelector("[data-logo-pick]");
+    logoBtn.addEventListener("click", () => logoFile.click());
+    logoFile.addEventListener("change", async () => {
+      const file = logoFile.files[0];
+      logoFile.value = "";
+      if (!file) return;
+      logoMsg.className = "";
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { logoMsg.className = "err"; logoMsg.textContent = "Choose a PNG, JPG or WebP picture."; return; }
+      if (file.size > 15 * 1024 * 1024) { logoMsg.className = "err"; logoMsg.textContent = "That picture is too large. Use one under 15 MB."; return; }
+      logoBtn.disabled = true;
+      logoBtn.classList.add("busy");
+      logoMsg.textContent = "Uploading…";
+      try {
+        const { logo } = await Nsh.api("dev/apps/logo", { body: { image: await squareLogo(file) } });
+        f.logo_url.value = logo;
+        f.querySelector(".da-logo-pv").innerHTML = `<img src="${esc(logo)}" alt="">`;
+        logoBtn.textContent = "Change logo";
+        logoMsg.className = "ok";
+        logoMsg.textContent = "Logo uploaded.";
+        f.closest(".da-form").querySelector(".da-logo-up").classList.remove("missing");
+        paint();
+      } catch (err) {
+        logoMsg.className = "err";
+        logoMsg.textContent = err.message || "We could not read that picture.";
+      } finally {
+        logoBtn.disabled = false;
+        logoBtn.classList.remove("busy");
+      }
+    });
+
     f.addEventListener("submit", (e) => {
       e.preventDefault();
       Nsh.submit(f, f.querySelector("#da-msg"), async () => {
+        if (!f.logo_url.value.trim()) {
+          f.querySelector(".da-logo-up").classList.add("missing");
+          throw new Error("Upload your app logo first. People see it when they connect and confirm.");
+        }
         const b = brand();
         await Nsh.api("dev/apps", {
           body: {
@@ -237,6 +301,7 @@ const { status } = await Nuru.deposit(deposit.url);
     try {
       data = await Nsh.api("dev/apps");
       render();
+      document.dispatchEvent(new CustomEvent("nsh:apps", { detail: data }));
     } catch (err) {
       root.innerHTML = `<div class="card-body"><p class="msg err">${esc(err.message)}</p></div>`;
     }

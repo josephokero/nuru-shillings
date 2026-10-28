@@ -51,6 +51,12 @@ createServer(async (req, res) => {
     const { default: handler } = await route();
     return handler(req, res);
   }
+  if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) {
+    url.searchParams.set("route", url.pathname === "/admin" ? "admin-console" : `admin-console/${url.pathname.slice(7)}`);
+    req.url = `/api/nsh?${url.searchParams}`;
+    const { default: handler } = await import("./api/nsh.js");
+    return handler(req, res);
+  }
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/v1/")) {
     req.body = req.method === "POST" ? await readJson(req) : {};
     url.searchParams.set("route", url.pathname.replace(/^\/api\//, "").replace(/^\//, ""));

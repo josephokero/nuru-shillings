@@ -9,8 +9,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@16,500&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="canonical" href="https://norashillings.benuru.com/signin">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nora Shillings">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:url" content="https://norashillings.benuru.com/signin">
+  <meta property="og:title" content="Log in · Nora Shillings">
+  <meta property="og:description" content="Log in to your Nora Shillings wallet with a link sent to your email.">
+  <meta property="og:image" content="https://norashillings.benuru.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Nora Shillings: payment infrastructure for every platform. 100 NSH = 1 USD.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Log in · Nora Shillings">
+  <meta name="twitter:description" content="Log in to your Nora Shillings wallet with a link sent to your email.">
+  <meta name="twitter:image" content="https://norashillings.benuru.com/og.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Nora Shillings","item":"https://norashillings.benuru.com/"},{"@type":"ListItem","position":2,"name":"Log in","item":"https://norashillings.benuru.com/signin"}]}</script>
   <link rel="stylesheet" href="app.css?v=3">
   <link rel="stylesheet" href="site-footer.css?v=1">
+  <link rel="stylesheet" href="mfa.css?v=1">
 </head>
 <body class="auth">
   <header class="auth-top">
@@ -27,6 +47,14 @@
           <button class="btn primary block" type="submit" data-busy="Continuing…">Continue with Email</button>
           <p class="msg" id="msg" role="status"></p>
         </form>
+        <div class="pk-login" id="pk-box" hidden>
+          <div class="mfa-or"><span>or</span></div>
+          <button class="btn block" type="button" id="pk-login">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 12-4.9M17 14a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM19.5 16.5H22"/></svg>
+            Log in with a passkey
+          </button>
+          <p class="msg" id="msg-pk" role="status"></p>
+        </div>
         <p class="auth-alt">Don’t have an account? <a class="link" href="/signup">Sign up</a></p>
       </section>
       <section class="auth-sent" id="sent" hidden>
@@ -48,7 +76,7 @@
     <div><strong>Company</strong><a href="/why-nuru">Why Nora</a><a href="/about">About</a><a href="/help">Help centre</a><a href="/community">Community</a><a href="mailto:norashillings@benuru.com">Contact</a></div>
     <div class="foot-base"><span>© 2026 Nora Shillings</span><nav><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Security</a><a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a></nav></div>
     <div class="foot-mark"><a class="foot-name" href="/">Nora Shillings</a></div></footer>
-  <script src="nsh.js?v=2"></script>
-  <script src="auth-page.js?v=4"></script>
+  <script src="nsh.js?v=7"></script>
+  <script src="auth-page.js?v=5"></script>
 </body>
 </html>

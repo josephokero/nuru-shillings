@@ -1,12 +1,23 @@
 {
-  "name": "nuru-shillings-site",
+  "name": "nuru-shillings",
   "private": true,
+  "description": "Nora Shillings — private payment infrastructure for every platform",
+  "homepage": "https://norashillings.benuru.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josephokero/nuru-shillings.git"
+  },
+  "license": "MIT",
+  "author": "Joseph Nyarandi",
   "type": "module",
   "scripts": {
-    "dev": "node server.mjs"
+    "dev": "node server.mjs",
+    "test:kyc": "node scripts/test-kyc.mjs"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.2.0"
+    "@neondatabase/serverless": "^1.2.0",
+    "@simplewebauthn/server": "^13.3.3",
+    "qrcode": "^1.5.4"
   },
   "engines": {
     "node": ">=18"

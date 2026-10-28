@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import dns from "node:dns/promises";
+import net from "node:net";
 import { neon } from "@neondatabase/serverless";
 
 let client;
@@ -31,12 +33,36 @@ export function send(res, status, body, headers = {}) {
 }
 
 export class HttpError extends Error {
-  constructor(status, message) {
+  constructor(status, message, extra = null) {
     super(message);
     this.status = status;
+    this.extra = extra;
   }
 }
-export const fail = (status, message) => { throw new HttpError(status, message); };
+export const fail = (status, message, extra) => { throw new HttpError(status, message, extra); };
+
+/* ---------- encryption at rest (AES-256-GCM) for secrets we must read back, like authenticator keys ---------- */
+
+function encKey() {
+  const key = Buffer.from(String(process.env.NSH_ENC_KEY || "").trim(), "base64");
+  if (key.length !== 32) throw new Error("NSH_ENC_KEY must be 32 random bytes in base64");
+  return key;
+}
+export function seal(text) {
+  const iv = crypto.randomBytes(12);
+  const c = crypto.createCipheriv("aes-256-gcm", encKey(), iv);
+  const enc = Buffer.concat([c.update(String(text), "utf8"), c.final()]);
+  return `v1.${iv.toString("base64url")}.${enc.toString("base64url")}.${c.getAuthTag().toString("base64url")}`;
+}
+export function unseal(sealed) {
+  const [v, iv, enc, tag] = String(sealed || "").split(".");
+  if (v !== "v1" || !iv || !enc || !tag) throw new Error("unreadable sealed value");
+  const d = crypto.createDecipheriv("aes-256-gcm", encKey(), Buffer.from(iv, "base64url"));
+  d.setAuthTag(Buffer.from(tag, "base64url"));
+  return Buffer.concat([d.update(Buffer.from(enc, "base64url")), d.final()]).toString("utf8");
+}
+export const webhookSecret = (userId, mode) =>
+  `whsec_${crypto.createHmac("sha256", encKey()).update(`webhook:${userId}:${mode}`).digest("base64url").slice(0, 40)}`;
 
 export async function body(req, limit = 64000) {
   if (req.body && typeof req.body === "object") return req.body;
@@ -133,6 +159,44 @@ export function safeWebhook(url) {
   if (host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) return false;
   if (/^[\d.]+$/.test(host) || host.includes(":") || host.startsWith("[")) return false;
   return true;
+}
+
+function privateIp(ip) {
+  if (net.isIPv6(ip)) {
+    const v = ip.toLowerCase();
+    if (v.startsWith("::ffff:")) return privateIp(v.slice(7));
+    return v === "::" || v === "::1" || /^f[cd]/.test(v) || /^fe[89ab]/.test(v) || v.startsWith("ff");
+  }
+  const [a, b] = ip.split(".").map(Number);
+  return a === 0 || a === 10 || a === 127 || a >= 224 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31)
+    || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || (a === 198 && (b === 18 || b === 19));
+}
+
+/** Signed delivery. Refuses hosts that resolve to private or internal addresses. */
+export async function postWebhook(userId, mode, url, event) {
+  if (!url || !safeWebhook(url)) return null;
+  const addrs = await dns.lookup(new URL(url).hostname, { all: true }).catch(() => []);
+  if (!addrs.length || addrs.some((a) => privateIp(a.address))) return 0;
+  const payload = JSON.stringify(event);
+  const t = Math.floor(Date.now() / 1000);
+  const sig = crypto.createHmac("sha256", webhookSecret(userId, mode)).update(`${t}.${payload}`).digest("hex");
+  try {
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "NuruShillings-Webhooks/1",
+        "Nuru-Event-Id": event.id,
+        "Nuru-Signature": `t=${t},v1=${sig}`,
+      },
+      body: payload,
+      redirect: "manual",
+      signal: AbortSignal.timeout(5000),
+    });
+    return r.status;
+  } catch {
+    return 0;
+  }
 }
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -316,6 +380,35 @@ export async function mailDeposit(to, d, role) {
   });
 }
 
+export async function mailKyc(to, outcome, u) {
+  const approved = outcome === "approved";
+  const when = new Date(u.verified_at || Date.now()).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Nairobi" });
+  const rows = approved ? [["Name", u.name || "—"], ["Country", u.country || "—"], ["Verified", `${when} EAT`], ["Withdrawals", "Unlocked"]] : [];
+  const body = rows.length ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-top:1px solid #262626">${rows.map(([k, v]) => `
+          <tr>
+            <td style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#6e6e6e">${esc(k)}</td>
+            <td align="right" style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#fff;font-weight:500">${esc(v)}</td>
+          </tr>`).join("")}
+        </table>` : "";
+  const title = approved ? "You’re verified" : "We couldn’t verify you";
+  const lead = approved
+    ? "Your identity check is approved. Withdrawals are now unlocked on your Nora Shillings wallet."
+    : "Your identity check wasn’t approved this time. You can try again from your wallet whenever you’re ready.";
+  const note = approved
+    ? "Your name and country now come from your ID. If anything looks wrong, reply to this email."
+    : "Use a valid ID that hasn’t expired, take the photos in good light, and keep your face fully visible.";
+  const action = approved ? "Open my wallet" : "Try again";
+  const link = `${APP_URL}/dashboard#account`;
+  const reason = "You're receiving this because you started an identity check on Nora Shillings.";
+  return resendMail({
+    to: [to],
+    subject: approved ? "You’re verified · withdrawals unlocked" : "Your identity check wasn’t approved",
+    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}${rows.length ? "\n\n" : ""}${note}\n\n${action}: ${link}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
+    html: emailLayout({ preheader: lead, title, lead, body, action, link, note, to, reason }),
+  });
+}
+
 export async function mailWithdrawal(to, w, outcome) {
   const paid = outcome === "paid";
   const nsh = `${Number(w.amount).toLocaleString("en-US")} NSH`;
@@ -346,32 +439,15 @@ export async function mailWithdrawal(to, w, outcome) {
   });
 }
 
-export async function mailKyc(to, outcome, u) {
-  const approved = outcome === "approved";
-  const when = new Date(u.verified_at || Date.now()).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Nairobi" });
-  const rows = approved ? [["Name", u.name || "—"], ["Country", u.country || "—"], ["Verified", `${when} EAT`], ["Withdrawals", "Unlocked"]] : [];
-  const body = rows.length ? `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-top:1px solid #262626">${rows.map(([k, v]) => `
-          <tr>
-            <td style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#6e6e6e">${esc(k)}</td>
-            <td align="right" style="padding:12px 0;border-bottom:1px solid #1c1c1c;font-family:${FONT};font-size:13px;color:#fff;font-weight:500">${esc(v)}</td>
-          </tr>`).join("")}
-        </table>` : "";
-  const title = approved ? "You’re verified" : "We couldn’t verify you";
-  const lead = approved
-    ? "Your identity check is approved. Withdrawals are now unlocked on your Nora Shillings wallet."
-    : "Your identity check wasn’t approved this time. You can try again from your wallet whenever you’re ready.";
-  const note = approved
-    ? "Your name and country now come from your ID. If anything looks wrong, reply to this email."
-    : "Use a valid ID that hasn’t expired, take the photos in good light, and keep your face fully visible.";
-  const action = approved ? "Open my wallet" : "Try again";
+export async function mailSecurity(to, title, lead) {
+  const note = "If this wasn't you, reply to this email or contact support straight away so we can lock your account.";
+  const reason = "We send this whenever the security settings on your Nora Shillings account change.";
   const link = `${APP_URL}/dashboard#account`;
-  const reason = "You're receiving this because you started an identity check on Nora Shillings.";
   return resendMail({
     to: [to],
-    subject: approved ? "You’re verified · withdrawals unlocked" : "Your identity check wasn’t approved",
-    text: `${title}\n\n${lead}\n\n${rows.map(([k, v]) => `${k}: ${v}`).join("\n")}${rows.length ? "\n\n" : ""}${note}\n\n${action}: ${link}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
-    html: emailLayout({ preheader: lead, title, lead, body, action, link, note, to, reason }),
+    subject: `Security alert: ${title}`,
+    text: `${title}\n\n${lead}\n\n${note}\n\nReview your account: ${link}\n\n—\nSent to ${to}. ${reason}\nNora Shillings · ${APP_URL}`,
+    html: emailLayout({ preheader: lead, title, lead, action: "Review my account", link, note, to, reason }),
   });
 }
 
@@ -393,21 +469,7 @@ export async function deliver(userId, mode, type, payment) {
   };
   const [user] = await sql`SELECT webhook_test, webhook_live FROM users WHERE id = ${userId}`;
   const url = mode === "live" ? user?.webhook_live : user?.webhook_test;
-  let status = null;
-  if (url && safeWebhook(url)) {
-    try {
-      const r = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "User-Agent": "NuruShillings-Webhooks/1", "Nuru-Event-Id": event.id },
-        body: JSON.stringify(event),
-        redirect: "manual",
-        signal: AbortSignal.timeout(5000),
-      });
-      status = r.status;
-    } catch {
-      status = 0;
-    }
-  }
+  const status = await postWebhook(userId, mode, url, event);
   await sql`INSERT INTO events (id, user_id, mode, type, payment_id, payload, delivery_status)
     VALUES (${event.id}, ${userId}, ${mode}, ${type}, ${payment?.id || null}, ${JSON.stringify(event)}, ${status})`;
   return { ...event, delivery_status: status, delivered_to: url || null };

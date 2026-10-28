@@ -1,0 +1,95 @@
+/* Second-step dialog (sign-in and "confirm it's you") and the Account → Security panel. */
+
+.mfa-veil {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px;
+  background: rgba(0, 0, 0, .72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: mfa-fade .16s ease-out;
+}
+.mfa-box {
+  width: min(400px, 100%); display: grid; gap: 12px; padding: 28px 24px 18px;
+  background: #0a0a0a; border: 1px solid #262626; border-radius: 14px; color: #ededed;
+  font: 400 14px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .6); animation: mfa-rise .2s cubic-bezier(.2, .8, .2, 1);
+}
+.mfa-mark {
+  width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%;
+  background: #161616; border: 1px solid #2e2e2e;
+}
+.mfa-mark svg { width: 20px; height: 20px; fill: none; stroke: #ededed; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.mfa-box h2 { margin: 4px 0 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: #fff; }
+.mfa-lead { margin: 0 0 6px; color: #a1a1a1; }
+.mfa-field { display: grid; gap: 6px; }
+.mfa-field[hidden] { display: none; }
+.mfa-field span { font-size: 13px; color: #a1a1a1; }
+.mfa-input {
+  width: 100%; box-sizing: border-box; height: 44px; padding: 0 14px; border-radius: 8px;
+  background: #000; border: 1px solid #333; color: #fff; font: inherit; font-size: 15px; outline: none;
+}
+.mfa-input.code { font: 500 22px/1 "IBM Plex Mono", ui-monospace, Menlo, monospace; letter-spacing: .18em; text-align: center; }
+.mfa-input:focus { border-color: #8f8f8f; box-shadow: 0 0 0 3px rgba(255, 255, 255, .08); }
+.mfa-btn {
+  height: 42px; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff;
+  font: 600 14px/1 Inter, system-ui, sans-serif; cursor: pointer; transition: background .15s, opacity .15s;
+}
+.mfa-btn:hover { background: #1a1a1a; }
+.mfa-btn.primary { background: #fff; color: #000; border-color: #fff; }
+.mfa-btn.primary:hover { background: #e6e6e6; }
+.mfa-btn:disabled { opacity: .55; cursor: default; }
+.mfa-btn.busy { position: relative; color: transparent !important; }
+.mfa-btn.busy::after {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid currentColor; border-color: #888 #888 #888 transparent; animation: mfa-spin .7s linear infinite;
+}
+.mfa-or { display: flex; align-items: center; gap: 10px; color: #6e6e6e; font-size: 12px; }
+.mfa-or::before, .mfa-or::after { content: ""; flex: 1; height: 1px; background: #262626; }
+.mfa-link { background: none; border: 0; padding: 4px; color: #ededed; font: 500 13px Inter, system-ui, sans-serif; cursor: pointer; }
+.mfa-link:hover { text-decoration: underline; }
+.mfa-link.muted { color: #8f8f8f; }
+.mfa-msg { margin: 0; min-height: 0; font-size: 13px; }
+.mfa-msg:empty { display: none; }
+.mfa-msg.err { color: #ff6166; }
+.mfa-msg.ok { color: #45d483; }
+
+@keyframes mfa-fade { from { opacity: 0; } }
+@keyframes mfa-rise { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+@keyframes mfa-spin { to { transform: rotate(360deg); } }
+
+.pk-login { display: grid; gap: 12px; margin-top: 16px; }
+.pk-login[hidden] { display: none; }
+.pk-login .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* ---------- Account → Security ---------- */
+
+.sec-card h2 { margin: 0 0 4px; }
+.sec-row {
+  display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center;
+  padding: 14px 0; border-top: 1px solid #1f1f1f;
+}
+.sec-row:first-of-type { border-top: 0; }
+.sec-ico { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 9px; background: #121212; border: 1px solid #262626; }
+.sec-ico svg { width: 18px; height: 18px; fill: none; stroke: #ededed; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.sec-row b { display: block; font-weight: 600; color: #fff; }
+.sec-row small { display: block; color: #8f8f8f; font-size: 13px; margin-top: 2px; }
+.sec-pill { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; vertical-align: 1px; background: #1a1a1a; color: #a1a1a1; border: 1px solid #2a2a2a; }
+.sec-pill.on { background: rgba(69, 212, 131, .1); color: #45d483; border-color: rgba(69, 212, 131, .25); }
+.sec-keys { margin: 0 0 4px 48px; display: grid; gap: 6px; }
+.sec-key { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border: 1px solid #222; border-radius: 8px; background: #0d0d0d; font-size: 13px; }
+.sec-key span { color: #8f8f8f; }
+.sec-setup { margin: 4px 0 8px 48px; display: grid; gap: 12px; padding: 16px; border: 1px solid #262626; border-radius: 10px; background: #0d0d0d; }
+.sec-setup[hidden] { display: none; }
+.sec-qr { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.sec-qr img { width: 148px; height: 148px; border-radius: 8px; background: #fff; padding: 6px; }
+.sec-secret { font: 500 13px/1.6 "IBM Plex Mono", ui-monospace, monospace; color: #ededed; word-break: break-all; user-select: all; }
+.sec-codes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; padding: 14px 16px; border-radius: 8px; background: #000; border: 1px dashed #333; font: 500 14px/1.6 "IBM Plex Mono", ui-monospace, monospace; color: #fff; }
+.sec-warn { padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 176, 32, .3); background: rgba(255, 176, 32, .07); color: #f5c066; font-size: 13px; }
+.sec-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.sec-log li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid #1a1a1a; font-size: 13px; }
+.sec-log li:first-child { border-top: 0; }
+.sec-log span { color: #8f8f8f; text-align: right; }
+.sec-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 560px) {
+  .sec-row { grid-template-columns: 36px 1fr; }
+  .sec-row > :last-child { grid-column: 1 / -1; }
+  .sec-keys, .sec-setup { margin-left: 0; }
+  .sec-codes { grid-template-columns: 1fr; }
+}

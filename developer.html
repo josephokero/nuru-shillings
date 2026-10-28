@@ -7,107 +7,250 @@
   <title>Business tools · Nora Shillings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
-  <link rel="stylesheet" href="app.css?v=3">
-  <link rel="stylesheet" href="dev-apps.css?v=5">
+  <link rel="stylesheet" href="app.css?v=5">
+  <link rel="stylesheet" href="wallet.css?v=11">
+  <link rel="stylesheet" href="dev-apps.css?v=6">
+  <link rel="stylesheet" href="developer.css?v=1">
+  <link rel="stylesheet" href="mfa.css?v=1">
 </head>
-<body>
-  <header class="top" id="top"></header>
-  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
-  <main class="page" id="page" hidden>
-    <div class="page-head">
-      <div>
-        <h1>Business tools</h1>
-        <p>Take Nora payments on your own platform. The company pays 1% only when a payment is paid.</p>
+<body class="wallet-page dev-page">
+  <aside class="side" id="side" aria-label="Menu">
+    <div class="side-head"><a class="brand" href="/">Nora</a></div>
+    <div class="side-nav sk-side">
+      <div class="sk" style="width:50px;height:10px;margin:14px 12px 10px"></div>
+      <div class="sk sk-link"></div><div class="sk sk-link"></div><div class="sk sk-link"></div><div class="sk sk-link"></div><div class="sk sk-link"></div>
+    </div>
+  </aside>
+  <div class="side-scrim" id="side-scrim"></div>
+
+  <div class="app-main">
+    <header class="app-top">
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-controls="side" aria-expanded="false"><span></span><span></span><span></span></button>
+      <div class="app-title">
+        <h1 id="view-title">Overview</h1>
+        <p id="view-sub">Take Nora payments on your own platform</p>
       </div>
-    </div>
-
-    <div class="banner sandbox" id="sandbox-note" hidden>
-      <span><b>Sandbox.</b> Test keys, test payments, test webhooks. No real money.</span>
-    </div>
-    <div class="banner" id="verify-note" hidden>
-      <span><b>Verify your identity</b> in your wallet to unlock the live key. A quick ID photo and selfie, once.</span>
-      <a class="btn sm primary" href="/dashboard#account">Verify now</a>
-    </div>
-
-    <div class="grid">
-      <section class="card">
-        <div class="card-head">
-          <div><h2>Secret key</h2><p id="key-note">Use it from your server only.</p></div>
-          <span class="tag" id="key-mode">Sandbox</span>
+      <div class="app-actions">
+        <div class="modes" role="group" aria-label="Mode">
+          <button type="button" data-mode="test">Sandbox</button>
+          <button type="button" data-mode="live">Live</button>
         </div>
-        <div class="card-body">
-          <div class="key" id="key-box"><code id="key-text">No key yet</code><button class="btn sm" type="button" id="copy-key" hidden>Copy</button></div>
-          <p class="msg" id="key-msg"></p>
-          <button class="btn primary" type="button" id="roll-key">Create key</button>
-        </div>
-      </section>
+      </div>
+    </header>
 
-      <section class="card">
-        <div class="card-head">
-          <div><h2>Webhook</h2><p>We POST payment.paid and payment.refunded here.</p></div>
-        </div>
-        <form class="card-body" id="hook-form">
-          <input class="input" name="url" type="url" placeholder="https://your-site.com/nuru" autocomplete="off">
-          <p class="msg" id="hook-msg"></p>
-          <div class="row" style="flex-direction:row">
-            <button class="btn primary" type="submit">Save</button>
-            <button class="btn" type="button" id="hook-test">Send test event</button>
+    <main class="wallet" id="page" hidden>
+      <div class="w-strip" id="sandbox-note" hidden>
+        <i aria-hidden="true"></i><span><b>Sandbox.</b> Test keys, test payments, test webhooks. No real money moves.</span>
+      </div>
+      <div class="w-strip verify" id="verify-note" hidden>
+        <span><b>Verify your identity to go live.</b> A quick ID photo and selfie, once. It unlocks the live key and live payments.</span>
+        <a class="btn sm primary" href="/dashboard#account">Verify now</a>
+      </div>
+
+      <!-- Overview -->
+      <section class="view" data-view="overview">
+        <div class="w-top">
+          <div class="w-balance">
+            <div class="w-balance-head">
+              <small>Business balance</small>
+              <span class="w-mode" id="ov-mode">Sandbox</span>
+            </div>
+            <strong class="w-amount"><span id="ov-bal">0</span><em>NSH</em></strong>
+            <div class="w-usd" id="ov-usd">$0.00</div>
+            <div class="w-actions">
+              <a class="w-action primary" href="#payments" data-go="pay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Create payment</a>
+              <a class="w-action" href="#apps" data-go="app"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 17h6M17 14v6"/></svg>New app</a>
+              <button class="w-action" type="button" data-hook-test><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h12M12 6l6 6-6 6"/></svg>Send test event</button>
+            </div>
+            <p class="dv-inline-msg" id="ov-msg" role="status"></p>
+            <dl class="w-balance-foot">
+              <div><dt>From payments</dt><dd id="ov-pay-net">0 NSH</dd></div>
+              <div><dt>From app deposits</dt><dd id="ov-dep-net">0 NSH</dd></div>
+              <div><dt>Fees paid</dt><dd id="ov-fees">0 NSH</dd></div>
+            </dl>
           </div>
-        </form>
+
+          <div class="w-card dv-setup">
+            <div class="w-card-head"><h2>Get set up</h2><span class="w-count" id="setup-count">0 of 4</span></div>
+            <div class="dv-bar" aria-hidden="true"><i id="setup-bar"></i></div>
+            <ol class="dv-steps" id="setup"></ol>
+          </div>
+        </div>
+
+        <div class="w-stats">
+          <div class="w-stat">
+            <span class="w-stat-ico in"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7 7 17M16 17H7V8"/></svg></span>
+            <div><small>Paid payments</small><b id="st-paid">0</b><span id="st-pending">0 pending</span></div>
+          </div>
+          <div class="w-stat">
+            <span class="w-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM20 20v-1.5a3.5 3.5 0 0 0-2.5-3.4M15.5 4.1a3.5 3.5 0 0 1 0 6.8"/></svg></span>
+            <div><small>Connected users</small><b id="st-users">0</b><span id="st-apps">0 apps</span></div>
+          </div>
+          <div class="w-stat">
+            <span class="w-stat-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h12M12 6l6 6-6 6"/></svg></span>
+            <div><small>Webhooks delivered</small><b id="st-hooks">0 of 0</b><span>last 30 days</span></div>
+          </div>
+        </div>
+
+        <div class="w-two dv-two">
+          <div class="w-card w-activity">
+            <div class="w-card-head"><h2>Recent payments</h2><a class="w-more" href="#payments">View all <i aria-hidden="true"></i></a></div>
+            <div class="w-thead dv-thead" aria-hidden="true"><span>Payment</span><span>Date</span><span>Status</span><span>Amount</span></div>
+            <ul class="w-list" id="ov-payments"></ul>
+          </div>
+          <div class="w-card w-activity">
+            <div class="w-card-head"><h2>Webhook events</h2><a class="w-more" href="#webhooks">All <i aria-hidden="true"></i></a></div>
+            <ul class="w-list dv-events" id="ov-events"></ul>
+          </div>
+        </div>
       </section>
+
+      <!-- Payments -->
+      <section class="view" data-view="payments" hidden>
+        <div class="co">
+          <form class="w-card co-main" id="pay-form">
+            <div class="co-body">
+              <div class="co-top"><span class="co-label">Amount</span><span class="co-avail" id="pay-note">Sandbox payments are paid at once</span></div>
+              <label class="co-amount"><input name="amount" inputmode="numeric" value="1800" required autocomplete="off" aria-label="Amount in NSH"><span class="co-unit">NSH</span></label>
+              <p class="co-eq" id="pay-eq">≈ $18.00 · fee 18 NSH</p>
+              <div class="co-chips">
+                <button type="button" data-nsh="500">500</button>
+                <button type="button" data-nsh="1800" class="on">1,800</button>
+                <button type="button" data-nsh="5000">5,000</button>
+                <button type="button" data-nsh="10000">10,000</button>
+              </div>
+              <div class="dv-fields">
+                <label class="field"><span>Company name buyers see</span><input class="input" name="company" required placeholder="Northwind Books" maxlength="80"></label>
+                <label class="field"><span>Your reference</span><input class="input" name="reference" placeholder="order_1042" maxlength="100"></label>
+              </div>
+              <button class="btn primary block co-pay" type="submit" data-busy="Creating…">Create payment</button>
+              <p class="msg" id="pay-msg"></p>
+              <div class="dv-result" id="pay-out" hidden></div>
+            </div>
+          </form>
+          <aside class="co-side">
+            <div class="w-card co-summary">
+              <div class="co-sum-head"><h3>How it works</h3></div>
+              <ol class="dv-how" id="pay-how"></ol>
+            </div>
+          </aside>
+        </div>
+
+        <div class="w-card w-activity dv-gap">
+          <div class="w-card-head w-tools">
+            <h2>Payments</h2>
+            <div class="w-filter" role="tablist" aria-label="Filter payments">
+              <button type="button" class="on" data-pf="all">All</button>
+              <button type="button" data-pf="paid">Paid</button>
+              <button type="button" data-pf="pending">Pending</button>
+              <button type="button" data-pf="refunded">Refunded</button>
+            </div>
+          </div>
+          <div class="w-thead dv-thead" aria-hidden="true"><span>Payment</span><span>Date</span><span>Status</span><span>Amount</span></div>
+          <ul class="w-list" id="payments"></ul>
+        </div>
+      </section>
+
+      <!-- Apps -->
+      <section class="view" data-view="apps" hidden>
+        <section class="w-card dv-card" id="dev-apps"></section>
+      </section>
+
+      <!-- API keys -->
+      <section class="view" data-view="keys" hidden>
+        <div class="dv-grid">
+          <section class="w-card dv-card">
+            <div class="w-card-head">
+              <div><h2>Secret key</h2><p class="dv-sub" id="key-note">Use it from your server only.</p></div>
+              <span class="tag" id="key-mode">Sandbox</span>
+            </div>
+            <div class="dv-body">
+              <div class="key" id="key-box"><code id="key-text">No key yet</code><button class="btn sm" type="button" id="copy-key" hidden>Copy</button></div>
+              <p class="msg" id="key-msg"></p>
+              <div class="dv-row">
+                <button class="btn primary" type="button" id="roll-key">Create key</button>
+                <button class="btn" type="button" id="key-check" hidden>Test the key</button>
+              </div>
+            </div>
+          </section>
+          <section class="w-card dv-card">
+            <div class="w-card-head"><div><h2>Base URL</h2><p class="dv-sub">Every request uses your secret key as a Bearer token.</p></div></div>
+            <div class="dv-body">
+              <div class="key"><code id="base-url"></code><button class="btn sm" type="button" data-copy-from="#base-url">Copy</button></div>
+              <ul class="dv-endpoints">
+                <li><code>POST /v1/payments</code><span>Create a payment</span></li>
+                <li><code>POST /v1/deposits</code><span>Ask a user to add funds to your app</span></li>
+                <li><code>POST /v1/refunds</code><span>Refund a paid payment</span></li>
+                <li><code>POST /v1/webhooks</code><span>Set your webhook URL</span></li>
+              </ul>
+            </div>
+          </section>
+        </div>
+        <section class="w-card dv-card dv-gap">
+          <div class="w-card-head">
+            <div><h2>Quick start</h2><p class="dv-sub">Create a payment from your server.</p></div>
+            <div class="dv-row">
+              <button class="btn sm" type="button" data-copy-from="#snippet">Copy</button>
+              <a class="btn sm" href="/docs#endpoints">All endpoints</a>
+            </div>
+          </div>
+          <div class="dv-body"><pre class="dv-code" id="snippet"></pre></div>
+        </section>
+      </section>
+
+      <!-- Webhooks -->
+      <section class="view" data-view="webhooks" hidden>
+        <section class="w-card dv-card">
+          <div class="w-card-head"><div><h2>Endpoint</h2><p class="dv-sub">We POST payment.paid, payment.refunded, deposit.succeeded, and connection events here.</p></div><span class="tag" id="hook-state">Not set</span></div>
+          <form class="dv-body" id="hook-form">
+            <div class="dv-inline">
+              <input class="input" name="url" type="url" placeholder="https://your-site.com/nuru" autocomplete="off" aria-label="Webhook URL">
+              <button class="btn primary" type="submit">Save</button>
+              <button class="btn" type="button" id="hook-test" data-hook-test>Send test event</button>
+            </div>
+            <p class="msg" id="hook-msg"></p>
+            <div class="dv-secret">
+              <span>Signing secret</span>
+              <code id="hook-secret">whsec_••••••••••••</code>
+              <button class="btn sm" type="button" id="hook-reveal">Reveal</button>
+            </div>
+            <p class="dv-sub">Every event has a <code>Nuru-Signature</code> header. Check it with this secret before trusting an event. <a class="link" href="/docs#webhooks">How to verify</a></p>
+          </form>
+        </section>
+        <div class="w-card w-activity dv-gap">
+          <div class="w-card-head"><h2>Events</h2><span class="w-count">What we sent, and what your server answered</span></div>
+          <ul class="w-list dv-events" id="events"></ul>
+        </div>
+      </section>
+    </main>
+
+    <div class="wallet w-skeleton" id="loading" aria-busy="true" aria-label="Loading business tools">
+      <div class="w-top">
+        <div class="w-card sk-card sk-balance">
+          <div class="sk" style="width:120px;height:12px"></div>
+          <div class="sk" style="width:min(260px,70%);height:48px;margin-top:16px;border-radius:12px"></div>
+          <div class="sk-row" style="margin-top:24px"><div class="sk sk-pill" style="width:140px"></div><div class="sk sk-pill" style="width:100px"></div></div>
+        </div>
+        <div class="w-card sk-card">
+          <div class="sk" style="width:90px;height:12px"></div>
+          <div class="sk" style="height:12px;margin-top:22px"></div>
+          <div class="sk" style="height:12px;margin-top:14px;width:80%"></div>
+          <div class="sk" style="height:12px;margin-top:14px;width:60%"></div>
+        </div>
+      </div>
     </div>
 
-    <section class="card" id="dev-apps"></section>
+    <footer class="app-foot">
+      <span>© 2026 Nora Shillings</span>
+      <nav><a href="/docs">Docs</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Security</a><a href="/help">Help</a></nav>
+    </footer>
+  </div>
 
-    <section class="card">
-      <div class="card-head">
-        <div><h2>Quick start</h2><p>Create a payment from your server.</p></div>
-        <a class="btn sm" href="/docs#endpoints">All endpoints</a>
-      </div>
-      <div class="card-body">
-        <pre class="code" id="snippet"></pre>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="card-head">
-        <div><h2>Create a payment</h2><p id="pay-note">Sandbox payments are paid at once so you can test.</p></div>
-      </div>
-      <form class="card-body" id="pay-form">
-        <div class="row">
-          <label class="field" style="margin-top:0"><span>Amount (NSH)</span><input class="input" name="amount" inputmode="numeric" value="1800" required></label>
-          <label class="field" style="margin-top:0"><span>Company name buyers see</span><input class="input" name="company" required placeholder="Northwind Books" maxlength="80"></label>
-          <label class="field" style="margin-top:0"><span>Your reference</span><input class="input" name="reference" placeholder="order_1042" maxlength="100"></label>
-        </div>
-        <button class="btn primary" type="submit" style="margin-top:16px">Create payment</button>
-        <p class="msg" id="pay-msg"></p>
-        <pre class="code" id="pay-out" hidden></pre>
-      </form>
-    </section>
-
-    <section class="card">
-      <div class="card-head"><div><h2>Payments</h2><p>Your latest 20.</p></div></div>
-      <ul class="list" id="payments"></ul>
-    </section>
-
-    <section class="card">
-      <div class="card-head"><div><h2>Webhook events</h2><p>What we sent, and what your server answered.</p></div></div>
-      <ul class="list" id="events"></ul>
-    </section>
-  </main>
-  <div class="loading" id="loading"><div class="spinner"></div></div>
-  <footer class="foot">
-    <a href="/docs">Docs</a>
-    <a href="/security">Security</a>
-    <a href="/privacy">Privacy</a>
-    <a href="/terms">Terms</a>
-    <a href="/help">Help</a>
-  </footer>
-  <script src="nsh.js?v=2"></script>
-  <script src="developer.js?v=10"></script>
+  <script src="nsh.js?v=8"></script>
+  <script src="developer.js?v=13"></script>
   <script src="nuru.js?v=2"></script>
-  <script src="dev-apps.js?v=5"></script>
+  <script src="dev-apps.js?v=7"></script>
 </body>
 </html>

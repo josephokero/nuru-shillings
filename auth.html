@@ -37,27 +37,7 @@
     <div><strong>Company</strong><a href="/why-nuru">Why Nora</a><a href="/about">About</a><a href="/help">Help centre</a><a href="/community">Community</a><a href="mailto:norashillings@benuru.com">Contact</a></div>
     <div class="foot-base"><span>© 2026 Nora Shillings</span><nav><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Security</a><a href="mailto:supportnorashillings@benuru.com">supportnorashillings@benuru.com</a></nav></div>
     <div class="foot-mark"><a class="foot-name" href="/">Nora Shillings</a></div></footer>
-  <script src="nsh.js?v=2"></script>
-  <script>
-    (async () => {
-      const token = location.hash.slice(1);
-      history.replaceState(null, "", "/auth");
-      const show = (text) => {
-        document.querySelector("#wait").hidden = true;
-        document.querySelector("#bad").hidden = false;
-        if (text) document.querySelector("#why").textContent = text;
-      };
-      if (!token) return show("The link is missing its code. Open it again from your email.");
-      try {
-        const r = await Nsh.api("auth/verify", { body: { token }, redirect: false });
-        if (r.created) localStorage.setItem("nsh-tour", "1");
-        const next = localStorage.getItem("nsh-next");
-        localStorage.removeItem("nsh-next");
-        location.replace(next || "/dashboard");
-      } catch (err) {
-        show(err.message);
-      }
-    })();
-  </script>
+  <script src="nsh.js?v=7"></script>
+  <script src="auth.js?v=1"></script>
 </body>
 </html>

@@ -40,7 +40,7 @@
 
   function logo(a) {
     if (a.brand?.logo) return `<span class="ap-tile ap-img"><img src="${esc(a.brand.logo)}" alt="" referrerpolicy="no-referrer" loading="lazy"></span>`;
-    if (a.brand?.color) return `<span class="ap-tile" style="background:${esc(a.brand.color)}">${esc(String(a.name).trim().charAt(0).toUpperCase())}</span>`;
+    if (/^#[0-9a-f]{6}$/i.test(a.brand?.color || "")) return `<span class="ap-tile" style="background:${esc(a.brand.color)}">${esc(String(a.name).trim().charAt(0).toUpperCase())}</span>`;
     return tile(a.name);
   }
 
@@ -51,7 +51,7 @@
           ${logo(a)}
           <div class="ap-title">
             <h3>${esc(a.name)}</h3>
-            <p>${a.domain ? `<a href="${esc(a.website)}" target="_blank" rel="noopener noreferrer">${esc(a.domain)}${ICONS.ext}</a><span>·</span>` : ""}Connected ${day(a.connected)}</p>
+            <p>${a.domain && /^https?:\/\//i.test(a.website || "") ? `<a href="${esc(a.website)}" target="_blank" rel="noopener noreferrer">${esc(a.domain)}${ICONS.ext}</a><span>·</span>` : ""}Connected ${day(a.connected)}</p>
           </div>
           <span class="ap-live"><i></i>Connected</span>
         </header>
