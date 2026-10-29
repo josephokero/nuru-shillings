@@ -59,7 +59,7 @@ Nora is payment infrastructure. It is **not** a bank, an investment, or a saving
 
 ### 1. Open a wallet (free, no password)
 
-Enter your email. Nora sends a one-time sign-in link. Opening it creates the account and signs you in. You can **add, send, and pay immediately**. Verification is only needed to **withdraw** or to take **live** business payments.
+Enter your email. Nora sends a one-time sign-in link. Opening it creates the account and signs you in. You can **add, send, pay, and withdraw** right away — identity verification is **not** required.
 
 ### 2. Hold Nora Shillings (NSH)
 
@@ -75,31 +75,31 @@ Choose PayPal, card, or M-Pesa. Each method opens its own checkout. Successful p
 
 - **Send** — to another Nora account by email (free, instant)
 - **Pay a company** — confirm at Nora checkout; the company name and amount are shown; if balance covers it, status becomes `paid`
-- **Withdraw** — after a free ID + selfie check, sell NSH back to USD and cash out to PayPal, card, or M-Pesa in your verified name (withdrawing is free)
+- **Withdraw** — sell NSH back to USD and cash out to PayPal, card, or M-Pesa (withdrawing is free; no ID check required)
 
 ### 5. Take payments as a business
 
 In **Business tools** you get:
 
 - Sandbox keys to practice without real money
-- Live keys after identity verification
+- Live keys when you are ready to take real payments
 - Hosted checkout and deposit flows
 - Signed webhooks (`payment.paid`, `payment.refunded`, and related events)
 - Connected apps for platforms that embed Nora
 
 The buyer pays exactly the amount shown. Nora does not add a fee on top for the buyer. The company pays **1% only when a payment is paid**. There is no monthly fee.
 
-### What you can do before and after verifying
+### What you can do
 
-| Action | Before verifying | After verifying |
-| --- | --- | --- |
-| Add money | Yes | Yes |
-| Send to another wallet | Yes | Yes |
-| Pay a company | Yes | Yes |
-| Withdraw | No | Yes, to accounts in your name |
-| Take live payments as a company | No | Yes |
+| Action | Available |
+| --- | --- |
+| Add money | Yes |
+| Send to another wallet | Yes |
+| Pay a company | Yes |
+| Withdraw | Yes |
+| Take live payments as a company | Yes |
 
-Verification is a short Didit check: photo of a national ID, passport, or driving licence, plus a live selfie. Free, about two minutes, once.
+Identity verification with Didit is optional and is not required to use the wallet or Business tools.
 
 ## Fees at a glance
 

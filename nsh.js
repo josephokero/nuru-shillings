@@ -103,7 +103,7 @@ const Nsh = (() => {
       <div class="side-foot">
         <div class="side-me">
           <span class="side-avatar" data-f="avatar">${avatar(me)}</span>
-          <div><b>${esc(who)}</b><span id="side-status">${me.verified ? "Verified" : "Not verified"}</span></div>
+          <div><b>${esc(who)}</b><span id="side-status">${me.verified ? "Verified" : "Ready"}</span></div>
           <button type="button" id="logout" aria-label="Log out" title="Log out">${SIDE_ICONS.out}</button>
         </div>
       </div>`;

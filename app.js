@@ -97,7 +97,7 @@
 
     $("#bal").textContent = Nsh.nsh(bal);
     $("#bal-usd").textContent = `≈ ${Nsh.usd(bal)} USD`;
-    $("#verify-note").hidden = me.verified || current !== "withdraw";
+    $("#verify-note").hidden = true;
 
     const pending = acts.filter((a) => a.status === "pending").reduce((s, a) => s + Math.abs(a.amount), 0);
     setAll("avail", (el) => { el.textContent = `${Nsh.nsh(bal)} NSH`; });
@@ -121,14 +121,16 @@
     $("#av-change").textContent = me.avatar ? "Change photo" : "Upload photo";
     $("#acc-since").textContent = me.member_since
       ? new Date(me.member_since).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "—";
-    setAll("tag", (el) => { el.textContent = me.verified ? "Verified" : "Not verified"; el.className = `tag ${me.verified ? "ok" : "warn"}`; });
-    setAll("step", (el) => el.classList.toggle("done", !!me.verified));
+    setAll("tag", (el) => {
+      el.textContent = me.verified ? "Verified" : "Open";
+      el.className = `tag ${me.verified ? "ok" : ""}`;
+    });
+    setAll("step", (el) => el.classList.toggle("done", true));
     $("#acc-name").textContent = me.name || "—";
     $("#acc-country").textContent = me.country || "—";
-    $("#panel-verify").hidden = !!me.verified;
-    renderKyc();
+    $("#panel-verify").hidden = true;
     const sideStatus = $("#side-status");
-    if (sideStatus) sideStatus.textContent = me.verified ? "Verified" : "Not verified";
+    if (sideStatus) sideStatus.textContent = me.verified ? "Verified" : "Ready";
 
     $("#recent").innerHTML = acts.length
       ? acts.slice(0, 5).map(row).join("")
@@ -235,7 +237,7 @@
     if (view === "verify") view = "account";
     if (!Object.hasOwn(VIEWS, view)) view = "home";
     current = view;
-    if (me) $("#verify-note").hidden = me.verified || view !== "withdraw";
+    if (me) $("#verify-note").hidden = true;
     $$(".view").forEach((s) => { s.hidden = s.dataset.view !== view; });
     $$("[data-view]").forEach((a) => {
       if (a.classList.contains("view")) return;
@@ -483,9 +485,8 @@
     $("#wd-s-total").textContent = Nsh.usd(wAmt);
     $("#wd-s-after").textContent = wOver ? "—" : after(-wAmt);
     $("#wd-warn").hidden = !wOver;
-    const unverified = me && !me.verified;
-    $("#wd-btn").textContent = unverified ? "Verify to withdraw" : !wAmt ? "Enter an amount" : wdChecked ? `Yes, send ${Nsh.usd(wAmt)}` : `Withdraw ${Nsh.usd(wAmt)}`;
-    $("#wd-btn").disabled = unverified || !wAmt || wOver;
+    $("#wd-btn").textContent = !wAmt ? "Enter an amount" : wdChecked ? `Yes, send ${Nsh.usd(wAmt)}` : `Withdraw ${Nsh.usd(wAmt)}`;
+    $("#wd-btn").disabled = !wAmt || wOver;
     $("#dest-label").textContent = m === "PayPal" ? "PayPal email" : m === "M-Pesa" ? "M-Pesa phone number" : "Card’s last 4 digits";
     wForm.destination.placeholder = m === "PayPal" ? "you@example.com" : m === "M-Pesa" ? "+254 7XX XXX XXX" : "4242";
     fit(wForm.amount);

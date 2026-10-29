@@ -42,10 +42,7 @@
     </header>
 
     <main class="wallet" id="page" hidden>
-      <div class="w-strip verify" id="verify-note" hidden>
-        <span><b>Verify once to withdraw.</b> Adding, sending, and paying work right away. Withdrawals need a quick ID and selfie check, once. Free.</span>
-        <a class="btn sm primary" href="#account">Verify now</a>
-      </div>
+      <div class="w-strip verify" id="verify-note" hidden></div>
 
       <!-- Home -->
       <section class="view" data-view="home">
@@ -331,29 +328,23 @@
               </dl>
             </section>
 
-            <form class="w-card v-form" id="panel-verify">
-              <h2>Verify your identity</h2>
-              <p class="note">Once, free, about 2 minutes. You can add, send, and pay without it. It’s needed to withdraw.</p>
-              <ol class="kyc-how">
-                <li><b>Photo of your ID</b><span>National ID, passport, or driving licence</span></li>
-                <li><b>Quick selfie</b><span>A short live check on your phone or computer</span></li>
-                <li><b>Withdrawals unlocked</b><span>Your name and country come from the ID</span></li>
-              </ol>
+            <form class="w-card v-form" id="panel-verify" hidden>
+              <h2>Identity (optional)</h2>
+              <p class="note">Not required. You can add, send, pay, and withdraw without it.</p>
               <p class="kyc-state" id="kyc-state" hidden></p>
-              <button class="btn primary block w-submit" type="submit" id="kyc-btn" data-busy="Opening…">Verify with ID</button>
+              <button class="btn primary block w-submit" type="submit" id="kyc-btn" data-busy="Opening…" hidden>Verify with ID</button>
               <p class="msg" id="msg-verify"></p>
-              <p class="kyc-fine">Checks are done by Didit, our identity partner. We keep the result, your name, and your country. Your ID photos stay with Didit. <a href="/privacy">Privacy</a></p>
             </form>
 
             <section class="w-card v-form sec-card" id="security-root" aria-live="polite"></section>
           </div>
           <aside class="v-side">
             <div class="w-card v-info">
-              <h3>Verification</h3>
+              <h3>Account</h3>
               <ul class="w-steps">
                 <li class="done"><i></i>Email confirmed</li>
-                <li data-f="step"><i></i>ID and selfie</li>
-                <li data-f="step"><i></i>Withdrawals unlocked</li>
+                <li class="done" data-f="step"><i></i>Add, send, and pay</li>
+                <li class="done" data-f="step"><i></i>Withdrawals open</li>
               </ul>
             </div>
             <div class="w-card v-info">

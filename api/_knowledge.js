@@ -15,7 +15,8 @@ Accounts
 - Everyone lands in the wallet after signing in. Business tools (the developer dashboard with keys, webhooks, and payments) is one click away from the wallet.
 - The wallet is always real money (Live). There is no Sandbox in the wallet. Sandbox is only for developers, inside Business tools, with practice money.
 - Users must be 18 or older (or the age of majority where they live). One personal wallet per person.
-- A new wallet can add money, send, and pay right away without verifying. Before the first withdrawal, the user verifies once on the Account page: a photo of a national ID, passport, or driving licence plus a short live selfie, checked by our identity partner Didit. It takes about two minutes and is free. The verified name and country come from the ID. If a check is declined, the user can try again with clearer photos; if it is in review, withdrawals unlock as soon as it is approved. Businesses also verify before creating a live key or live payments.
+- A new wallet can add money, send, pay, and withdraw right away. Identity verification is optional and is not required for deposits, withdrawals, live keys, or live payments. Didit ID checks may still exist in older product pages but are not a gate on the account.
+
 
 Business name
 - A business does not have to be a registered company to use Nora. The user gives the business a name, Nora records that name on its own servers, and that is the only name a checkout shows. The personal name of the owner is not shown to buyers.
@@ -23,7 +24,7 @@ Business name
 Adding money, paying, withdrawing
 - Add money with PayPal, a supported card, or M-Pesa. Money added is available in the wallet immediately.
 - Pay any platform that connects the Nora API, without leaving that platform's page.
-- Sell back at 100 NSH = 1 USD and withdraw to PayPal, a supported card, or M-Pesa in the verified name. Withdrawing is free. PayPal and M-Pesa withdrawals are checked and sent by the Nora team to the PayPal email or M-Pesa number entered, and usually arrive within 1 to 8 hours (smallest 100 NSH, up to 1,000 USD a day). The withdrawal shows as Processing until it is sent, and the person gets an email with the PayPal transaction ID or M-Pesa code. Card withdrawals are paid out after a short review. Money added by card or PayPal can be withdrawn 24 hours after it arrives. If the method rejects a withdrawal, the amount returns to the wallet.
+- Sell back at 100 NSH = 1 USD and withdraw to PayPal, a supported card, or M-Pesa. Withdrawing is free and does not require ID verification. PayPal and M-Pesa withdrawals are checked and sent by the Nora team to the PayPal email or M-Pesa number entered, and usually arrive within 1 to 8 hours (smallest 100 NSH, up to 1,000 USD a day). The withdrawal shows as Processing until it is sent, and the person gets an email with the PayPal transaction ID or M-Pesa code. Card withdrawals are paid out after a short review. Money added by card or PayPal can be withdrawn 24 hours after it arrives. If the method rejects a withdrawal, the amount returns to the wallet.
 
 Fees
 - Opening an account, the wallet, the API, the sandbox, adding money, and withdrawing are free. No monthly fee.

@@ -82,7 +82,6 @@
       { done: Boolean(apps?.apps.length), title: "Create an app", text: "Let people add funds from their wallet.", href: "#apps", go: "New app" },
       { done: Boolean(t && (t.payments.paid + t.payments.pending + t.payments.refunded + t.deposits.count)), title: live() ? "Take your first payment" : "Make a test payment", text: live() ? "Share a checkout link with a buyer." : "It is paid at once in Sandbox.", href: "#payments", go: "Create" },
     ];
-    if (live() && !me.verified) steps.unshift({ done: false, title: "Verify your identity", text: "Needed for the live key and live payments.", href: "/dashboard#account", go: "Verify" });
     const done = steps.filter((s) => s.done).length;
     $("#setup-count").textContent = done === steps.length ? "All set" : `${done} of ${steps.length}`;
     $("#setup-bar").style.width = `${Math.round((done / steps.length) * 100)}%`;
@@ -139,7 +138,6 @@
 
   function renderKey() {
     const m = mode();
-    const locked = live() && !me.verified;
     const k = me.keys[m];
     $("#key-mode").textContent = live() ? "Live" : "Sandbox";
     $("#key-mode").className = `tag ${live() ? "ok" : "warn"}`;
@@ -153,11 +151,11 @@
       $("#key-text").textContent = `nsh_${m}_••••••••••••${k.last4}`;
       $("#key-note").textContent = `Created ${Nsh.when(k.created)}. Use it from your server only.`;
     } else {
-      $("#key-text").textContent = locked ? "Verify to unlock" : "No key yet";
+      $("#key-text").textContent = "No key yet";
       $("#key-note").textContent = "Use it from your server only.";
     }
     $("#roll-key").textContent = k || freshKey[m] ? "Replace key" : "Create key";
-    $("#roll-key").disabled = locked;
+    $("#roll-key").disabled = false;
     $("#base-url").textContent = `${BASE}/v1`;
     const key = freshKey[m] || `nsh_${m}_your_secret_key`;
     $("#snippet").innerHTML = `curl ${BASE}/v1/payments \\
@@ -179,7 +177,7 @@
 
   function render() {
     $("#sandbox-note").hidden = live();
-    $("#verify-note").hidden = !live() || me.verified;
+    $("#verify-note").hidden = true;
     $$(".modes button").forEach((b) => b.classList.toggle("on", b.dataset.mode === mode()));
     renderOverview();
     renderPayments();

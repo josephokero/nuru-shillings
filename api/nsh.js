@@ -13,7 +13,7 @@ import {
 import { appsHandler, v1Connections, v1Deposits } from "./_apps.js";
 import { adminHandler, adminPage, isAdmin, notifyWithdrawal } from "./_admin.js";
 import { kycReady, startKyc, syncKyc, kycWebhook, KYC_DONE } from "./_kyc.js";
-import { securityHandler, finishLogin, guardMoneyOut, requireStepUp, requireMfaSetup, hasMfa } from "./_security.js";
+import { securityHandler, finishLogin, guardMoneyOut, requireStepUp, hasMfa } from "./_security.js";
 
 const AVATAR_DIR = "nuru-shillings/avatars";
 const AVATAR_NAME = /^[A-Za-z0-9_-]{20,40}\.(jpg|png|webp)$/;
@@ -62,7 +62,6 @@ async function keyUser(req) {
   const [row] = await sql`SELECT k.mode, u.* FROM api_keys k JOIN users u ON u.id = k.user_id
     WHERE k.key_hash = ${sha(key)} AND k.revoked_at IS NULL`;
   if (!row) fail(401, "This key is not valid or was replaced.");
-  if (row.mode === "live" && !row.verified_at) fail(403, "Verify the account before using the live key.");
   return row;
 }
 
@@ -265,8 +264,7 @@ async function addMoney(req, res) {
   if (!Number.isInteger(usd) || usd < 1 || usd > 10000) fail(400, "Enter a whole amount from 1 to 10,000 USD.");
   const method = METHODS.has(b.method) ? b.method : fail(400, "Choose PayPal, Card, or M-Pesa.");
   if (mode === "live") {
-    if (!user.verified_at) fail(403, "Verify your identity before adding live money.");
-    fail(503, "Live top-ups through PayPal, card, and M-Pesa are not switched on yet. Your live balance can still receive payments and transfers.");
+    fail(503, "Use Add money with PayPal, card, or M-Pesa for Live. Instant sandbox top-ups stay in Sandbox.");
   }
   const amount = usd * 100;
   const sql = db();
@@ -314,8 +312,6 @@ async function withdraw(req, res) {
   const destination = String(b.destination || "").trim().slice(0, 120);
   if (!amount) fail(400, "Enter an amount in NSH.");
   if (destination.length < 4) fail(400, `Enter your ${method === "M-Pesa" ? "M-Pesa phone number" : method === "PayPal" ? "PayPal email" : "card's last 4 digits"}.`);
-  if (mode === "live" && !user.verified_at) fail(403, "Verify your identity before withdrawing. It’s free and done once.");
-  if (mode === "live") requireMfaSetup(user, "withdrawing");
   guardMoneyOut(user, mode);
   if (mode === "live") {
     const w = await requestWithdrawal(user, method, amount, destination);
@@ -507,7 +503,6 @@ async function rollKey(req, res) {
   const user = await needUser(req);
   const b = await body(req);
   const mode = isMode(b.mode) ? b.mode : fail(400, "Choose Sandbox or Live.");
-  if (mode === "live" && !user.verified_at) fail(403, "Verify your identity to get a live key.");
   if (mode === "live") requireStepUp(user);
   const key = `nsh_${mode}_${secret(24)}`;
   const sql = db();
@@ -602,7 +597,6 @@ async function devPayment(req, res) {
   const user = await needUser(req);
   const b = await body(req);
   const mode = isMode(b.mode) ? b.mode : fail(400, "Choose Sandbox or Live.");
-  if (mode === "live" && !user.verified_at) fail(403, "Verify your identity first.");
   send(res, 200, publicPayment(await createPayment(user, mode, b)));
 }
 
